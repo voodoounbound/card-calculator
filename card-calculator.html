@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Card Calculator</title>
+</head>
+<body>
+  <h2>Card Deficit Calculator</h2>
+
+  <label>Current Level:</label>
+  <input id="currentLevel" type="number" min="1" max="18"><br><br>
+
+  <label>Rarity:</label>
+  <select id="rarity">
+    <option>Legendary</option>
+    <option>Epic</option>
+    <option>Rare</option>
+    <option>Common</option>
+  </select><br><br>
+
+  <label>Desired Level:</label>
+  <input id="desiredLevel" type="number" min="1" max="18"><br><br>
+
+  <button onclick="calculateCards()">Calculate</button>
+
+  <h3 id="result"></h3>
+
+  <script>
+    const cardData = {
+      Legendary: {
+        1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0,
+        9: 1, 10: 2, 11: 3, 12: 4, 13: 5, 14: 6, 15: 7, 16: 8, 17: 10, 18: 12
+      },
+      Epic: {
+        1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 1, 7: 2, 8: 3,
+        9: 4, 10: 6, 11: 8, 12: 10, 13: 13, 14: 20, 15: 25, 16: 26, 17: 27, 18: 30
+      },
+      Rare: {
+        1: 0, 2: 0, 3: 1, 4: 2, 5: 3, 6: 4, 7: 5, 8: 8,
+        9: 10, 10: 12, 11: 18, 12: 25, 13: 35, 14: 50, 15: 70, 16: 95, 17: 125, 18: 160
+      },
+      Common: {
+        1: 1, 2: 2, 3: 3, 4: 5, 5: 7, 6: 8, 7: 10, 8: 12,
+        9: 20, 10: 30, 11: 45, 12: 70, 13: 100, 14: 140, 15: 250, 16: 320, 17: 450, 18: 510
+      }
+    };
+
+    function calculateCards() {
+      const currentLevel = Number(document.getElementById("currentLevel").value);
+      const desiredLevel = Number(document.getElementById("desiredLevel").value);
+      const rarity = document.getElementById("rarity").value;
+
+      if (!currentLevel || !desiredLevel) {
+        document.getElementById("result").innerText = "Please enter both levels.";
+        return;
+      }
+
+      if (desiredLevel <= currentLevel) {
+        document.getElementById("result").innerText = "Desired level must be higher than current level.";
+        return;
+      }
+
+      let total = 0;
+
+      for (let level = currentLevel + 1; level <= desiredLevel; level++) {
+        total += cardData[rarity][level] || 0;
+      }
+
+      document.getElementById("result").innerText =
+        `You still need ${total.toLocaleString()} ${rarity} cards.`;
+    }
+  </script>
+</body>
+</html>
