@@ -1,87 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Card Calculator</title>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 500px;
-            margin: 40px auto;
-            padding: 20px;
-        }
-
-        label {
-            display: block;
-            margin-top: 15px;
-        }
-
-        input, select, button {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-        }
-
-        button {
-            margin-top: 20px;
-            cursor: pointer;
-        }
-
-        #result {
-            margin-top: 25px;
-            font-size: 24px;
-            font-weight: bold;
-        }
-    </style>
+  <title>Card Calculator</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 420px; margin: 40px auto; padding: 20px; }
+    label { display: block; margin-top: 15px; font-weight: bold; }
+    input, select, button { width: 100%; padding: 10px; margin-top: 5px; font-size: 16px; }
+    button { margin-top: 20px; cursor: pointer; }
+    #result { margin-top: 25px; font-size: 24px; font-weight: bold; }
+  </style>
 </head>
 <body>
 
-    <h1>Card Calculator</h1>
+  <h1>Card Calculator</h1>
 
-    <label>Current Level</label>
-    <input type="number" id="currentLevel">
+  <label>Current Level</label>
+  <input type="number" id="currentLevel" min="1" max="18">
 
-    <label>Category</label>
-    <select id="category">
-        <option>Legendary</option>
-        <option>Epic</option>
-        <option>Rare</option>
-        <option>Common</option>
-    </select>
+  <label>Rarity</label>
+  <select id="rarity">
+    <option>Legendary</option>
+    <option>Epic</option>
+    <option>Rare</option>
+    <option>Common</option>
+  </select>
 
-    <label>Desired Level</label>
-    <input type="number" id="desiredLevel">
+  <label>Desired Level</label>
+  <input type="number" id="desiredLevel" min="1" max="18">
 
-    <button onclick="calculate()">Calculate</button>
+  <button onclick="calculateCards()">Calculate</button>
 
-    <div id="result"></div>
+  <div id="result"></div>
 
-    <script>
-const cardData = {
-  Legendary: {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:1, 10:2, 11:3, 12:4, 13:5, 14:6, 15:7, 16:8, 17:10, 18:12},
-  Epic: {1:0, 2:0, 3:0, 4:0, 5:0, 6:1, 7:2, 8:3, 9:4, 10:6, 11:8, 12:10, 13:13, 14:20, 15:25, 16:26, 17:27, 18:30},
-  Rare: {1:0, 2:0, 3:1, 4:2, 5:3, 6:4, 7:5, 8:8, 9:10, 10:12, 11:18, 12:25, 13:35, 14:50, 15:70, 16:95, 17:125, 18:160},
-  Common: {1:1, 2:2, 3:3, 4:5, 5:7, 6:8, 7:10, 8:12, 9:20, 10:30, 11:45, 12:70, 13:100, 14:140, 15:250, 16:320, 17:450, 18:510}
-};
+  <script>
+    const cards = {
+      Legendary: {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:1, 10:2, 11:3, 12:4, 13:5, 14:6, 15:7, 16:8, 17:10, 18:12},
+      Epic:      {1:0, 2:0, 3:0, 4:0, 5:0, 6:1, 7:2, 8:3, 9:4, 10:6, 11:8, 12:10, 13:13, 14:20, 15:25, 16:26, 17:27, 18:30},
+      Rare:      {1:0, 2:0, 3:1, 4:2, 5:3, 6:4, 7:5, 8:8, 9:10, 10:12, 11:18, 12:25, 13:35, 14:50, 15:70, 16:95, 17:125, 18:160},
+      Common:    {1:1, 2:2, 3:3, 4:5, 5:7, 6:8, 7:10, 8:12, 9:20, 10:30, 11:45, 12:70, 13:100, 14:140, 15:250, 16:320, 17:450, 18:510}
+    };
 
-        function calculate() {
+    function calculateCards() {
+      const current = Number(document.getElementById("currentLevel").value);
+      const desired = Number(document.getElementById("desiredLevel").value);
+      const rarity = document.getElementById("rarity").value;
 
-            const current = Number(document.getElementById("currentLevel").value);
-            const desired = Number(document.getElementById("desiredLevel").value);
-            const category = document.getElementById("category").value;
+      if (!current || !desired) {
+        document.getElementById("result").textContent = "Enter both levels.";
+        return;
+      }
 
-            let total = 0;
+      if (desired <= current) {
+        document.getElementById("result").textContent = "Desired level must be higher.";
+        return;
+      }
 
-            for (let level = current + 1; level <= desired; level++) {
-                total += cardRequirements[category][level] || 0;
-            }
+      let total = 0;
 
-            document.getElementById("result").textContent =
-                "Cards Needed: " + total.toLocaleString();
-        }
+      for (let level = current + 1; level <= desired; level++) {
+        total += cards[rarity][level];
+      }
 
-    </script>
+      document.getElementById("result").textContent =
+        "Cards Needed: " + total.toLocaleString();
+    }
+  </script>
 
 </body>
 </html>
