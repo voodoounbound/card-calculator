@@ -1,43 +1,113 @@
-<h2>Card Calculator</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Card Calculator</title>
 
-<label>Current Level:</label>
-<input id="current" type="number"><br><br>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 20px;
+        }
 
-<label>Category:</label>
-<select id="category">
-  <option>Legendary</option>
-  <option>Epic</option>
-  <option>Rare</option>
-  <option>Common</option>
-</select><br><br>
+        label {
+            display: block;
+            margin-top: 15px;
+        }
 
-<label>Desired Level:</label>
-<input id="desired" type="number"><br><br>
+        input, select, button {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
 
-<button onclick="calculate()">Calculate</button>
+        button {
+            margin-top: 20px;
+            cursor: pointer;
+        }
 
-<h3 id="result"></h3>
+        #result {
+            margin-top: 25px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
 
-<script>
-const cardTable = {
-  Legendary: {2:1,3:1,4:2,5:2,6:3,7:4,8:6,9:8,10:12,11:16,12:25,13:35,14:50,15:70,16:100,17:150,18:200,19:300,20:450},
-  Epic:      {2:2,3:4,4:6,5:8,6:12,7:16,8:25,9:35,10:50,11:70,12:100,13:150,14:200,15:300,16:450,17:600,18:800,19:1000,20:1200},
-  Rare:      {2:4,3:8,4:12,5:20,6:30,7:40,8:60,9:80,10:120,11:180,12:250,13:350,14:500,15:700,16:1000,17:1500,18:2000,19:3000,20:4500},
-  Common:    {2:8,3:20,4:30,5:50,6:80,7:120,8:180,9:250,10:350,11:500,12:700,13:1000,14:1500,15:2000,16:3000,17:4500,18:6000,19:8000,20:10000}
-};
+    <h1>Card Calculator</h1>
 
-function calculate() {
-  const current = Number(document.getElementById("current").value);
-  const desired = Number(document.getElementById("desired").value);
-  const category = document.getElementById("category").value;
+    <label>Current Level</label>
+    <input type="number" id="currentLevel">
 
-  let total = 0;
+    <label>Category</label>
+    <select id="category">
+        <option>Legendary</option>
+        <option>Epic</option>
+        <option>Rare</option>
+        <option>Common</option>
+    </select>
 
-  for (let level = current + 1; level <= desired; level++) {
-    total += cardTable[category][level] || 0;
-  }
+    <label>Desired Level</label>
+    <input type="number" id="desiredLevel">
 
-  document.getElementById("result").innerText =
-    `You still need ${total.toLocaleString()} ${category} cards.`;
-}
-</script>
+    <button onclick="calculate()">Calculate</button>
+
+    <div id="result"></div>
+
+    <script>
+
+        const cardRequirements = {
+
+            Legendary: {
+                2: 1,
+                3: 1,
+                4: 2,
+                5: 2
+            },
+
+            Epic: {
+                2: 2,
+                3: 4,
+                4: 6,
+                5: 8
+            },
+
+            Rare: {
+                2: 4,
+                3: 8,
+                4: 12,
+                5: 20
+            },
+
+            Common: {
+                2: 8,
+                3: 20,
+                4: 30,
+                5: 50
+            }
+
+        };
+
+        function calculate() {
+
+            const current = Number(document.getElementById("currentLevel").value);
+            const desired = Number(document.getElementById("desiredLevel").value);
+            const category = document.getElementById("category").value;
+
+            let total = 0;
+
+            for (let level = current + 1; level <= desired; level++) {
+                total += cardRequirements[category][level] || 0;
+            }
+
+            document.getElementById("result").textContent =
+                "Cards Needed: " + total.toLocaleString();
+        }
+
+    </script>
+
+</body>
+</html>
