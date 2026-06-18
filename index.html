@@ -6,26 +6,9 @@
 <title>Harry Potter Card Calculator</title>
 
 <style>
-.brand-hero {
-    display: block;
-    width: 100%;
-    max-width: 100%;
-    margin: 0 auto 24px auto;
-
-    border-radius: 16px;
-    border: 2px solid rgba(212,175,55,.75);
-
-    opacity: 1;
-    filter: none;
-    mix-blend-mode: normal;
-
-    box-shadow:
-        0 0 14px rgba(212,175,55,.35),
-        0 0 35px rgba(120,160,255,.18);
-}
-    @font-face {
-    font-family: "Lumos";
-    src: url("./LUMOS.TTF") format("truetype");
+@font-face {
+    font-family: "PARSELTO";
+    src: url("./PARSELTO.TTF") format("truetype");
 }
 
 @font-face {
@@ -86,8 +69,8 @@ h1 {
     font-family: "Parselto", Georgia, serif;
 }
 
-.title-lumos {
-    font-family: "Lumos", Georgia, serif;
+.title-PARSELTO {
+    font-family: "PARSELTO", Georgia, serif;
     font-size: 4.9rem;
 }
 
@@ -100,8 +83,8 @@ h1 {
     letter-spacing: 1px;
 }
 
-.subtitle .lumos {
-    font-family: "Lumos", Georgia, serif;
+.subtitle .PARSELTO {
+    font-family: "PARSELTO", Georgia, serif;
 }
 
 .subtitle .parselto {
@@ -184,8 +167,8 @@ select:focus {
     font-family: "Parselto", Georgia, serif;
 }
 
-.calculate-button .lumos {
-    font-family: "Lumos", Georgia, serif;
+.calculate-button .PARSELTO {
+    font-family: "PARSELTO", Georgia, serif;
 }
 
 .calculate-button:hover {
@@ -219,7 +202,7 @@ select:focus {
     text-align: center;
     font-size: 1.3rem;
     color: #9f9270;
-    font-family: "Lumos", Georgia, serif;
+    font-family: "PARSELTO", Georgia, serif;
 }
 
 /* Summary Panel */
@@ -250,8 +233,8 @@ select:focus {
     font-family: "Parselto", Georgia, serif;
 }
 
-.summary-panel h2 .lumos {
-    font-family: "Lumos", Georgia, serif;
+.summary-panel h2 .PARSELTO {
+    font-family: "PARSELTO", Georgia, serif;
 }
 
 .summary-empty {
@@ -268,7 +251,7 @@ select:focus {
 }
 
 .card-group-title {
-    font-family: "Lumos", Georgia, serif;
+    font-family: "PARSELTO", Georgia, serif;
     color: #d4af37;
     font-size: 1.2rem;
     margin-bottom: 8px;
@@ -316,7 +299,7 @@ select:focus {
     font-size: 1.15rem;
     border-radius: 8px;
     cursor: pointer;
-    font-family: "Lumos", Georgia, serif;
+    font-family: "PARSELTO", Georgia, serif;
 }
 
 .clear-button:hover {
@@ -338,7 +321,7 @@ select:focus {
         font-size: 3.6rem;
     }
 
-    .title-lumos {
+    .title-PARSELTO {
         font-size: 4rem;
     }
 }
@@ -349,14 +332,15 @@ select:focus {
 
 <div class="page">
 
-<div class="calculator">
+    <div class="calculator">
 
-    <img src="./VoodooUnbound.png" alt="Voodoo Unbound" class="brand-hero">
-
-    <h1>
+        <h1>
+            <span class="title-main title-parselto">Card</span>
+            <span class="title-main title-PARSELTO">Calculator</span>
+        </h1>
 
         <div class="subtitle">
-            <span class="lumos">Harry Potter</span>
+            <span class="PARSELTO">Harry Potter</span>
             <span>:</span>
             <span class="parselto">Magic Awakened</span>
         </div>
@@ -412,7 +396,7 @@ select:focus {
 
         <button class="calculate-button" onclick="calculateCards()">
             <span class="parselto">Cast</span>
-            <span class="lumos">Calculation</span>
+            <span class="PARSELTO">Calculation</span>
         </button>
 
         <div id="result"></div>
@@ -426,7 +410,7 @@ select:focus {
     <aside class="summary-panel">
         <h2>
             <span class="parselto">Calculation</span>
-            <span class="lumos">Summary</span>
+            <span class="PARSELTO">Summary</span>
         </h2>
 
         <div id="summaryList" class="summary-empty">
