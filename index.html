@@ -283,10 +283,10 @@ select:focus {
 }
 
 .summary-panel h2 {
-    margin: 0 0 3px 0;
+    margin: 0 0 8px 0;
     text-align: center;
     color: #d4af37;
-    font-family: 'Witches Magic', sans-serif;
+    font-family: 'Hikaya Mirage', sans-serif;
     font-size: 1.65rem;
     letter-spacing: 1px;
 }
@@ -300,26 +300,42 @@ select:focus {
 }
 
 .card-group {
-    margin-top: 9px;
-    padding-top: 7px;
+    margin-top: 12px;
+    padding-top: 8px;
     border-top: 1px solid rgba(212,175,55,.35);
 }
 
 .card-group-title {
-    font-family: 'Mendalion', sans-serif;
+    font-family: 'Hikaya Mirage', sans-serif;
     color: #d4af37;
     font-size: 1.25rem;
-    margin-bottom: 6px;
+    margin-bottom: 7px;
 }
 
-.summary-card {
-    margin-top: 6px;
-    padding: 7px 8px;
+/* Horizontal calculation history row */
+.summary-history-row {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 6px;
     border: 1px solid rgba(212,175,55,.45);
     border-radius: 7px;
-    background: rgba(37, 37, 66, 0.82);
-    font-size: .74rem;
-    line-height: 1.28;
+    background: rgba(37, 37, 66, 0.65);
+    padding: 8px;
+}
+
+/* Each historical calculation card */
+.summary-card {
+    flex: 0 0 120px;
+    min-width: 120px;
+    padding: 6px 7px;
+    border-right: 1px solid rgba(212,175,55,.35);
+    font-size: .68rem;
+    line-height: 1.22;
+}
+
+.summary-card:last-child {
+    border-right: none;
 }
 
 .summary-card strong {
@@ -327,7 +343,7 @@ select:focus {
 }
 
 .summary-final {
-    font-size: .84rem;
+    font-size: .74rem;
     color: #d4af37;
     font-weight: bold;
     margin-bottom: 3px;
@@ -335,12 +351,12 @@ select:focus {
 
 .summary-meta {
     color: #f4e7c5;
-    margin-bottom: 3px;
+    margin-bottom: 2px;
 }
 
 .summary-deductions {
     color: #c8b98f;
-    font-size: .7rem;
+    font-size: .65rem;
     margin-top: 3px;
 }
 
@@ -354,7 +370,7 @@ select:focus {
     font-size: 1.05rem;
     border-radius: 4px;
     cursor: pointer;
-    font-family: 'Mendalion', sans-serif;
+    font-family: 'Hikaya Mirage', sans-serif;
 }
 
 .clear-button:hover {
@@ -978,15 +994,15 @@ function renderSummary() {
             }
 
             if (item.tradeTokens > 0) {
-                deductionLines += `<div><strong>Trade Tokens:</strong> ${item.tradeTokens.toLocaleString()}</div>`;
+                deductionLines += `<div><strong>Trade:</strong> ${item.tradeTokens.toLocaleString()}</div>`;
             }
 
             if (item.wildCards > 0) {
-                deductionLines += `<div><strong>Wild Cards:</strong> ${item.wildCards.toLocaleString()}</div>`;
+                deductionLines += `<div><strong>Wild:</strong> ${item.wildCards.toLocaleString()}</div>`;
             }
 
             if (item.deductions > 0) {
-                deductionLines += `<div><strong>Total Deducted:</strong> ${item.deductions.toLocaleString()}</div>`;
+                deductionLines += `<div><strong>Deducted:</strong> ${item.deductions.toLocaleString()}</div>`;
             }
 
             return `
@@ -996,7 +1012,7 @@ function renderSummary() {
                     </div>
 
                     <div class="summary-meta">
-                        <strong>${item.category}</strong> | Level ${item.current} → ${item.desired}
+                        ${item.category} | Lvl ${item.current} → ${item.desired}
                     </div>
 
                     <div>
@@ -1015,7 +1031,9 @@ function renderSummary() {
         return `
             <div class="card-group">
                 <div class="card-group-title">${cardName}</div>
-                ${cardsHtml}
+                <div class="summary-history-row">
+                    ${cardsHtml}
+                </div>
             </div>
         `;
     }).join("");
