@@ -7,17 +7,9 @@
 
 <style>
 @font-face {
-    font-family: "LUMOS";
-    src:
-        url("./LUMOS.TTF") format("truetype"),
-        url("./LUMOS.TTF") format("truetype");
-}
-
-@font-face {
-    font-family: "LUMOS";
-    src:
-        url("./LUMOS.TTF") format("truetype"),
-        url("./LUMOS.TTF") format("truetype");
+    font-family: "Lumos";
+    src: url("./LUMOS.TTF") format("truetype");
+    font-display: swap;
 }
 
 * {
@@ -61,6 +53,7 @@ h1 {
     margin: 0;
     text-align: center;
     color: #d4af37;
+    font-family: "Lumos", Georgia, serif;
     text-shadow:
         0 0 5px rgba(212,175,55,.75),
         0 0 16px rgba(212,175,55,.35);
@@ -68,18 +61,9 @@ h1 {
 
 .title-main {
     display: block;
-    font-size: 3.45rem;
+    font-size: 3.55rem;
     line-height: .82;
     letter-spacing: 1px;
-}
-
-.title-LUMOS {
-    font-family: "LUMOS", Georgia, serif;
-}
-
-.title-LUMOS {
-    font-family: "LUMOS", Georgia, serif;
-    font-size: 3.75rem;
 }
 
 .subtitle {
@@ -87,16 +71,9 @@ h1 {
     margin-top: 8px;
     margin-bottom: 22px;
     color: #c8b98f;
+    font-family: Georgia, serif;
     font-size: .95rem;
     letter-spacing: .5px;
-}
-
-.subtitle .LUMOS {
-    font-family: "LUMOS", Georgia, serif;
-}
-
-.subtitle .LUMOS {
-    font-family: "LUMOS", Georgia, serif;
 }
 
 label {
@@ -121,6 +98,7 @@ select {
     border: 1px solid #d4af37;
     background: #252542;
     color: #f4e7c5;
+    font-family: Georgia, serif;
     font-size: .78rem;
 }
 
@@ -231,16 +209,9 @@ select:focus {
     background: #d4af37;
     color: #111;
     transition: .25s;
-    font-size: 1.02rem;
+    font-family: "Lumos", Georgia, serif;
+    font-size: 1.05rem;
     letter-spacing: .5px;
-}
-
-.calculate-button .LUMOS {
-    font-family: "LUMOS", Georgia, serif;
-}
-
-.calculate-button .LUMOS {
-    font-family: "LUMOS", Georgia, serif;
 }
 
 .calculate-button:hover {
@@ -274,7 +245,7 @@ select:focus {
     text-align: center;
     font-size: .95rem;
     color: #9f9270;
-    font-family: "LUMOS", Georgia, serif;
+    font-family: "Lumos", Georgia, serif;
 }
 
 /* Summary Panel */
@@ -296,16 +267,9 @@ select:focus {
     margin: 0 0 3px 0;
     text-align: center;
     color: #d4af37;
+    font-family: "Lumos", Georgia, serif;
     font-size: 1.25rem;
     letter-spacing: 1px;
-}
-
-.summary-panel h2 .LUMOS {
-    font-family: "LUMOS", Georgia, serif;
-}
-
-.summary-panel h2 .LUMOS {
-    font-family: "LUMOS", Georgia, serif;
 }
 
 .summary-empty {
@@ -323,7 +287,7 @@ select:focus {
 }
 
 .card-group-title {
-    font-family: "LUMOS", Georgia, serif;
+    font-family: "Lumos", Georgia, serif;
     color: #d4af37;
     font-size: 1rem;
     margin-bottom: 6px;
@@ -371,7 +335,7 @@ select:focus {
     font-size: .82rem;
     border-radius: 4px;
     cursor: pointer;
-    font-family: "LUMOS", Georgia, serif;
+    font-family: "Lumos", Georgia, serif;
 }
 
 .clear-button:hover {
@@ -410,10 +374,6 @@ select:focus {
     .title-main {
         font-size: 3rem;
     }
-
-    .title-LUMOS {
-        font-size: 3.25rem;
-    }
 }
 </style>
 </head>
@@ -425,14 +385,12 @@ select:focus {
     <div class="calculator">
 
         <h1>
-            <span class="title-main title-LUMOS">Card</span>
-            <span class="title-main title-LUMOS">Calculator</span>
+            <span class="title-main">Card</span>
+            <span class="title-main">Calculator</span>
         </h1>
 
         <div class="subtitle">
-            <span class="LUMOS">Harry Potter</span>
-            <span>:</span>
-            <span class="LUMOS">Magic Awakened</span>
+            Harry Potter : Magic Awakened
         </div>
 
         <label for="cardName">Card</label>
@@ -493,8 +451,7 @@ select:focus {
         </div>
 
         <button class="calculate-button" onclick="calculateCards()">
-            <span class="LUMOS">Cast</span>
-            <span class="LUMOS">Calculation</span>
+            Cast Calculation
         </button>
 
         <div id="result"></div>
@@ -506,10 +463,7 @@ select:focus {
     </div>
 
     <aside class="summary-panel">
-        <h2>
-            <span class="LUMOS">Calculation</span>
-            <span class="LUMOS">Summary</span>
-        </h2>
+        <h2>Calculation Summary</h2>
 
         <div id="summaryList" class="summary-empty">
             No calculations yet.
