@@ -965,10 +965,23 @@ function clearField(fieldId) {
     if (fieldId === "cardName") {
         document.getElementById("category").value = "";
         document.getElementById("currentLevel").value = "";
+        document.getElementById("desiredLevel").value = "";
         renderCardSuggestions();
         return;
     }
 
+    if (fieldId === "category") {
+        document.getElementById("currentLevel").value = "";
+        document.getElementById("desiredLevel").value = "";
+        renderCardSuggestions();
+        return;
+    }
+
+    if (fieldId === "currentLevel") {
+        document.getElementById("desiredLevel").value = "";
+        return;
+    }
+}
     if (fieldId === "category") {
         document.getElementById("currentLevel").value = "";
         renderCardSuggestions();
@@ -1039,6 +1052,27 @@ function autoFillCurrentLevel() {
 
     if (startingLevel !== "") {
         currentLevel.value = startingLevel;
+        autoFillDesiredLevel();
+    }
+}
+
+function autoFillDesiredLevel() {
+    const currentLevel = document.getElementById("currentLevel");
+    const desiredLevel = document.getElementById("desiredLevel");
+
+    const current = Number(currentLevel.value);
+    const desired = Number(desiredLevel.value);
+
+    if (!current || current < 1 || current >= 18) {
+        return;
+    }
+
+    const minimumDesired = current + 1;
+
+    desiredLevel.min = minimumDesired;
+
+    if (!desired || desired <= current) {
+        desiredLevel.value = minimumDesired;
     }
 }
 function getCalculationCategory(displayCategory) {
@@ -1321,7 +1355,8 @@ function clearSummary() {
 
 document.getElementById("cardName").addEventListener("focus", renderCardSuggestions);
 document.getElementById("cardName").addEventListener("click", renderCardSuggestions);
-
+document.getElementById("currentLevel").addEventListener("input", autoFillDesiredLevel);
+document.getElementById("currentLevel").addEventListener("change", autoFillDesiredLevel);
 document.getElementById("cardName").addEventListener("input", function() {
     const cardName = document.getElementById("cardName").value.trim();
 
