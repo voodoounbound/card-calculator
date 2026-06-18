@@ -18,16 +18,19 @@ body {
     background: radial-gradient(circle at top, #1b1b2f 0%, #0f0f1a 100%);
     color: #f4e7c5;
     font-family: Georgia, serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     padding: 30px;
 }
 
-/* Main calculator card */
+.page {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(380px, 560px) minmax(320px, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
 .calculator {
     width: 100%;
-    max-width: 560px;
     background: rgba(27, 27, 47, 0.95);
     border: 3px solid #d4af37;
     border-radius: 20px;
@@ -128,48 +131,57 @@ button:hover {
     color: #9f9270;
 }
 
-/* Right-hand summary panel */
 .summary-panel {
-    position: fixed;
+    width: 100%;
+    position: sticky;
     top: 25px;
-    right: 25px;
-    width: 320px;
     max-height: calc(100vh - 50px);
     overflow-y: auto;
-
     background: rgba(15, 15, 26, 0.96);
     border: 2px solid #d4af37;
-    border-radius: 16px;
-    padding: 20px;
-
+    border-radius: 14px;
+    padding: 14px;
     box-shadow:
         0 0 12px rgba(212,175,55,.35),
         0 0 30px rgba(212,175,55,.12);
 }
 
 .summary-panel h2 {
-    margin-top: 0;
+    margin: 0 0 10px 0;
     text-align: center;
     font-family: 'Cinzel', serif;
     color: #d4af37;
-    font-size: 1.35rem;
+    font-size: 1.15rem;
 }
 
 .summary-empty {
     text-align: center;
     color: #c8b98f;
     font-style: italic;
+    font-size: .85rem;
+}
+
+.card-group {
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(212,175,55,.35);
+}
+
+.card-group-title {
+    font-family: 'Cinzel', serif;
+    color: #d4af37;
     font-size: .95rem;
+    margin-bottom: 8px;
 }
 
 .summary-card {
-    margin-top: 14px;
-    padding: 14px;
-    border: 1px solid rgba(212,175,55,.55);
-    border-radius: 12px;
-    background: rgba(37, 37, 66, 0.85);
-    font-size: .95rem;
-    line-height: 1.5;
+    margin-top: 7px;
+    padding: 8px 9px;
+    border: 1px solid rgba(212,175,55,.45);
+    border-radius: 9px;
+    background: rgba(37, 37, 66, 0.82);
+    font-size: .8rem;
+    line-height: 1.35;
 }
 
 .summary-card strong {
@@ -177,40 +189,44 @@ button:hover {
 }
 
 .summary-final {
-    font-size: 1.2rem;
+    font-size: .92rem;
     color: #d4af37;
     font-weight: bold;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
+}
+
+.summary-meta {
+    color: #f4e7c5;
+    margin-bottom: 3px;
+}
+
+.summary-deductions {
+    color: #c8b98f;
+    font-size: .76rem;
+    margin-top: 4px;
 }
 
 .clear-button {
     background: transparent;
     color: #d4af37;
     border: 1px solid #d4af37;
-    margin-top: 15px;
+    margin-top: 12px;
+    padding: 9px;
+    font-size: .85rem;
 }
 
 .clear-button:hover {
     background: rgba(212,175,55,.12);
 }
 
-/* Mobile layout */
 @media (max-width: 1050px) {
-    body {
-        align-items: flex-start;
-        padding-bottom: 30px;
+    .page {
+        grid-template-columns: 1fr;
     }
 
     .summary-panel {
         position: static;
-        width: 100%;
-        max-width: 560px;
         max-height: none;
-        margin-top: 25px;
-    }
-
-    body {
-        flex-direction: column;
     }
 }
 </style>
@@ -218,58 +234,208 @@ button:hover {
 
 <body>
 
-<div class="calculator">
+<div class="page">
 
-    <h1>Card Calculator</h1>
+    <div class="calculator">
 
-    <div class="subtitle">
-        Harry Potter: Magic Awakened
+        <h1>Card Calculator</h1>
+
+        <div class="subtitle">
+            Harry Potter: Magic Awakened
+        </div>
+
+        <label for="cardName">Card</label>
+        <input type="text" id="cardName" list="cardOptions" placeholder="Start typing a card name...">
+        <datalist id="cardOptions"></datalist>
+
+        <label for="currentLevel">Current Level</label>
+        <input type="number" id="currentLevel" min="1" max="18">
+
+        <label for="category">Rarity</label>
+        <select id="category">
+            <option>Legendary</option>
+            <option>Epic</option>
+            <option>Rare</option>
+            <option>Common</option>
+        </select>
+
+        <label for="desiredLevel">Desired Level</label>
+        <input type="number" id="desiredLevel" min="1" max="18">
+
+        <label for="ownedCards">Owned</label>
+        <input type="number" id="ownedCards" min="0" value="0">
+
+        <label for="tradeTokens">Trade Tokens</label>
+        <input type="number" id="tradeTokens" min="0" value="0">
+
+        <label for="wildCards">Wild Cards</label>
+        <input type="number" id="wildCards" min="0" value="0">
+
+        <button onclick="calculateCards()">
+            Cast Calculation
+        </button>
+
+        <div id="result"></div>
+
+        <div class="footer">
+            Mischief Managed ✨
+        </div>
+
     </div>
 
-    <label for="currentLevel">Current Level</label>
-    <input type="number" id="currentLevel" min="1" max="18">
-
-    <label for="category">Rarity</label>
-    <select id="category">
-        <option>Legendary</option>
-        <option>Epic</option>
-        <option>Rare</option>
-        <option>Common</option>
-    </select>
-
-    <label for="desiredLevel">Desired Level</label>
-    <input type="number" id="desiredLevel" min="1" max="18">
-
-    <label for="ownedCards">Owned</label>
-    <input type="number" id="ownedCards" min="0" value="0">
-
-    <label for="tradeTokens">Trade Tokens</label>
-    <input type="number" id="tradeTokens" min="0" value="0">
-
-    <label for="wildCards">Wild Cards</label>
-    <input type="number" id="wildCards" min="0" value="0">
-
-    <button onclick="calculateCards()">
-        Cast Calculation
-    </button>
-
-    <div id="result"></div>
-
-    <div class="footer">
-        Mischief Managed ✨
-    </div>
+    <aside class="summary-panel">
+        <h2>Calculation Summary</h2>
+        <div id="summaryList" class="summary-empty">
+            No calculations yet.
+        </div>
+        <button class="clear-button" onclick="clearSummary()">Clear Summary</button>
+    </aside>
 
 </div>
 
-<aside class="summary-panel">
-    <h2>Calculation Summary</h2>
-    <div id="summaryList" class="summary-empty">
-        No calculations yet.
-    </div>
-    <button class="clear-button" onclick="clearSummary()">Clear Summary</button>
-</aside>
-
 <script>
+const cardNames = [
+    "Accio",
+    "Acromantula Venom",
+    "Aguamenti",
+    "Atmospheric Charm",
+    "Avada Kedavra",
+    "Avis",
+    "Azkaban",
+    "Bewitched Snowballs",
+    "Bludger",
+    "Broomstick",
+    "Carpe Retractum",
+    "Confringo",
+    "Confundus Charm",
+    "Crucio",
+    "Crystal Ball",
+    "Diffindo",
+    "Enchanted Popping Candy",
+    "Episkey",
+    "Essence of Dittany",
+    "Expecto Patronum",
+    "Expelliarmus",
+    "Expulso",
+    "Fanged Flyer",
+    "Felix Felicis",
+    "Flipendo",
+    "Floo Network",
+    "Glacius",
+    "Glacius Maxima",
+    "Gobstones",
+    "Group Counter-Spell",
+    "Gubraithian Fire",
+    "Headless Hunt",
+    "Hot Air Charm",
+    "Howler",
+    "Incarcerous",
+    "Incendio",
+    "Inflatus",
+    "Invisibility Cloak",
+    "Legilimency",
+    "Meteolojinx",
+    "Nebulus",
+    "Obscurus",
+    "Oppugno",
+    "Orb of Water",
+    "Petrificus Totalus",
+    "Portkey",
+    "Prior Incantato",
+    "Protego",
+    "Protego Diabolica",
+    "Protego Totalum",
+    "Regenerate",
+    "Sectumsempra",
+    "Side-Along Apparition",
+    "Stupefy",
+    "Swelling Solution",
+    "Tebo",
+    "The Standard Book of Spells",
+    "The Tales of Beedle the Bard",
+    "Thunderstorm",
+    "Time-Turner",
+    "Transfiguration",
+    "Ventus",
+    "Weasleys' Wildfire Whiz-bangs",
+    "Zouwu",
+    "Accio Snowman",
+    "Acromantula's Nest",
+    "Ashwinder",
+    "Baby Antipodean Opaleye",
+    "Baby Chinese Fireball",
+    "Baby Manticores",
+    "Blast-Ended Skrewt",
+    "Bombtastic Bomb Box",
+    "Book of Spells",
+    "Centaur",
+    "Cornish Pixies",
+    "Death Eater",
+    "Demiguise",
+    "Dessert Master",
+    "El Pointe",
+    "Erumpent",
+    "Fiendfyre",
+    "Fire Crab",
+    "Fwoopers",
+    "Giant Squid",
+    "Golden Snitch",
+    "Hinkypunk",
+    "Kelpie",
+    "Knight Bus",
+    "Matagot",
+    "Memory Vial",
+    "Mimbulus Mimbletonia",
+    "Mooncalf",
+    "Murtlap",
+    "Niffler",
+    "Norwegian Ridgeback Egg",
+    "Occamy",
+    "Pawn",
+    "Peeves",
+    "Phoenix",
+    "Piertotum Locomotor",
+    "Pranktastic Present",
+    "Scamander's Suitcase",
+    "Spiders",
+    "Stack of Monster Book of Monsters",
+    "Swooping Evil",
+    "The Monster Book of Monsters",
+    "Three-Headed Puppy",
+    "Thunderbird",
+    "Troll",
+    "Unicorn",
+    "Vanishing Cabinet",
+    "Weasley's Firework Box",
+    "Whomping Willow",
+    "Winged Catapult",
+    "Yeti",
+    "Abigail Grey",
+    "Albus Dumbledore",
+    "Cassandra Vole",
+    "Daniel Page",
+    "Dobby",
+    "Dolores Umbridge",
+    "Frey Twins",
+    "Grawp",
+    "Harry Potter",
+    "Harry Potter (Throwback)",
+    "Hermione Granger",
+    "Hermione Granger (Throwback)",
+    "Ivy Warrington",
+    "Kevin Farrell",
+    "Long Shouren",
+    "Lottie Turner",
+    "Luna Lovegood",
+    "Malfoy Gang",
+    "Minerva McGonagall",
+    "Newt Scamander",
+    "Robyn Thistlethwaite",
+    "Ron Weasley",
+    "Rubeus Hagrid",
+    "Severus Snape"
+];
+
 const cards = {
     Legendary: {
         1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:1,
@@ -294,7 +460,18 @@ const cards = {
 
 let calculationHistory = [];
 
+function populateCardDropdown() {
+    const datalist = document.getElementById("cardOptions");
+
+    cardNames.forEach(card => {
+        const option = document.createElement("option");
+        option.value = card;
+        datalist.appendChild(option);
+    });
+}
+
 function calculateCards() {
+    const cardName = document.getElementById("cardName").value.trim();
     const current = Number(document.getElementById("currentLevel").value);
     const desired = Number(document.getElementById("desiredLevel").value);
     const category = document.getElementById("category").value;
@@ -304,6 +481,16 @@ function calculateCards() {
     const wildCards = Number(document.getElementById("wildCards").value) || 0;
 
     const result = document.getElementById("result");
+
+    if (!cardName) {
+        result.textContent = "Choose or type a card name.";
+        return;
+    }
+
+    if (!cardNames.includes(cardName)) {
+        result.textContent = "Select a card from the suggested list.";
+        return;
+    }
 
     if (!current || !desired) {
         result.textContent = "Enter both levels.";
@@ -332,6 +519,7 @@ function calculateCards() {
     result.innerHTML = `
         ✨ ${finalNeed.toLocaleString()} Cards Needed ✨
         <span class="result-detail">
+            ${cardName}<br>
             Base Need: ${baseNeed.toLocaleString()}<br>
             Owned: ${ownedCards.toLocaleString()} |
             Trade Tokens: ${tradeTokens.toLocaleString()} |
@@ -341,6 +529,7 @@ function calculateCards() {
     `;
 
     addToSummary({
+        cardName,
         current,
         desired,
         category,
@@ -349,54 +538,92 @@ function calculateCards() {
         tradeTokens,
         wildCards,
         deductions,
-        finalNeed
+        finalNeed,
+        timestamp: Date.now()
     });
 }
 
 function addToSummary(entry) {
     calculationHistory.unshift(entry);
+    renderSummary();
+}
 
+function renderSummary() {
     const summaryList = document.getElementById("summaryList");
+
+    if (calculationHistory.length === 0) {
+        summaryList.className = "summary-empty";
+        summaryList.textContent = "No calculations yet.";
+        return;
+    }
+
     summaryList.className = "";
 
-    summaryList.innerHTML = calculationHistory.map((item, index) => {
-        let deductionLines = "";
+    const groupedByCard = {};
 
-        if (item.ownedCards > 0) {
-            deductionLines += `<div><strong>Owned:</strong> ${item.ownedCards.toLocaleString()}</div>`;
+    calculationHistory.forEach(item => {
+        if (!groupedByCard[item.cardName]) {
+            groupedByCard[item.cardName] = [];
         }
 
-        if (item.tradeTokens > 0) {
-            deductionLines += `<div><strong>Trade Tokens:</strong> ${item.tradeTokens.toLocaleString()}</div>`;
-        }
+        groupedByCard[item.cardName].push(item);
+    });
 
-        if (item.wildCards > 0) {
-            deductionLines += `<div><strong>Wild Cards:</strong> ${item.wildCards.toLocaleString()}</div>`;
-        }
+    const sortedCardGroups = Object.entries(groupedByCard).sort((a, b) => {
+        const latestA = Math.max(...a[1].map(item => item.timestamp));
+        const latestB = Math.max(...b[1].map(item => item.timestamp));
+        return latestB - latestA;
+    });
 
-        if (item.deductions > 0) {
-            deductionLines += `<div><strong>Total Deducted:</strong> ${item.deductions.toLocaleString()}</div>`;
-        }
+    summaryList.innerHTML = sortedCardGroups.map(([cardName, entries]) => {
+        entries.sort((a, b) => b.timestamp - a.timestamp);
+
+        const cardsHtml = entries.map((item, index) => {
+            let deductionLines = "";
+
+            if (item.ownedCards > 0) {
+                deductionLines += `<div><strong>Owned:</strong> ${item.ownedCards.toLocaleString()}</div>`;
+            }
+
+            if (item.tradeTokens > 0) {
+                deductionLines += `<div><strong>Trade Tokens:</strong> ${item.tradeTokens.toLocaleString()}</div>`;
+            }
+
+            if (item.wildCards > 0) {
+                deductionLines += `<div><strong>Wild Cards:</strong> ${item.wildCards.toLocaleString()}</div>`;
+            }
+
+            if (item.deductions > 0) {
+                deductionLines += `<div><strong>Total Deducted:</strong> ${item.deductions.toLocaleString()}</div>`;
+            }
+
+            return `
+                <div class="summary-card">
+                    <div class="summary-final">
+                        ${index === 0 ? "Latest: " : ""}${item.finalNeed.toLocaleString()} Needed
+                    </div>
+
+                    <div class="summary-meta">
+                        <strong>${item.category}</strong> | Level ${item.current} → ${item.desired}
+                    </div>
+
+                    <div>
+                        <strong>Base:</strong> ${item.baseNeed.toLocaleString()}
+                    </div>
+
+                    ${deductionLines ? `
+                        <div class="summary-deductions">
+                            ${deductionLines}
+                        </div>
+                    ` : ""}
+                </div>
+            `;
+        }).join("");
 
         return `
-            <div class="summary-card">
-                <div class="summary-final">
-                    ${index === 0 ? "Latest: " : ""}${item.finalNeed.toLocaleString()} Needed
-                </div>
-
-                <div class="summary-meta">
-                    <strong>${item.category}</strong> | Level ${item.current} → ${item.desired}
-                </div>
-
-                <div>
-                    <strong>Base:</strong> ${item.baseNeed.toLocaleString()}
-                </div>
-
-                ${deductionLines ? `
-                    <div class="summary-deductions">
-                        ${deductionLines}
-                    </div>
-                ` : ""}
+            <div class="card-group">
+                <div class="card-group-title">${cardName}</div>
+                ${cardsHtml}
             </div>
         `;
     }).join("");
@@ -404,11 +631,10 @@ function addToSummary(entry) {
 
 function clearSummary() {
     calculationHistory = [];
-
-    const summaryList = document.getElementById("summaryList");
-    summaryList.className = "summary-empty";
-    summaryList.textContent = "No calculations yet.";
+    renderSummary();
 }
+
+populateCardDropdown();
 </script>
 
 </body>
