@@ -862,10 +862,18 @@ function clearField(fieldId) {
     field.value = "";
     field.focus();
 
-   if (fieldId === "category" || fieldId === "cardName") {
-    document.getElementById("currentLevel").value = "";
-    renderCardSuggestions();
-  }
+    if (fieldId === "cardName") {
+        document.getElementById("category").value = "";
+        document.getElementById("currentLevel").value = "";
+        renderCardSuggestions();
+        return;
+    }
+
+    if (fieldId === "category") {
+        document.getElementById("currentLevel").value = "";
+        renderCardSuggestions();
+        return;
+    }
 }
 
 function autoFillRarity() {
@@ -1127,7 +1135,15 @@ function clearSummary() {
 document.getElementById("cardName").addEventListener("focus", renderCardSuggestions);
 document.getElementById("cardName").addEventListener("click", renderCardSuggestions);
 document.getElementById("cardName").addEventListener("input", function() {
-    autoFillRarity();
+    const cardName = document.getElementById("cardName").value.trim();
+
+    if (cardName === "") {
+        document.getElementById("category").value = "";
+        document.getElementById("currentLevel").value = "";
+    } else {
+        autoFillRarity();
+    }
+
     renderCardSuggestions();
 });
 
