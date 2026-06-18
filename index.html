@@ -359,20 +359,47 @@ function addToSummary(entry) {
     const summaryList = document.getElementById("summaryList");
     summaryList.className = "";
 
-    summaryList.innerHTML = calculationHistory.map((item, index) => `
-        <div class="summary-card">
-            <div class="summary-final">
-                ${index === 0 ? "Latest: " : ""}${item.finalNeed.toLocaleString()} Cards Needed
+    summaryList.innerHTML = calculationHistory.map((item, index) => {
+        let deductionLines = "";
+
+        if (item.ownedCards > 0) {
+            deductionLines += `<div><strong>Owned:</strong> ${item.ownedCards.toLocaleString()}</div>`;
+        }
+
+        if (item.tradeTokens > 0) {
+            deductionLines += `<div><strong>Trade Tokens:</strong> ${item.tradeTokens.toLocaleString()}</div>`;
+        }
+
+        if (item.wildCards > 0) {
+            deductionLines += `<div><strong>Wild Cards:</strong> ${item.wildCards.toLocaleString()}</div>`;
+        }
+
+        if (item.deductions > 0) {
+            deductionLines += `<div><strong>Total Deducted:</strong> ${item.deductions.toLocaleString()}</div>`;
+        }
+
+        return `
+            <div class="summary-card">
+                <div class="summary-final">
+                    ${index === 0 ? "Latest: " : ""}${item.finalNeed.toLocaleString()} Needed
+                </div>
+
+                <div class="summary-meta">
+                    <strong>${item.category}</strong> | Level ${item.current} → ${item.desired}
+                </div>
+
+                <div>
+                    <strong>Base:</strong> ${item.baseNeed.toLocaleString()}
+                </div>
+
+                ${deductionLines ? `
+                    <div class="summary-deductions">
+                        ${deductionLines}
+                    </div>
+                ` : ""}
             </div>
-            <div><strong>Rarity:</strong> ${item.category}</div>
-            <div><strong>Levels:</strong> ${item.current} → ${item.desired}</div>
-            <div><strong>Base Need:</strong> ${item.baseNeed.toLocaleString()}</div>
-            <div><strong>Owned:</strong> ${item.ownedCards.toLocaleString()}</div>
-            <div><strong>Trade Tokens:</strong> ${item.tradeTokens.toLocaleString()}</div>
-            <div><strong>Wild Cards:</strong> ${item.wildCards.toLocaleString()}</div>
-            <div><strong>Total Deducted:</strong> ${item.deductions.toLocaleString()}</div>
-        </div>
-    `).join("");
+        `;
+    }).join("");
 }
 
 function clearSummary() {
