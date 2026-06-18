@@ -458,8 +458,7 @@ select:focus {
             drop-shadow(0 0 4px rgba(212,175,55,.45))
             drop-shadow(0 0 10px rgba(212,175,55,.25));
     }
-}
-}  
+
 @media (max-width: 850px) {
     body {
         padding: 14px;
@@ -918,7 +917,13 @@ function autoFillCurrentLevel() {
         currentLevel.value = startingLevel;
     }
 }
+function getCalculationCategory(displayCategory) {
+    if (displayCategory === "Mythic" || displayCategory === "Dark") {
+        return "Legendary";
+    }
 
+    return displayCategory;
+}  
 function calculateCards() {
     const cardName = document.getElementById("cardName").value.trim();
     const current = Number(document.getElementById("currentLevel").value);
