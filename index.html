@@ -982,13 +982,6 @@ function clearField(fieldId) {
         return;
     }
 }
-    if (fieldId === "category") {
-        document.getElementById("currentLevel").value = "";
-        renderCardSuggestions();
-        return;
-    }
-}
-
 function autoFillRarity() {
     const cardName = document.getElementById("cardName").value.trim();
     const category = document.getElementById("category");
@@ -1363,6 +1356,7 @@ document.getElementById("cardName").addEventListener("input", function() {
     if (cardName === "") {
         document.getElementById("category").value = "";
         document.getElementById("currentLevel").value = "";
+        document.getElementById("desiredLevel").value = "";
     } else {
         autoFillRarity();
     }
