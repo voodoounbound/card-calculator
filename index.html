@@ -883,13 +883,10 @@ function clearField(fieldId) {
     field.value = "";
     field.focus();
 
-    if (fieldId === "category") {
-        renderCardSuggestions();
-    }
-
-    if (fieldId === "cardName") {
-        renderCardSuggestions();
-    }
+   if (fieldId === "category" || fieldId === "cardName") {
+    document.getElementById("currentLevel").value = "";
+    renderCardSuggestions();
+  }
 }
 
 function autoFillRarity() {
@@ -898,6 +895,7 @@ function autoFillRarity() {
 
     if (cardRarities[cardName]) {
         category.value = cardRarities[cardName];
+        autoFillCurrentLevel();
     }
 }
 
@@ -905,6 +903,8 @@ function filterCardsByRarity() {
     const cardInput = document.getElementById("cardName");
     const selectedRarity = document.getElementById("category").value;
     const selectedCard = cardInput.value.trim();
+
+    autoFillCurrentLevel();
 
     if (selectedCard && cardRarities[selectedCard]) {
         const allowedRarities = getAllowedRarities(selectedRarity);
@@ -920,12 +920,39 @@ function filterCardsByRarity() {
     renderCardSuggestions();
 }
 
-function getCalculationCategory(displayCategory) {
-    if (displayCategory === "Mythic" || displayCategory === "Dark") {
-        return "Legendary";
+function getStartingLevel(displayCategory) {
+    if (
+        displayCategory === "Legendary" ||
+        displayCategory === "Mythic" ||
+        displayCategory === "Dark"
+    ) {
+        return 9;
     }
 
-    return displayCategory;
+    if (displayCategory === "Epic") {
+        return 6;
+    }
+
+    if (displayCategory === "Rare") {
+        return 3;
+    }
+
+    if (displayCategory === "Common") {
+        return 1;
+    }
+
+    return "";
+}
+
+function autoFillCurrentLevel() {
+    const displayCategory = document.getElementById("category").value;
+    const currentLevel = document.getElementById("currentLevel");
+
+    const startingLevel = getStartingLevel(displayCategory);
+
+    if (startingLevel !== "") {
+        currentLevel.value = startingLevel;
+    }
 }
 
 function calculateCards() {
