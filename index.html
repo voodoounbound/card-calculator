@@ -6,7 +6,24 @@
 <title>Harry Potter Card Calculator</title>
 
 <style>
-@font-face {
+.brand-hero {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto 24px auto;
+
+    border-radius: 16px;
+    border: 2px solid rgba(212,175,55,.75);
+
+    opacity: 1;
+    filter: none;
+    mix-blend-mode: normal;
+
+    box-shadow:
+        0 0 14px rgba(212,175,55,.35),
+        0 0 35px rgba(120,160,255,.18);
+}
+    @font-face {
     font-family: "Lumos";
     src: url("./LUMOS.TTF") format("truetype");
 }
@@ -332,12 +349,11 @@ select:focus {
 
 <div class="page">
 
-    <div class="calculator">
+<div class="calculator">
 
-        <h1>
-            <span class="title-main title-parselto">Card</span>
-            <span class="title-main title-lumos">Calculator</span>
-        </h1>
+    <img src="./VoodooUnbound.png" alt="Voodoo Unbound" class="brand-hero">
+
+    <h1>
 
         <div class="subtitle">
             <span class="lumos">Harry Potter</span>
