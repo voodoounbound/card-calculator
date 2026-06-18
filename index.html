@@ -51,11 +51,27 @@ h1 {
     margin: 0;
     text-align: center;
     color: #d4af37;
-    font-family: 'Witches Magic', sans-serif;
-                                                
-    text-shadow:
-        0 0 5px rgba(212,175,55,.75),
-        0 0 16px rgba(212,175,55,.35);
+    font-family: 'Hikaya Mirage', sans-serif;
+
+    position: relative;
+    overflow: hidden;
+
+    background: linear-gradient(
+        135deg,
+        #d4af37 0%,
+        #f4d76b 45%,
+        #b88a1f 100%
+    );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+
+    filter:
+        drop-shadow(0 0 5px rgba(212,175,55,.75))
+        drop-shadow(0 0 16px rgba(212,175,55,.35));
+
+    animation: titleGlow 2.4s ease-in-out infinite;
 }
 
 .title-main {
@@ -63,6 +79,25 @@ h1 {
     font-size: 3.9rem;
     line-height: .82;
     letter-spacing: 1px;
+}
+  h1::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -80%;
+    width: 55%;
+    height: 100%;
+
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255,255,255,.45),
+        transparent
+    );
+
+    transform: skewX(-20deg);
+    animation: titleShine 3.2s ease-in-out infinite;
+    pointer-events: none;
 }
 
 .subtitle {
@@ -427,7 +462,40 @@ select:focus {
         left: 125%;
     }
 }
-  
+@keyframes titleGlow {
+    0% {
+        filter:
+            drop-shadow(0 0 4px rgba(212,175,55,.45))
+            drop-shadow(0 0 10px rgba(212,175,55,.25));
+    }
+
+    50% {
+        filter:
+            drop-shadow(0 0 8px rgba(212,175,55,.95))
+            drop-shadow(0 0 20px rgba(212,175,55,.65))
+            drop-shadow(0 0 34px rgba(212,175,55,.35));
+    }
+
+    100% {
+        filter:
+            drop-shadow(0 0 4px rgba(212,175,55,.45))
+            drop-shadow(0 0 10px rgba(212,175,55,.25));
+    }
+}
+
+@keyframes titleShine {
+    0% {
+        left: -80%;
+    }
+
+    45% {
+        left: 125%;
+    }
+
+    100% {
+        left: 125%;
+    }
+}  
 @media (max-width: 850px) {
     body {
         padding: 14px;
