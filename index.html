@@ -406,6 +406,21 @@ select:focus {
 .clear-button:hover {
     background: rgba(212,175,55,.12);
 }
+  .export-button {
+    background: linear-gradient(
+        135deg,
+        rgba(212,175,55,.2),
+        rgba(212,175,55,.08)
+    );
+    margin-top: 10px;
+}
+
+.export-button:hover {
+    background: rgba(212,175,55,.18);
+    box-shadow:
+        0 0 8px rgba(212,175,55,.45),
+        0 0 18px rgba(212,175,55,.18);
+}
 @keyframes buttonGlow {
     0% {
         box-shadow:
@@ -605,7 +620,13 @@ select:focus {
             No calculations yet.
         </div>
 
-        <button class="clear-button" onclick="clearSummary()">Clear Summary</button>
+<button class="clear-button export-button" onclick="exportResults()">
+    Export Results
+</button>
+
+<button class="clear-button" onclick="clearSummary()">
+    Clear Summary
+</button>
     </aside>
 
 </div>
@@ -1176,7 +1197,84 @@ function renderSummary() {
         `;
     }).join("");
 }
+function exportResults() {
+    if (calculationHistory.length === 0) {
+        alert("No calculation results to export yet.");
+        return;
+    }
 
+    const headers = [
+        "Date",
+        "Card",
+        "Rarity",
+        "Current Level",
+        "Desired Level",
+        "Base Need",
+        "Owned",
+        "Trade Tokens",
+        "Wild Cards",
+        "Total Deducted",
+        "Final Cards Needed"
+    ];
+
+    const rows = calculationHistory.map(item => {
+        const date = new Date(item.timestamp).toLocaleString();
+
+        return [
+            date,
+            item.cardName,
+            item.category,
+            item.current,
+            item.desired,
+            item.baseNeed,
+            item.ownedCards,
+            item.tradeTokens,
+            item.wildCards,
+            item.deductions,
+            item.finalNeed
+        ];
+    });
+
+    const csvContent = [
+        headers,
+        ...rows
+    ]
+        .map(row => row.map(escapeCSV).join(","))
+        .join("\n");
+
+    const blob = new Blob(["\uFEFF" + csvContent], {
+        type: "text/csv;charset=utf-8;"
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    const fileDate = new Date()
+        .toISOString()
+        .slice(0, 10);
+
+    link.href = url;
+    link.download = `voodoo-card-calculations-${fileDate}.csv`;
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+function escapeCSV(value) {
+    const stringValue = String(value ?? "");
+
+    if (
+        stringValue.includes(",") ||
+        stringValue.includes('"') ||
+        stringValue.includes("\n")
+    ) {
+        return `"${stringValue.replace(/"/g, '""')}"`;
+    }
+
+    return stringValue;
+}
 function clearSummary() {
     calculationHistory = [];
     renderSummary();
