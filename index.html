@@ -205,19 +205,39 @@ select:focus {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    background: #d4af37;
+
+    background: linear-gradient(
+        135deg,
+        #d4af37 0%,
+        #f4d76b 45%,
+        #b88a1f 100%
+    );
+
     color: #111;
     transition: .25s;
-    font-family: 'Witches Magic', sans-serif;
+    font-family: 'Hikaya Mirage', sans-serif;
     font-size: 1.45rem;
     letter-spacing: .5px;
+
+    box-shadow:
+        0 0 8px rgba(212,175,55,.65),
+        0 0 18px rgba(212,175,55,.35);
+
+    animation: buttonGlow 2.4s ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
 }
 
 .calculate-button:hover {
-    transform: scale(1.015);
+    transform: scale(1.025);
+
     box-shadow:
-        0 0 8px #d4af37,
-        0 0 18px #d4af37;
+        0 0 12px #d4af37,
+        0 0 28px rgba(212,175,55,.85),
+        0 0 48px rgba(212,175,55,.45);
+}
+  .calculate-button:active {
+    transform: scale(0.98);
 }
 
 #result {
@@ -340,7 +360,58 @@ select:focus {
 .clear-button:hover {
     background: rgba(212,175,55,.12);
 }
+@keyframes buttonGlow {
+    0% {
+        box-shadow:
+            0 0 6px rgba(212,175,55,.45),
+            0 0 14px rgba(212,175,55,.25);
+    }
 
+    50% {
+        box-shadow:
+            0 0 12px rgba(212,175,55,.9),
+            0 0 30px rgba(212,175,55,.55),
+            0 0 48px rgba(212,175,55,.25);
+    }
+
+    100% {
+        box-shadow:
+            0 0 6px rgba(212,175,55,.45),
+            0 0 14px rgba(212,175,55,.25);
+    }
+}
+  .calculate-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255,255,255,.45),
+        transparent
+    );
+
+    transform: skewX(-20deg);
+    animation: buttonShine 3.2s ease-in-out infinite;
+}
+  @keyframes buttonShine {
+    0% {
+        left: -75%;
+    }
+
+    45% {
+        left: 125%;
+    }
+
+    100% {
+        left: 125%;
+    }
+}
+  
 @media (max-width: 850px) {
     body {
         padding: 14px;
