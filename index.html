@@ -796,7 +796,36 @@ const cards = {
         9:30, 10:45, 11:70, 12:100, 13:140, 14:190, 15:250, 16:320, 17:410, 18:510
     }
 };
+const goldCosts = {
+    1: 0,
+    2: 100,
+    3: 150,
+    4: 200,
+    5: 300,
+    6: 500,
+    7: 750,
+    8: 1000,
+    9: 1500,
+    10: 2000,
+    11: 3000,
+    12: 5000,
+    13: 7500,
+    14: 10000,
+    15: 15000,
+    16: 20000,
+    17: 25000,
+    18: 30000
+};
 
+function calculateGoldCost(current, desired) {
+    let goldCost = 0;
+
+    for (let level = current + 1; level <= desired; level++) {
+        goldCost += goldCosts[level] || 0;
+    }
+
+    return goldCost;
+}
 let calculationHistory = [];
 let activeSuggestionIndex = -1;
 let currentCardSuggestions = [];
@@ -1065,8 +1094,10 @@ function calculateCards() {
     let baseNeed = 0;
 
     for (let level = current + 1; level <= desired; level++) {
-        baseNeed += cards[category][level] || 0;
+    baseNeed += cards[category][level] || 0;
     }
+
+    const goldCost = calculateGoldCost(current, desired);
 
     const deductions = ownedCards + tradeTokens + wildCards;
     const finalNeed = Math.max(baseNeed - deductions, 0);
@@ -1090,24 +1121,26 @@ function calculateCards() {
         <span class="result-detail">
             ${cardName}<br>
             Rarity: ${displayCategory}<br>
-            Base Need: ${baseNeed.toLocaleString()}
+            Base Need: ${baseNeed.toLocaleString()}<br>
+            Gold Cost: ${goldCost.toLocaleString()}
             ${deductions > 0 ? `<br>${deductionDetails}<br>Total Deducted: ${deductions.toLocaleString()}` : ""}
         </span>
     `;
 
     addToSummary({
-        cardName,
-        current,
-        desired,
-        category: displayCategory,
-        baseNeed,
-        ownedCards,
-        tradeTokens,
-        wildCards,
-        deductions,
-        finalNeed,
-        timestamp: Date.now()
-    });
+      cardName,
+      current,
+      desired,
+      category: displayCategory,
+      baseNeed,
+      goldCost,
+      ownedCards,
+      tradeTokens,
+      wildCards,
+      deductions,
+      finalNeed,
+      timestamp: Date.now()
+  });
 }
 
 function addToSummary(entry) {
@@ -1175,7 +1208,11 @@ function renderSummary() {
                     </div>
 
                     <div>
-                        <strong>Base:</strong> ${item.baseNeed.toLocaleString()}
+                      <strong>Base:</strong> ${item.baseNeed.toLocaleString()}
+                    </div>
+
+                    <div>
+                      <strong>Gold:</strong> ${(item.goldCost || 0).toLocaleString()}
                     </div>
 
                     ${deductionLines ? `
@@ -1210,6 +1247,7 @@ function exportResults() {
         "Current Level",
         "Desired Level",
         "Base Need",
+        "Gold Cost",
         "Owned",
         "Trade Tokens",
         "Wild Cards",
@@ -1220,19 +1258,20 @@ function exportResults() {
     const rows = calculationHistory.map(item => {
         const date = new Date(item.timestamp).toLocaleString();
 
-        return [
-            date,
-            item.cardName,
-            item.category,
-            item.current,
-            item.desired,
-            item.baseNeed,
-            item.ownedCards,
-            item.tradeTokens,
-            item.wildCards,
-            item.deductions,
-            item.finalNeed
-        ];
+     return [
+        date,
+        item.cardName,
+        item.category,
+        item.current,
+        item.desired,
+        item.baseNeed,
+        item.goldCost || 0,
+        item.ownedCards,
+        item.tradeTokens,
+        item.wildCards,
+        item.deductions,
+        item.finalNeed
+    ];
     });
 
     const csvContent = [
