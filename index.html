@@ -5,9 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Harry Potter Card Calculator</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
-
 <style>
+@font-face {
+    font-family: "Lumos";
+    src: url("./LUMOS.TTF") format("truetype");
+}
+
+@font-face {
+    font-family: "Parselto";
+    src: url("./PARSELTO.TTF") format("truetype");
+}
+
 * {
     box-sizing: border-box;
 }
@@ -29,6 +37,7 @@ body {
     align-items: start;
 }
 
+/* Calculator */
 .calculator {
     width: 100%;
     background: rgba(27, 27, 47, 0.95);
@@ -41,22 +50,45 @@ body {
 }
 
 h1 {
-    margin-top: 0;
+    margin: 0;
     text-align: center;
-    font-family: 'Cinzel', serif;
-    font-size: 3rem;
     color: #d4af37;
     text-shadow:
         0 0 5px rgba(212,175,55,.6),
         0 0 15px rgba(212,175,55,.3);
 }
 
+.title-main {
+    display: block;
+    font-size: 4.4rem;
+    line-height: .9;
+    letter-spacing: 1px;
+}
+
+.title-parselto {
+    font-family: "Parselto", Georgia, serif;
+}
+
+.title-lumos {
+    font-family: "Lumos", Georgia, serif;
+    font-size: 4.9rem;
+}
+
 .subtitle {
     text-align: center;
-    margin-top: -10px;
+    margin-top: 10px;
     margin-bottom: 30px;
     color: #c8b98f;
-    font-style: italic;
+    font-size: 1.45rem;
+    letter-spacing: 1px;
+}
+
+.subtitle .lumos {
+    font-family: "Lumos", Georgia, serif;
+}
+
+.subtitle .parselto {
+    font-family: "Parselto", Georgia, serif;
 }
 
 label {
@@ -95,7 +127,6 @@ select:focus {
 
     width: 26px;
     height: 26px;
-
     margin: 0;
     padding: 0;
 
@@ -125,12 +156,19 @@ select:focus {
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-    font-family: 'Cinzel', serif;
     background: #d4af37;
     color: #111;
     transition: .25s;
+    font-size: 1.65rem;
+    letter-spacing: 1px;
+}
+
+.calculate-button .parselto {
+    font-family: "Parselto", Georgia, serif;
+}
+
+.calculate-button .lumos {
+    font-family: "Lumos", Georgia, serif;
 }
 
 .calculate-button:hover {
@@ -162,10 +200,12 @@ select:focus {
 .footer {
     margin-top: 25px;
     text-align: center;
-    font-size: .85rem;
+    font-size: 1.3rem;
     color: #9f9270;
+    font-family: "Lumos", Georgia, serif;
 }
 
+/* Summary Panel */
 .summary-panel {
     width: 100%;
     position: sticky;
@@ -184,9 +224,17 @@ select:focus {
 .summary-panel h2 {
     margin: 0 0 10px 0;
     text-align: center;
-    font-family: 'Cinzel', serif;
     color: #d4af37;
-    font-size: 1.15rem;
+    font-size: 1.7rem;
+    letter-spacing: 1px;
+}
+
+.summary-panel h2 .parselto {
+    font-family: "Parselto", Georgia, serif;
+}
+
+.summary-panel h2 .lumos {
+    font-family: "Lumos", Georgia, serif;
 }
 
 .summary-empty {
@@ -203,9 +251,9 @@ select:focus {
 }
 
 .card-group-title {
-    font-family: 'Cinzel', serif;
+    font-family: "Lumos", Georgia, serif;
     color: #d4af37;
-    font-size: .95rem;
+    font-size: 1.2rem;
     margin-bottom: 8px;
 }
 
@@ -248,15 +296,17 @@ select:focus {
     border: 1px solid #d4af37;
     margin-top: 12px;
     padding: 9px;
-    font-size: .85rem;
+    font-size: 1.15rem;
     border-radius: 8px;
     cursor: pointer;
+    font-family: "Lumos", Georgia, serif;
 }
 
 .clear-button:hover {
     background: rgba(212,175,55,.12);
 }
 
+/* Mobile */
 @media (max-width: 1050px) {
     .page {
         grid-template-columns: 1fr;
@@ -265,6 +315,14 @@ select:focus {
     .summary-panel {
         position: static;
         max-height: none;
+    }
+
+    .title-main {
+        font-size: 3.6rem;
+    }
+
+    .title-lumos {
+        font-size: 4rem;
     }
 }
 </style>
@@ -276,10 +334,15 @@ select:focus {
 
     <div class="calculator">
 
-        <h1>Card Calculator</h1>
+        <h1>
+            <span class="title-main title-parselto">Card</span>
+            <span class="title-main title-lumos">Calculator</span>
+        </h1>
 
         <div class="subtitle">
-            Harry Potter: Magic Awakened
+            <span class="lumos">Harry Potter</span>
+            <span>:</span>
+            <span class="parselto">Magic Awakened</span>
         </div>
 
         <label for="cardName">Card</label>
@@ -332,7 +395,8 @@ select:focus {
         </div>
 
         <button class="calculate-button" onclick="calculateCards()">
-            Cast Calculation
+            <span class="parselto">Cast</span>
+            <span class="lumos">Calculation</span>
         </button>
 
         <div id="result"></div>
@@ -344,10 +408,15 @@ select:focus {
     </div>
 
     <aside class="summary-panel">
-        <h2>Calculation Summary</h2>
+        <h2>
+            <span class="parselto">Calculation</span>
+            <span class="lumos">Summary</span>
+        </h2>
+
         <div id="summaryList" class="summary-empty">
             No calculations yet.
         </div>
+
         <button class="clear-button" onclick="clearSummary()">Clear Summary</button>
     </aside>
 
@@ -587,15 +656,26 @@ function calculateCards() {
     const deductions = ownedCards + tradeTokens + wildCards;
     const finalNeed = Math.max(baseNeed - deductions, 0);
 
+    let deductionDetails = "";
+
+    if (ownedCards > 0) {
+        deductionDetails += `Owned: ${ownedCards.toLocaleString()} `;
+    }
+
+    if (tradeTokens > 0) {
+        deductionDetails += `Trade Tokens: ${tradeTokens.toLocaleString()} `;
+    }
+
+    if (wildCards > 0) {
+        deductionDetails += `Wild Cards: ${wildCards.toLocaleString()} `;
+    }
+
     result.innerHTML = `
         ✨ ${finalNeed.toLocaleString()} Cards Needed ✨
         <span class="result-detail">
             ${cardName}<br>
-            Base Need: ${baseNeed.toLocaleString()}<br>
-            ${ownedCards > 0 ? `Owned: ${ownedCards.toLocaleString()} | ` : ""}
-            ${tradeTokens > 0 ? `Trade Tokens: ${tradeTokens.toLocaleString()} | ` : ""}
-            ${wildCards > 0 ? `Wild Cards: ${wildCards.toLocaleString()}` : ""}
-            ${deductions > 0 ? `<br>Total Deducted: ${deductions.toLocaleString()}` : ""}
+            Base Need: ${baseNeed.toLocaleString()}
+            ${deductions > 0 ? `<br>${deductionDetails}<br>Total Deducted: ${deductions.toLocaleString()}` : ""}
         </span>
     `;
 
