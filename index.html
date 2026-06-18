@@ -48,13 +48,10 @@ body {
 }
 
 h1 {
-    margin: 0;
+    margin: 0 0 22px 0;
     text-align: center;
     color: #d4af37;
-    font-family: 'Witches Magic', sans-serif;
-
-    position: relative;
-    overflow: hidden;
+    font-family: 'Hikaya Mirage', sans-serif;
 
     background: linear-gradient(
         135deg,
@@ -80,33 +77,13 @@ h1 {
     line-height: 2.2;
     letter-spacing: 1px;
 }
-  h1::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -80%;
-    width: 55%;
-    height: 100%;
-
-    background: linear-gradient(
-        120deg,
-        transparent,
-        rgba(255,255,255,.45),
-        transparent
-    );
-
-    transform: skewX(-20deg);
-    animation: titleShine 3.2s ease-in-out infinite;
-    pointer-events: none;
-}
-
 .subtitle {
     text-align: center;
-    margin-top: 8px;
-    margin-bottom: 22px;
+    margin-top: 0;
+    margin-bottom: 8px;
     color: #c8b98f;
-    font-family: 'Mendalion', sans-serif;
-    font-size: 1.5rem;
+    font-family: Georgia, serif;
+    font-size: .95rem;
     letter-spacing: .5px;
 }
 
@@ -482,19 +459,6 @@ select:focus {
             drop-shadow(0 0 10px rgba(212,175,55,.25));
     }
 }
-
-@keyframes titleShine {
-    0% {
-        left: -80%;
-    }
-
-    45% {
-        left: 125%;
-    }
-
-    100% {
-        left: 125%;
-    }
 }  
 @media (max-width: 850px) {
     body {
@@ -538,14 +502,14 @@ select:focus {
 
     <div class="calculator">
 
-        <h1>
-            <span class="title-main">Card</span>
-            <span class="title-main">Calculator</span>
-        </h1>
+    <div class="subtitle">
+        Harry Potter : Magic Awakened
+    </div>
 
-        <div class="subtitle">
-            Harry Potter : Magic Awakened
-        </div>
+    <h1>
+        <span class="title-main">Card</span>
+        <span class="title-main">Calculator</span>
+    </h1>
 
         <label for="cardName">Card</label>
         <div class="field-wrap">
