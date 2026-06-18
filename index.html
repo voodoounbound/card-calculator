@@ -616,7 +616,38 @@ function clearField(fieldId) {
     }
 }
 
-function autoFillRarity() {
+function autoFillRarity() 
+    function filterCardsByRarity() {
+    const selectedRarity = document.getElementById("category").value;
+    const cardInput = document.getElementById("cardName");
+    const selectedCard = cardInput.value.trim();
+
+    populateCardDropdown(selectedRarity);
+
+    if (!selectedCard) {
+        return;
+    }
+
+    const cardRarity = cardRarities[selectedCard];
+
+    if (!cardRarity) {
+        cardInput.value = "";
+        return;
+    }
+
+    let allowedRarities = [];
+
+    if (selectedRarity === "Legendary") {
+        allowedRarities = ["Legendary", "Mythic", "Dark"];
+    } else if (selectedRarity) {
+        allowedRarities = [selectedRarity];
+    }
+
+    if (selectedRarity && !allowedRarities.includes(cardRarity)) {
+        cardInput.value = "";
+    }
+}
+{
     const cardName = document.getElementById("cardName").value.trim();
     const category = document.getElementById("category");
 
@@ -815,10 +846,34 @@ function clearSummary() {
     renderSummary();
 }
 
-populateCardDropdown();
+function populateCardDropdown(filterRarity = "") {
+    const datalist = document.getElementById("cardOptions");
+    datalist.innerHTML = "";
 
-document.getElementById("cardName").addEventListener("change", autoFillRarity);
-document.getElementById("cardName").addEventListener("input", autoFillRarity);
+    let allowedRarities = [];
+
+    if (filterRarity === "Legendary") {
+        allowedRarities = ["Legendary", "Mythic", "Dark"];
+    } else if (filterRarity) {
+        allowedRarities = [filterRarity];
+    }
+
+    const filteredCards = Object.keys(cardRarities)
+        .filter(card => {
+            if (!filterRarity) {
+                return true;
+            }
+
+            return allowedRarities.includes(cardRarities[card]);
+        })
+        .sort();
+
+    filteredCards.forEach(card => {
+        const option = document.createElement("option");
+        option.value = card;
+        datalist.appendChild(option);
+    });
+}
 </script>
 
 </body>
