@@ -207,11 +207,13 @@ select:focus {
     font-size: .82rem;
 }
 
-.autocomplete-item:hover {
-    background: rgba(212,175,55,.16);
+.autocomplete-item:hover,
+.autocomplete-item.active {
+    background: rgba(212,175,55,.22);
     color: #d4af37;
+    box-shadow: inset 0 0 8px rgba(212,175,55,.18);
 }
-
+  
 .autocomplete-rarity {
     display: block;
     margin-top: 2px;
@@ -774,7 +776,9 @@ const cards = {
 };
 
 let calculationHistory = [];
-
+let activeSuggestionIndex = -1;
+let currentCardSuggestions = [];
+  
 function getAllowedRarities(selectedRarity) {
     if (selectedRarity === "Legendary") {
         return ["Legendary", "Mythic", "Dark"];
@@ -811,6 +815,9 @@ function renderCardSuggestions() {
     const menu = document.getElementById("cardSuggestions");
     const filteredCards = getFilteredCards();
 
+    currentCardSuggestions = filteredCards;
+    activeSuggestionIndex = -1;
+
     menu.innerHTML = "";
 
     if (filteredCards.length === 0) {
@@ -822,9 +829,10 @@ function renderCardSuggestions() {
         return;
     }
 
-    filteredCards.forEach(card => {
+    filteredCards.forEach((card, index) => {
         const item = document.createElement("div");
         item.className = "autocomplete-item";
+        item.dataset.index = index;
 
         const name = document.createElement("div");
         name.textContent = card;
@@ -849,6 +857,47 @@ function renderCardSuggestions() {
 
 function hideCardSuggestions() {
     document.getElementById("cardSuggestions").classList.remove("show");
+    activeSuggestionIndex = -1;
+}
+
+function setActiveSuggestion(index) {
+    const items = document.querySelectorAll("#cardSuggestions .autocomplete-item");
+
+    if (items.length === 0) {
+        activeSuggestionIndex = -1;
+        return;
+    }
+
+    if (index < 0) {
+        index = items.length - 1;
+    }
+
+    if (index >= items.length) {
+        index = 0;
+    }
+
+    items.forEach(item => item.classList.remove("active"));
+
+    activeSuggestionIndex = index;
+    items[activeSuggestionIndex].classList.add("active");
+    items[activeSuggestionIndex].scrollIntoView({
+        block: "nearest"
+    });
+}
+
+function formIsReadyForCalculation() {
+    const cardName = document.getElementById("cardName").value.trim();
+    const category = document.getElementById("category").value;
+    const currentLevel = document.getElementById("currentLevel").value;
+    const desiredLevel = document.getElementById("desiredLevel").value;
+
+    return (
+        cardName !== "" &&
+        cardRarities[cardName] &&
+        category !== "" &&
+        currentLevel !== "" &&
+        desiredLevel !== ""
+    );
 }
 
 function chooseCard(card) {
@@ -1134,6 +1183,7 @@ function clearSummary() {
 
 document.getElementById("cardName").addEventListener("focus", renderCardSuggestions);
 document.getElementById("cardName").addEventListener("click", renderCardSuggestions);
+
 document.getElementById("cardName").addEventListener("input", function() {
     const cardName = document.getElementById("cardName").value.trim();
 
@@ -1147,8 +1197,90 @@ document.getElementById("cardName").addEventListener("input", function() {
     renderCardSuggestions();
 });
 
-document.getElementById("category").addEventListener("change", filterCardsByRarity);
+document.getElementById("cardName").addEventListener("keydown", function(event) {
+    const menu = document.getElementById("cardSuggestions");
+    const menuIsOpen = menu.classList.contains("show");
 
+    if (event.key === "ArrowDown") {
+        event.preventDefault();
+
+        if (!menuIsOpen) {
+            renderCardSuggestions();
+        }
+
+        if (currentCardSuggestions.length > 0) {
+            setActiveSuggestion(activeSuggestionIndex + 1);
+        }
+
+        return;
+    }
+
+    if (event.key === "ArrowUp") {
+        event.preventDefault();
+
+        if (!menuIsOpen) {
+            renderCardSuggestions();
+        }
+
+        if (currentCardSuggestions.length > 0) {
+            setActiveSuggestion(activeSuggestionIndex - 1);
+        }
+
+        return;
+    }
+
+    if (event.key === "Enter") {
+        if (menuIsOpen && activeSuggestionIndex >= 0) {
+            event.preventDefault();
+            chooseCard(currentCardSuggestions[activeSuggestionIndex]);
+            return;
+        }
+
+        if (formIsReadyForCalculation()) {
+            event.preventDefault();
+            calculateCards();
+        }
+
+        return;
+    }
+
+    if (event.key === "Escape") {
+        hideCardSuggestions();
+    }
+});
+
+    if (cardName === "") {
+        document.getElementById("category").value = "";
+        document.getElementById("currentLevel").value = "";
+    } else {
+        autoFillRarity();
+    }
+
+    renderCardSuggestions();
+});
+
+document.getElementById("category").addEventListener("change", filterCardsByRarity);
+document.getElementById("category").addEventListener("keydown", function(event) {
+    if (event.key === "Enter" && formIsReadyForCalculation()) {
+        event.preventDefault();
+        calculateCards();
+    }
+});
+
+[
+    "currentLevel",
+    "desiredLevel",
+    "ownedCards",
+    "tradeTokens",
+    "wildCards"
+].forEach(fieldId => {
+    document.getElementById(fieldId).addEventListener("keydown", function(event) {
+        if (event.key === "Enter" && formIsReadyForCalculation()) {
+            event.preventDefault();
+            calculateCards();
+        }
+    });
+});
 document.addEventListener("click", function(event) {
     const cardField = document.getElementById("cardName");
     const menu = document.getElementById("cardSuggestions");
