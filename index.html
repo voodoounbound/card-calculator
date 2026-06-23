@@ -1295,9 +1295,11 @@ function calculateCards() {
             ${cardName}<br>
             Rarity: ${displayCategory}<br>
             Base Need: ${baseNeed.toLocaleString()}<br>
-           <span class="gold-line">
-    ${goldIconHtml("result")} Gold Cost: ${goldCost.toLocaleString()}
-</span>
+            <span class="gold-line">
+                ${goldIconHtml("result")} Gold Cost: ${goldCost.toLocaleString()}
+            </span>
+            ${deductions > 0 ? `<br>${deductionDetails}<br>Total Deducted: ${deductions.toLocaleString()}` : ""}
+        </span>
     `;
 
     addToSummary({
@@ -1380,22 +1382,41 @@ function renderSummary() {
                         ${item.category} | Lvl ${item.current} → ${item.desired}
                     </div>
 
-<div>
-    <strong>Base:</strong> ${item.baseNeed.toLocaleString()}
-</div>
+                    <div>
+                        <strong>Base:</strong> ${item.baseNeed.toLocaleString()}
+                    </div>
 
-${deductionLines ? `
-    <div class="summary-deductions">
-        ${deductionLines}
-    </div>
-` : ""}
+                    ${deductionLines ? `
+                        <div class="summary-deductions">
+                            ${deductionLines}
+                        </div>
+                    ` : ""}
 
-<div class="summary-gold-bottom">
-    <span class="gold-line">
-        ${goldIconHtml("summary")} <strong>Gold:</strong> ${(item.goldCost || 0).toLocaleString()}
-    </span>
-</div>
+                    <div class="summary-gold-bottom">
+                        <span class="gold-line">
+                            ${goldIconHtml("summary")} <strong>Gold:</strong> ${(item.goldCost || 0).toLocaleString()}
+                        </span>
+                    </div>
+                </div>
+            `;
         }).join("");
+
+        return `
+            <div class="card-group">
+                <div class="summary-card-layout">
+                    ${getSummaryImageHtml(cardName)}
+
+                    <div>
+                        <div class="card-group-title">${cardName}</div>
+                        <div class="summary-history-row">
+                            ${cardsHtml}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join("");
+}
 
     return `
     <div class="card-group">
