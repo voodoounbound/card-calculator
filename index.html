@@ -431,7 +431,16 @@ select:focus {
     font-size: 1rem;
     margin-top: 3px;
 }
+.summary-button-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+}
 
+.summary-button-row .clear-button {
+    margin-top: 0;
+}
 .clear-button {
     width: 100%;
     background: transparent;
@@ -443,10 +452,6 @@ select:focus {
     border-radius: 4px;
     cursor: pointer;
     font-family: 'Mendalion', sans-serif;
-}
-
-.clear-button:hover {
-    background: rgba(212,175,55,.12);
 }
 
 .export-button {
