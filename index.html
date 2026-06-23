@@ -547,14 +547,18 @@ select:focus {
         <span class="title-main">Calculator</span>
     </h1>
 
-        <label for="cardName">Card</label>
-        <div class="field-wrap">
-            <input type="text" id="cardName" placeholder="Start typing a card name..." autocomplete="off">
-            <button type="button" class="clear-field" onclick="clearField('cardName')">×</button>
-            <div id="cardSuggestions" class="autocomplete-menu"></div>
-        </div>
+<label for="cardName">Card</label>
+<div class="field-wrap">
+    <input type="text" id="cardName" placeholder="Start typing a card name..." autocomplete="off">
+    <button type="button" class="clear-field" onclick="clearField('cardName')">×</button>
+    <div id="cardSuggestions" class="autocomplete-menu"></div>
+</div>
 
-        <label for="category">Rarity</label>
+<div id="cardImagePreview" class="card-image-preview hidden">
+    <img id="cardImage" src="" alt="">
+</div>
+
+<label for="category">Rarity</label>
         <div class="field-wrap">
             <select id="category">
                 <option value="">Select rarity...</option>
@@ -778,7 +782,22 @@ const cardRarities = {
     "Harry Potter (Throwback)": "Mythic",
     "Abigail Grey": "Epic"
 };
+const CARD_IMAGE_FOLDER = "card-images";
 
+const cardImageAliases = {
+    "Abigail Grey": "Abigail Gray",
+    "Regenerate": "Rennervate"
+};
+
+function getCardImageFileName(cardName) {
+    return cardImageAliases[cardName] || cardName;
+}
+
+function getCardImagePath(cardName) {
+    const fileName = getCardImageFileName(cardName);
+
+    return `${CARD_IMAGE_FOLDER}/${encodeURIComponent(fileName).replace(/'/g, "%27")}.png`;
+}
 const cards = {
     Legendary: {
         1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0,
@@ -906,7 +925,31 @@ function renderCardSuggestions() {
 
     menu.classList.add("show");
 }
+function updateCardImage() {
+    const cardName = document.getElementById("cardName").value.trim();
+    const preview = document.getElementById("cardImagePreview");
+    const image = document.getElementById("cardImage");
 
+    if (!cardName || !cardRarities[cardName]) {
+        image.src = "";
+        image.alt = "";
+        preview.classList.add("hidden");
+        return;
+    }
+
+    image.onload = function() {
+        preview.classList.remove("hidden");
+    };
+
+    image.onerror = function() {
+        image.src = "";
+        image.alt = "";
+        preview.classList.add("hidden");
+    };
+
+    image.alt = `${cardName} card image`;
+    image.src = getCardImagePath(cardName);
+}
 function hideCardSuggestions() {
     document.getElementById("cardSuggestions").classList.remove("show");
     activeSuggestionIndex = -1;
@@ -936,6 +979,26 @@ function setActiveSuggestion(index) {
         block: "nearest"
     });
 }
+  .card-image-preview {
+    margin-top: 14px;
+    display: flex;
+    justify-content: center;
+}
+
+.card-image-preview img {
+    width: 135px;
+    max-width: 100%;
+    border: 1px solid #d4af37;
+    border-radius: 10px;
+    background: rgba(15, 15, 26, 0.75);
+    box-shadow:
+        0 0 8px rgba(212,175,55,.45),
+        0 0 20px rgba(212,175,55,.18);
+}
+
+.card-image-preview.hidden {
+    display: none;
+}
 
 function formIsReadyForCalculation() {
     const cardName = document.getElementById("cardName").value.trim();
@@ -955,6 +1018,7 @@ function formIsReadyForCalculation() {
 function chooseCard(card) {
     document.getElementById("cardName").value = card;
     autoFillRarity();
+    updateCardImage();
     hideCardSuggestions();
 }
 
@@ -963,13 +1027,14 @@ function clearField(fieldId) {
     field.value = "";
     field.focus();
 
-    if (fieldId === "cardName") {
-        document.getElementById("category").value = "";
-        document.getElementById("currentLevel").value = "";
-        document.getElementById("desiredLevel").value = "";
-        renderCardSuggestions();
-        return;
-    }
+if (fieldId === "cardName") {
+    document.getElementById("category").value = "";
+    document.getElementById("currentLevel").value = "";
+    document.getElementById("desiredLevel").value = "";
+    updateCardImage();
+    renderCardSuggestions();
+    return;
+}
 
     if (fieldId === "category") {
         document.getElementById("currentLevel").value = "";
@@ -1362,6 +1427,7 @@ document.getElementById("cardName").addEventListener("input", function() {
         autoFillRarity();
     }
 
+    updateCardImage();
     renderCardSuggestions();
 });
 
