@@ -807,29 +807,33 @@ const cardRarities = {
     "Harry Potter (Throwback)": "Mythic",
     "Abigail Grey": "Epic"
 };
-
-/*
-    Images should be unzipped into this GitHub folder:
-    card images/
-
-    If you rename the folder to card-images, change this to:
-    const CARD_IMAGE_FOLDER = "card-images";
-*/
-const CARD_IMAGE_FOLDER = "card images";
+const CARD_IMAGE_FOLDER = "card-images";
 
 const cardImageAliases = {
-    "Abigail Grey": "Abigail Gray"
+    "Abigail Grey": "Abigail Gray",
+    "Regenerate": "Rennervate"
 };
 
 function getCardImageFileName(cardName) {
     return cardImageAliases[cardName] || cardName;
 }
 
-function getCardImagePath(cardName) {
-    const fileName = getCardImageFileName(cardName);
-    const folderPath = encodeURIComponent(CARD_IMAGE_FOLDER);
+function getCardImageSlug(cardName) {
+    return getCardImageFileName(cardName)
+        .trim()
+        .replace(/\s+/g, "-");
+}
 
-    return `${folderPath}/${encodeURIComponent(fileName).replace(/'/g, "%27")}.png`;
+function encodePathSegment(value) {
+    return encodeURIComponent(value)
+        .replace(/'/g, "%27")
+        .replace(/\(/g, "%28")
+        .replace(/\)/g, "%29");
+}
+
+function getCardImagePath(cardName) {
+    const fileName = getCardImageSlug(cardName);
+    return `${CARD_IMAGE_FOLDER}/${encodePathSegment(fileName)}.png`;
 }
 
 function getSummaryImageHtml(cardName) {
@@ -846,7 +850,6 @@ function getSummaryImageHtml(cardName) {
         >
     `;
 }
-
 const cards = {
     Legendary: {
         1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0,
