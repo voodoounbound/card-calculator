@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Voodoo.Unbound Card Calculator</title>
+
 <!-- Discord / Open Graph Preview -->
 <meta property="og:title" content="Voodoo.Unbound Card Calculator">
 <meta property="og:description" content="A magical Harry Potter: Magic Awakened card upgrade calculator.">
@@ -21,10 +22,10 @@
 <meta name="twitter:title" content="Voodoo.Unbound Card Calculator">
 <meta name="twitter:description" content="A magical Harry Potter: Magic Awakened card upgrade calculator.">
 <meta name="twitter:image" content="https://voodoounbound.github.io/card-calculator/discord-preview.png">
+
 <link href="https://fonts.cdnfonts.com/css/witches-magic" rel="stylesheet">
 <link href="https://fonts.cdnfonts.com/css/mendalion" rel="stylesheet">
-                
-                
+
 <style>
 * {
     box-sizing: border-box;
@@ -93,6 +94,7 @@ h1 {
     line-height: 1.2;
     letter-spacing: 1px;
 }
+
 .subtitle {
     text-align: center;
     margin-top: 0;
@@ -129,9 +131,11 @@ select {
     font-size: 1rem;
     line-height: 1.2;
 }
+
 input::placeholder {
     color: rgba(244, 231, 197, 0.5);
 }
+
 input:focus,
 select:focus {
     outline: none;
@@ -216,7 +220,7 @@ select:focus {
     color: #d4af37;
     box-shadow: inset 0 0 8px rgba(212,175,55,.18);
 }
-  
+
 .autocomplete-rarity {
     display: block;
     margin-top: 2px;
@@ -231,6 +235,7 @@ select:focus {
     font-size: 1rem;
 }
 
+/* Calculate Button */
 .calculate-button {
     width: 100%;
     margin-top: 20px;
@@ -263,14 +268,31 @@ select:focus {
 
 .calculate-button:hover {
     transform: scale(1.025);
-
     box-shadow:
         0 0 12px #d4af37,
         0 0 28px rgba(212,175,55,.85),
         0 0 48px rgba(212,175,55,.45);
 }
-  .calculate-button:active {
+
+.calculate-button:active {
     transform: scale(0.98);
+}
+
+.calculate-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255,255,255,.45),
+        transparent
+    );
+    transform: skewX(-20deg);
+    animation: buttonShine 3.2s ease-in-out infinite;
 }
 
 #result {
@@ -345,19 +367,38 @@ select:focus {
     margin-bottom: 7px;
 }
 
-/* Horizontal calculation history row */
+/* Summary image + history layout */
+.summary-card-layout {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+}
+
+.summary-card-layout.no-image {
+    grid-template-columns: 1fr;
+}
+
+.summary-card-thumbnail {
+    width: 34px;
+    border: 1px solid #d4af37;
+    border-radius: 5px;
+    background: rgba(15, 15, 26, 0.75);
+    box-shadow:
+        0 0 5px rgba(212,175,55,.35),
+        0 0 10px rgba(212,175,55,.14);
+}
+
 .summary-history-row {
     display: flex;
     gap: 8px;
     overflow-x: auto;
-    padding-bottom: 6px;
+    padding: 8px;
     border: 1px solid rgba(212,175,55,.45);
     border-radius: 7px;
     background: rgba(37, 37, 66, 0.65);
-    padding: 8px;
 }
 
-/* Each historical calculation card */
 .summary-card {
     flex: 0 0 120px;
     min-width: 120px;
@@ -409,7 +450,8 @@ select:focus {
 .clear-button:hover {
     background: rgba(212,175,55,.12);
 }
-  .export-button {
+
+.export-button {
     background: linear-gradient(
         135deg,
         rgba(212,175,55,.2),
@@ -424,6 +466,8 @@ select:focus {
         0 0 8px rgba(212,175,55,.45),
         0 0 18px rgba(212,175,55,.18);
 }
+
+/* Animations */
 @keyframes buttonGlow {
     0% {
         box-shadow:
@@ -444,25 +488,8 @@ select:focus {
             0 0 14px rgba(212,175,55,.25);
     }
 }
-  .calculate-button::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -75%;
-    width: 50%;
-    height: 100%;
 
-    background: linear-gradient(
-        120deg,
-        transparent,
-        rgba(255,255,255,.45),
-        transparent
-    );
-
-    transform: skewX(-20deg);
-    animation: buttonShine 3.2s ease-in-out infinite;
-}
-  @keyframes buttonShine {
+@keyframes buttonShine {
     0% {
         left: -75%;
     }
@@ -475,6 +502,7 @@ select:focus {
         left: 125%;
     }
 }
+
 @keyframes titleGlow {
     0% {
         filter:
@@ -538,27 +566,23 @@ select:focus {
 
     <div class="calculator">
 
-    <div class="subtitle">
-        Harry Potter: Magic Awakened
-    </div>
+        <div class="subtitle">
+            Harry Potter: Magic Awakened
+        </div>
 
-    <h1>
-        <span class="title-main">Card</span>
-        <span class="title-main">Calculator</span>
-    </h1>
+        <h1>
+            <span class="title-main">Card</span>
+            <span class="title-main">Calculator</span>
+        </h1>
 
-<label for="cardName">Card</label>
-<div class="field-wrap">
-    <input type="text" id="cardName" placeholder="Start typing a card name..." autocomplete="off">
-    <button type="button" class="clear-field" onclick="clearField('cardName')">×</button>
-    <div id="cardSuggestions" class="autocomplete-menu"></div>
-</div>
+        <label for="cardName">Card</label>
+        <div class="field-wrap">
+            <input type="text" id="cardName" placeholder="Start typing a card name..." autocomplete="off">
+            <button type="button" class="clear-field" onclick="clearField('cardName')">×</button>
+            <div id="cardSuggestions" class="autocomplete-menu"></div>
+        </div>
 
-<div id="cardImagePreview" class="card-image-preview hidden">
-    <img id="cardImage" src="" alt="">
-</div>
-
-<label for="category">Rarity</label>
+        <label for="category">Rarity</label>
         <div class="field-wrap">
             <select id="category">
                 <option value="">Select rarity...</option>
@@ -627,13 +651,13 @@ select:focus {
             No calculations yet.
         </div>
 
-<button class="clear-button export-button" onclick="exportResults()">
-    Export Results
-</button>
+        <button class="clear-button export-button" onclick="exportResults()">
+            Export Results
+        </button>
 
-<button class="clear-button" onclick="clearSummary()">
-    Clear Summary
-</button>
+        <button class="clear-button" onclick="clearSummary()">
+            Clear Summary
+        </button>
     </aside>
 
 </div>
@@ -702,6 +726,7 @@ const cardRarities = {
     "Orb of Water": "Legendary",
     "Glacius Maxima": "Epic",
     "Zouwu": "Legendary",
+    "Weasleys' Whiz-bangs": "Epic",
     "Weasleys' Wildfire Whiz-bangs": "Epic",
     "Azkaban": "Dark",
 
@@ -782,11 +807,18 @@ const cardRarities = {
     "Harry Potter (Throwback)": "Mythic",
     "Abigail Grey": "Epic"
 };
-const CARD_IMAGE_FOLDER = "card-images";
+
+/*
+    Images should be unzipped into this GitHub folder:
+    card images/
+
+    If you rename the folder to card-images, change this to:
+    const CARD_IMAGE_FOLDER = "card-images";
+*/
+const CARD_IMAGE_FOLDER = "card images";
 
 const cardImageAliases = {
-    "Abigail Grey": "Abigail Gray",
-    "Regenerate": "Rennervate"
+    "Abigail Grey": "Abigail Gray"
 };
 
 function getCardImageFileName(cardName) {
@@ -795,9 +827,26 @@ function getCardImageFileName(cardName) {
 
 function getCardImagePath(cardName) {
     const fileName = getCardImageFileName(cardName);
+    const folderPath = encodeURIComponent(CARD_IMAGE_FOLDER);
 
-    return `${CARD_IMAGE_FOLDER}/${encodeURIComponent(fileName).replace(/'/g, "%27")}.png`;
+    return `${folderPath}/${encodeURIComponent(fileName).replace(/'/g, "%27")}.png`;
 }
+
+function getSummaryImageHtml(cardName) {
+    return `
+        <img
+            class="summary-card-thumbnail"
+            src="${getCardImagePath(cardName)}"
+            alt="${cardName} card image"
+            onerror="
+                const layout = this.closest('.summary-card-layout');
+                if (layout) layout.classList.add('no-image');
+                this.remove();
+            "
+        >
+    `;
+}
+
 const cards = {
     Legendary: {
         1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0,
@@ -816,6 +865,7 @@ const cards = {
         9:30, 10:45, 11:70, 12:100, 13:140, 14:190, 15:250, 16:320, 17:410, 18:510
     }
 };
+
 const goldCosts = {
     1: 0,
     2: 100,
@@ -837,6 +887,10 @@ const goldCosts = {
     18: 30000
 };
 
+let calculationHistory = [];
+let activeSuggestionIndex = -1;
+let currentCardSuggestions = [];
+
 function calculateGoldCost(current, desired) {
     let goldCost = 0;
 
@@ -846,10 +900,7 @@ function calculateGoldCost(current, desired) {
 
     return goldCost;
 }
-let calculationHistory = [];
-let activeSuggestionIndex = -1;
-let currentCardSuggestions = [];
-  
+
 function getAllowedRarities(selectedRarity) {
     if (selectedRarity === "Legendary") {
         return ["Legendary", "Mythic", "Dark"];
@@ -925,31 +976,7 @@ function renderCardSuggestions() {
 
     menu.classList.add("show");
 }
-function updateCardImage() {
-    const cardName = document.getElementById("cardName").value.trim();
-    const preview = document.getElementById("cardImagePreview");
-    const image = document.getElementById("cardImage");
 
-    if (!cardName || !cardRarities[cardName]) {
-        image.src = "";
-        image.alt = "";
-        preview.classList.add("hidden");
-        return;
-    }
-
-    image.onload = function() {
-        preview.classList.remove("hidden");
-    };
-
-    image.onerror = function() {
-        image.src = "";
-        image.alt = "";
-        preview.classList.add("hidden");
-    };
-
-    image.alt = `${cardName} card image`;
-    image.src = getCardImagePath(cardName);
-}
 function hideCardSuggestions() {
     document.getElementById("cardSuggestions").classList.remove("show");
     activeSuggestionIndex = -1;
@@ -998,7 +1025,6 @@ function formIsReadyForCalculation() {
 function chooseCard(card) {
     document.getElementById("cardName").value = card;
     autoFillRarity();
-    updateCardImage();
     hideCardSuggestions();
 }
 
@@ -1007,14 +1033,13 @@ function clearField(fieldId) {
     field.value = "";
     field.focus();
 
-if (fieldId === "cardName") {
-    document.getElementById("category").value = "";
-    document.getElementById("currentLevel").value = "";
-    document.getElementById("desiredLevel").value = "";
-    updateCardImage();
-    renderCardSuggestions();
-    return;
-}
+    if (fieldId === "cardName") {
+        document.getElementById("category").value = "";
+        document.getElementById("currentLevel").value = "";
+        document.getElementById("desiredLevel").value = "";
+        renderCardSuggestions();
+        return;
+    }
 
     if (fieldId === "category") {
         document.getElementById("currentLevel").value = "";
@@ -1028,6 +1053,7 @@ if (fieldId === "cardName") {
         return;
     }
 }
+
 function autoFillRarity() {
     const cardName = document.getElementById("cardName").value.trim();
     const category = document.getElementById("category");
@@ -1114,13 +1140,15 @@ function autoFillDesiredLevel() {
         desiredLevel.value = minimumDesired;
     }
 }
+
 function getCalculationCategory(displayCategory) {
     if (displayCategory === "Mythic" || displayCategory === "Dark") {
         return "Legendary";
     }
 
     return displayCategory;
-}  
+}
+
 function calculateCards() {
     const cardName = document.getElementById("cardName").value.trim();
     const current = Number(document.getElementById("currentLevel").value);
@@ -1167,7 +1195,7 @@ function calculateCards() {
     let baseNeed = 0;
 
     for (let level = current + 1; level <= desired; level++) {
-    baseNeed += cards[category][level] || 0;
+        baseNeed += cards[category][level] || 0;
     }
 
     const goldCost = calculateGoldCost(current, desired);
@@ -1201,19 +1229,19 @@ function calculateCards() {
     `;
 
     addToSummary({
-      cardName,
-      current,
-      desired,
-      category: displayCategory,
-      baseNeed,
-      goldCost,
-      ownedCards,
-      tradeTokens,
-      wildCards,
-      deductions,
-      finalNeed,
-      timestamp: Date.now()
-  });
+        cardName,
+        current,
+        desired,
+        category: displayCategory,
+        baseNeed,
+        goldCost,
+        ownedCards,
+        tradeTokens,
+        wildCards,
+        deductions,
+        finalNeed,
+        timestamp: Date.now()
+    });
 }
 
 function addToSummary(entry) {
@@ -1281,11 +1309,11 @@ function renderSummary() {
                     </div>
 
                     <div>
-                      <strong>Base:</strong> ${item.baseNeed.toLocaleString()}
+                        <strong>Base:</strong> ${item.baseNeed.toLocaleString()}
                     </div>
 
                     <div>
-                      <strong>Gold:</strong> ${(item.goldCost || 0).toLocaleString()}
+                        <strong>Gold:</strong> ${(item.goldCost || 0).toLocaleString()}
                     </div>
 
                     ${deductionLines ? `
@@ -1299,14 +1327,21 @@ function renderSummary() {
 
         return `
             <div class="card-group">
-                <div class="card-group-title">${cardName}</div>
-                <div class="summary-history-row">
-                    ${cardsHtml}
+                <div class="summary-card-layout">
+                    ${getSummaryImageHtml(cardName)}
+
+                    <div>
+                        <div class="card-group-title">${cardName}</div>
+                        <div class="summary-history-row">
+                            ${cardsHtml}
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
     }).join("");
 }
+
 function exportResults() {
     if (calculationHistory.length === 0) {
         alert("No calculation results to export yet.");
@@ -1331,20 +1366,20 @@ function exportResults() {
     const rows = calculationHistory.map(item => {
         const date = new Date(item.timestamp).toLocaleString();
 
-     return [
-        date,
-        item.cardName,
-        item.category,
-        item.current,
-        item.desired,
-        item.baseNeed,
-        item.goldCost || 0,
-        item.ownedCards,
-        item.tradeTokens,
-        item.wildCards,
-        item.deductions,
-        item.finalNeed
-    ];
+        return [
+            date,
+            item.cardName,
+            item.category,
+            item.current,
+            item.desired,
+            item.baseNeed,
+            item.goldCost || 0,
+            item.ownedCards,
+            item.tradeTokens,
+            item.wildCards,
+            item.deductions,
+            item.finalNeed
+        ];
     });
 
     const csvContent = [
@@ -1387,15 +1422,19 @@ function escapeCSV(value) {
 
     return stringValue;
 }
+
 function clearSummary() {
     calculationHistory = [];
     renderSummary();
 }
 
+/* Event Listeners */
 document.getElementById("cardName").addEventListener("focus", renderCardSuggestions);
 document.getElementById("cardName").addEventListener("click", renderCardSuggestions);
+
 document.getElementById("currentLevel").addEventListener("input", autoFillDesiredLevel);
 document.getElementById("currentLevel").addEventListener("change", autoFillDesiredLevel);
+
 document.getElementById("cardName").addEventListener("input", function() {
     const cardName = document.getElementById("cardName").value.trim();
 
@@ -1407,7 +1446,6 @@ document.getElementById("cardName").addEventListener("input", function() {
         autoFillRarity();
     }
 
-    updateCardImage();
     renderCardSuggestions();
 });
 
