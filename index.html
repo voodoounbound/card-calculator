@@ -464,7 +464,20 @@ select:focus {
         0 0 8px rgba(212,175,55,.45),
         0 0 18px rgba(212,175,55,.18);
 }
+.import-button {
+    background: linear-gradient(
+        135deg,
+        rgba(212,175,55,.14),
+        rgba(212,175,55,.04)
+    );
+}
 
+.import-button:hover {
+    background: rgba(212,175,55,.16);
+    box-shadow:
+        0 0 8px rgba(212,175,55,.38),
+        0 0 18px rgba(212,175,55,.14);
+}
 /* Animations */
 @keyframes buttonGlow {
     0% {
@@ -649,13 +662,25 @@ select:focus {
             No calculations yet.
         </div>
 
-        <button class="clear-button export-button" onclick="exportResults()">
-            Export Results
-        </button>
+     <button class="clear-button export-button" onclick="exportResults()">
+    Export Results
+</button>
 
-        <button class="clear-button" onclick="clearSummary()">
-            Clear Summary
-        </button>
+<button class="clear-button import-button" onclick="triggerImportResults()">
+    Import Results
+</button>
+
+<input 
+    type="file" 
+    id="importResultsFile" 
+    accept=".csv" 
+    style="display: none;"
+    onchange="importResultsFromFile(event)"
+>
+
+<button class="clear-button" onclick="clearSummary()">
+    Clear Summary
+</button>
     </aside>
 
 </div>
@@ -1423,7 +1448,170 @@ function escapeCSV(value) {
 
     return stringValue;
 }
+function triggerImportResults() {
+    document.getElementById("importResultsFile").click();
+}
 
+function importResultsFromFile(event) {
+    const file = event.target.files[0];
+
+    if (!file) {
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        try {
+            const csvText = e.target.result;
+            const rows = parseCSV(csvText);
+
+            if (rows.length < 2) {
+                alert("This file does not contain any calculation results.");
+                return;
+            }
+
+            const headers = rows[0].map(header => header.trim());
+            const importedEntries = [];
+
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+
+                if (!row || row.length === 0 || row.every(cell => String(cell).trim() === "")) {
+                    continue;
+                }
+
+                const entry = createHistoryEntryFromCSV(headers, row);
+
+                if (entry) {
+                    importedEntries.push(entry);
+                }
+            }
+
+            if (importedEntries.length === 0) {
+                alert("No valid calculation results were found in this file.");
+                return;
+            }
+
+            calculationHistory = [
+                ...importedEntries,
+                ...calculationHistory
+            ];
+
+            calculationHistory.sort((a, b) => b.timestamp - a.timestamp);
+
+            renderSummary();
+
+            alert(`${importedEntries.length} calculation result${importedEntries.length === 1 ? "" : "s"} imported.`);
+        } catch (error) {
+            console.error(error);
+            alert("Something went wrong while importing the file.");
+        }
+
+        event.target.value = "";
+    };
+
+    reader.readAsText(file);
+}
+
+function createHistoryEntryFromCSV(headers, row) {
+    function getValue(columnName) {
+        const index = headers.indexOf(columnName);
+        return index >= 0 ? row[index] : "";
+    }
+
+    const cardName = getValue("Card").trim();
+    const category = getValue("Rarity").trim();
+
+    if (!cardName || !cardRarities[cardName]) {
+        return null;
+    }
+
+    const current = Number(getValue("Current Level"));
+    const desired = Number(getValue("Desired Level"));
+
+    if (!current || !desired) {
+        return null;
+    }
+
+    const baseNeed = Number(getValue("Base Need")) || 0;
+    const goldCost = Number(getValue("Gold Cost")) || calculateGoldCost(current, desired);
+    const ownedCards = Number(getValue("Owned")) || 0;
+    const tradeTokens = Number(getValue("Trade Tokens")) || 0;
+    const wildCards = Number(getValue("Wild Cards")) || 0;
+    const deductions = Number(getValue("Total Deducted")) || ownedCards + tradeTokens + wildCards;
+    const finalNeed = Number(getValue("Final Cards Needed")) || Math.max(baseNeed - deductions, 0);
+
+    const dateValue = getValue("Date");
+    const parsedDate = Date.parse(dateValue);
+    const timestamp = Number.isNaN(parsedDate) ? Date.now() : parsedDate;
+
+    return {
+        cardName,
+        current,
+        desired,
+        category,
+        baseNeed,
+        goldCost,
+        ownedCards,
+        tradeTokens,
+        wildCards,
+        deductions,
+        finalNeed,
+        timestamp
+    };
+}
+
+function parseCSV(csvText) {
+    const rows = [];
+    let currentRow = [];
+    let currentCell = "";
+    let insideQuotes = false;
+
+    for (let i = 0; i < csvText.length; i++) {
+        const char = csvText[i];
+        const nextChar = csvText[i + 1];
+
+        if (char === '"' && insideQuotes && nextChar === '"') {
+            currentCell += '"';
+            i++;
+            continue;
+        }
+
+        if (char === '"') {
+            insideQuotes = !insideQuotes;
+            continue;
+        }
+
+        if (char === "," && !insideQuotes) {
+            currentRow.push(currentCell);
+            currentCell = "";
+            continue;
+        }
+
+        if ((char === "\n" || char === "\r") && !insideQuotes) {
+            if (char === "\r" && nextChar === "\n") {
+                i++;
+            }
+
+            currentRow.push(currentCell);
+            rows.push(currentRow);
+
+            currentRow = [];
+            currentCell = "";
+            continue;
+        }
+
+        currentCell += char;
+    }
+
+    if (currentCell !== "" || currentRow.length > 0) {
+        currentRow.push(currentCell);
+        rows.push(currentRow);
+    }
+
+    return rows;
+}
 function clearSummary() {
     calculationHistory = [];
     renderSummary();
