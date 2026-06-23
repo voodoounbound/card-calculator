@@ -1401,23 +1401,6 @@ function renderSummary() {
             `;
         }).join("");
 
-        return `
-            <div class="card-group">
-                <div class="summary-card-layout">
-                    ${getSummaryImageHtml(cardName)}
-
-                    <div>
-                        <div class="card-group-title">${cardName}</div>
-                        <div class="summary-history-row">
-                            ${cardsHtml}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join("");
-}
-
     return `
     <div class="card-group">
         <div class="summary-card-layout">
