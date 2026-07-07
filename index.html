@@ -1,0 +1,1977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voodoo.Unbound Card Calculator</title>
+<!-- pages redeploy -->
+    
+    
+<!-- Discord / Open Graph Preview -->
+<meta property="og:title" content="Voodoo.Unbound Card Calculator">
+<meta property="og:description" content="A magical Harry Potter: Magic Awakened card upgrade calculator.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://voodoounbound.github.io/card-calculator/">
+<meta property="og:image" content="https://voodoounbound.github.io/card-calculator/discord-preview.png">
+<meta property="og:image:secure_url" content="https://voodoounbound.github.io/card-calculator/discord-preview.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Voodoo.Unbound Card Calculator preview image">
+
+<!-- Optional Twitter fallback -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Voodoo.Unbound Card Calculator">
+<meta name="twitter:description" content="A magical Harry Potter: Magic Awakened card upgrade calculator.">
+<meta name="twitter:image" content="https://voodoounbound.github.io/card-calculator/discord-preview.png">
+
+<link href="https://fonts.cdnfonts.com/css/witches-magic" rel="stylesheet">
+<link href="https://fonts.cdnfonts.com/css/mendalion" rel="stylesheet">
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    overflow-x: auto;
+    background:
+        radial-gradient(circle at top left, rgba(44, 42, 82, 0.55), transparent 35%),
+        radial-gradient(circle at top right, rgba(8, 8, 18, 0.8), transparent 40%),
+        linear-gradient(135deg, #10101d 0%, #060711 100%);
+    color: #f4e7c5;
+    font-family: 'Mendalion', sans-serif;
+    padding: 18px;
+}
+
+.page {
+    width: 100%;
+    min-width: 980px;
+    display: grid;
+    grid-template-columns: 420px minmax(520px, 1fr);
+    gap: 18px;
+    align-items: start;
+}
+/* Calculator */
+.calculator {
+    width: 100%;
+    min-height: calc(100vh - 36px);
+    background: rgba(27, 27, 47, 0.95);
+    border: 2px solid #d4af37;
+    border-radius: 10px;
+    padding: 18px 20px;
+    box-shadow:
+        0 0 8px rgba(212,175,55,.55),
+        0 0 25px rgba(212,175,55,.14);
+}
+
+h1 {
+    margin: 0 0 14px 0;
+    text-align: center;
+    color: #d4af37;
+    font-family: 'Witches Magic', sans-serif;
+
+    background: linear-gradient(
+        135deg,
+        #d4af37 0%,
+        #f4d76b 45%,
+        #b88a1f 100%
+    );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+
+    filter:
+        drop-shadow(0 0 5px rgba(212,175,55,.75))
+        drop-shadow(0 0 16px rgba(212,175,55,.35));
+
+    animation: titleGlow 2.4s ease-in-out infinite;
+}
+
+.title-main {
+    display: block;
+    font-size: 2.8rem;
+    line-height: 1.15;
+    letter-spacing: 1px;
+}
+.subtitle {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: #c8b98f;
+    font-family: 'Mendalion', serif;
+    font-size: 1.7rem;
+    letter-spacing: .5px;
+}
+
+label {
+    display: block;
+    margin-top: 9px;
+    margin-bottom: 4px;
+    font-size: 1.15rem;
+    font-weight: bold;
+    color: #f4e7c5; 
+}
+
+.field-wrap {
+    position: relative;
+}
+.input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 18px;
+    row-gap: 0;
+    margin-top: 4px;
+}
+
+.field-block {
+    min-width: 0;
+}
+
+.button-field-block {
+    display: flex;
+    align-items: flex-end;
+}
+
+.button-field-block .calculate-button {
+    margin-top: 0;
+    min-height: 44px;
+}
+input,
+select {
+    width: 100%;
+    height: 44px;
+    padding: 8px 34px 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #d4af37;
+    background: #252542;
+    color: #f4e7c5;
+    font-family: 'Mendalion', sans-serif;
+    font-size: 1rem;
+    line-height: 1.2;
+}
+
+input::placeholder {
+    color: rgba(244, 231, 197, 0.5);
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    box-shadow:
+        0 0 6px rgba(212,175,55,.75),
+        0 0 16px rgba(212,175,55,.2);
+}
+
+.clear-field {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    padding: 0;
+    border: 1px solid rgba(212,175,55,.65);
+    border-radius: 50%;
+    background: rgba(15, 15, 26, 0.75);
+    color: #d4af37;
+    font-size: 14px;
+    line-height: 18px;
+    font-family: 'Mendalion', sans-serif;
+    cursor: pointer;
+    transition: .2s;
+    z-index: 5;
+}
+
+.clear-field:hover {
+    background: #d4af37;
+    color: #111;
+    box-shadow: 0 0 6px #d4af37;
+}
+
+/* Lower input layout */
+.lower-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 4px;
+}
+
+.lower-fields .right-fields {
+    border-left: none;
+    padding-left: 0;
+}
+
+/* Custom card autocomplete */
+.autocomplete-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    right: 0;
+    max-height: 230px;
+    overflow-y: auto;
+    background: rgba(15, 15, 26, 0.98);
+    border: 1px solid #d4af37;
+    border-radius: 8px;
+    box-shadow:
+        0 0 10px rgba(212,175,55,.45),
+        0 0 25px rgba(212,175,55,.15);
+    z-index: 50;
+}
+
+.autocomplete-menu.show {
+    display: block;
+}
+
+.autocomplete-item {
+    padding: 8px 10px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(212,175,55,.16);
+    color: #f4e7c5;
+    font-size: 1rem;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.active {
+    background: rgba(212,175,55,.22);
+    color: #d4af37;
+    box-shadow: inset 0 0 8px rgba(212,175,55,.18);
+}
+
+.autocomplete-rarity {
+    display: block;
+    margin-top: 2px;
+    color: #c8b98f;
+    font-size: 1rem;
+}
+
+.autocomplete-empty {
+    padding: 8px 10px;
+    color: #c8b98f;
+    font-style: italic;
+    font-size: 1rem;
+}
+
+/* Calculate Button */
+.calculate-button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 9px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+
+    background: linear-gradient(
+        135deg,
+        #d4af37 0%,
+        #f4d76b 45%,
+        #b88a1f 100%
+    );
+
+    color: #111;
+    transition: .25s;
+    font-family: 'Mendalion', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: .5px;
+
+    box-shadow:
+        0 0 8px rgba(212,175,55,.65),
+        0 0 18px rgba(212,175,55,.35);
+
+    animation: buttonGlow 2.4s ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
+}
+.calculate-button-compact {
+    padding: 10px 8px;
+    font-size: 1.25rem;
+}
+.calculate-button:hover {
+    transform: scale(1.025);
+    box-shadow:
+        0 0 12px #d4af37,
+        0 0 28px rgba(212,175,55,.85),
+        0 0 48px rgba(212,175,55,.45);
+}
+
+.calculate-button:active {
+    transform: scale(0.98);
+}
+
+.calculate-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255,255,255,.45),
+        transparent
+    );
+    transform: skewX(-20deg);
+    animation: buttonShine 3.2s ease-in-out infinite;
+}
+
+#result {
+    margin-top: 22px;
+    text-align: center;
+    font-size: 1.15rem;
+    font-weight: bold;
+    color: #d4af37;
+    min-height: 62px;
+    text-shadow: 0 0 10px rgba(212,175,55,.45);
+}
+
+.result-detail {
+    display: block;
+    margin-top: 8px;
+    font-size: 1rem;
+    color: #f4e7c5;
+    font-weight: normal;
+    line-height: 1.35;
+}
+
+.footer {
+    margin-top: 34px;
+    text-align: center;
+    font-size: 1.15rem;
+    color: #9f9270;
+    font-family: 'Witches Magic', sans-serif;
+}
+
+/* Summary Panel */
+.summary-panel {
+    width: 100%;
+    min-height: 94px;
+    max-height: calc(100vh - 36px);
+    overflow-y: auto;
+    background: rgba(15, 15, 26, 0.96);
+    border: 2px solid #d4af37;
+    border-radius: 9px;
+    padding: 10px;
+    box-shadow:
+        0 0 10px rgba(212,175,55,.4),
+        0 0 28px rgba(212,175,55,.12);
+}
+
+.summary-panel h2 {
+    margin: 0 0 8px 0;
+    text-align: center;
+    color: #d4af37;
+    font-family: 'Mendalion', sans-serif;
+    font-size: 2.5rem;
+    letter-spacing: 1px;
+}
+
+.summary-empty {
+    text-align: center;
+    color: #c8b98f;
+    font-style: italic;
+    font-size: 1rem;
+    margin: 2px 0 6px;
+}
+
+.card-group {
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(212,175,55,.35);
+}
+
+.card-group-title {
+    font-family: 'Mendalion', sans-serif;
+    color: #d4af37;
+    font-size: 1.25rem;
+    margin-bottom: 3px;
+}
+
+/* Summary image + history layout */
+.summary-card-layout {
+    display: grid;
+    grid-template-columns: 80px minmax(0, 1fr);
+    gap: 8px;
+    align-items: start;
+}
+
+.summary-card-layout.no-image {
+    grid-template-columns: 1fr;
+}
+
+.summary-card-thumbnail {
+    width: 80px;
+    border: none;
+    border-radius: 3px;
+    background: transparent;
+    box-shadow: none;
+}
+
+.summary-history-row {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 8px;
+    border: none;
+    border-radius: 7px;
+    background: rgba(37, 37, 66, 0.65);
+}
+
+.summary-card {
+    flex: 0 0 120px;
+    min-width: 120px;
+    padding: 6px 7px;
+    border-right: 1px solid rgba(212,175,55,.35);
+    font-size: 1rem;
+    line-height: 1.22;
+}
+
+.summary-card:last-child {
+    border-right: none;
+}
+
+.summary-card strong {
+    color: #d4af37;
+}
+.summary-gold-bottom {
+    margin-top: 5px;
+}
+.summary-final {
+    font-size: 1.05rem;
+    color: #d4af37;
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+.summary-meta {
+    color: #f4e7c5;
+    margin-bottom: 2px;
+}
+
+.summary-deductions {
+    color: #c8b98f;
+    font-size: 1rem;
+    margin-top: 3px;
+}
+.summary-button-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.summary-button-row .clear-button {
+    margin-top: 0;
+}
+.clear-button {
+    width: 100%;
+    background: transparent;
+    color: #d4af37;
+    border: 1px solid #d4af37;
+    margin-top: 6px;
+    padding: 5px;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Mendalion', sans-serif;
+}
+
+.export-button {
+    background: linear-gradient(
+        135deg,
+        rgba(212,175,55,.2),
+        rgba(212,175,55,.08)
+    );
+    margin-top: 10px;
+}
+
+.export-button:hover {
+    background: rgba(212,175,55,.18);
+    box-shadow:
+        0 0 8px rgba(212,175,55,.45),
+        0 0 18px rgba(212,175,55,.18);
+}
+.import-button {
+    background: linear-gradient(
+        135deg,
+        rgba(212,175,55,.14),
+        rgba(212,175,55,.04)
+    );
+}
+
+.import-button:hover {
+    background: rgba(212,175,55,.16);
+    box-shadow:
+        0 0 8px rgba(212,175,55,.38),
+        0 0 18px rgba(212,175,55,.14);
+}
+    .gold-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    vertical-align: middle;
+}
+
+.gold-icon {
+    display: inline-block;
+    object-fit: contain;
+    vertical-align: middle;
+    transform: translateY(-1px);
+    filter:
+        drop-shadow(0 0 3px rgba(212,175,55,.55))
+        drop-shadow(0 0 6px rgba(212,175,55,.25));
+}
+.gold-icon-result {
+    width: 20px;
+    height: auto;
+}
+
+.gold-icon-summary {
+    width: 16px;
+    height: auto;
+}
+/* Animations */
+@keyframes buttonGlow {
+    0% {
+        box-shadow:
+            0 0 6px rgba(212,175,55,.45),
+            0 0 14px rgba(212,175,55,.25);
+    }
+
+    50% {
+        box-shadow:
+            0 0 12px rgba(212,175,55,.9),
+            0 0 30px rgba(212,175,55,.55),
+            0 0 48px rgba(212,175,55,.25);
+    }
+
+    100% {
+        box-shadow:
+            0 0 6px rgba(212,175,55,.45),
+            0 0 14px rgba(212,175,55,.25);
+    }
+}
+
+@keyframes buttonShine {
+    0% {
+        left: -75%;
+    }
+
+    45% {
+        left: 125%;
+    }
+
+    100% {
+        left: 125%;
+    }
+}
+
+@keyframes titleGlow {
+    0% {
+        filter:
+            drop-shadow(0 0 4px rgba(212,175,55,.45))
+            drop-shadow(0 0 10px rgba(212,175,55,.25));
+    }
+
+    50% {
+        filter:
+            drop-shadow(0 0 8px rgba(212,175,55,.95))
+            drop-shadow(0 0 20px rgba(212,175,55,.65))
+            drop-shadow(0 0 34px rgba(212,175,55,.35));
+    }
+
+    100% {
+        filter:
+            drop-shadow(0 0 4px rgba(212,175,55,.45))
+            drop-shadow(0 0 10px rgba(212,175,55,.25));
+    }
+}
+
+@media (max-width: 700px) {
+    body {
+        padding: 14px;
+    }
+
+    .page {
+        min-width: 0;
+        grid-template-columns: 1fr;
+    }
+
+    .calculator {
+        min-height: auto;
+    }
+
+    .summary-panel {
+        max-height: none;
+    }
+
+    .input-grid {
+        grid-template-columns: 1fr 1fr;
+        column-gap: 12px;
+    }
+
+    .title-main {
+        font-size: 2.5rem;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="calculator">
+
+        <div class="subtitle">
+            Harry Potter: Magic Awakened
+        </div>
+
+        <h1>
+            <span class="title-main">Card</span>
+            <span class="title-main">Calculator</span>
+        </h1>
+
+<div class="input-grid">
+
+    <div class="field-block">
+        <label for="cardName">Card</label>
+        <div class="field-wrap">
+            <input type="text" id="cardName" placeholder="Start typing a card name..." autocomplete="off">
+            <button type="button" class="clear-field" onclick="clearField('cardName')">×</button>
+            <div id="cardSuggestions" class="autocomplete-menu"></div>
+        </div>
+    </div>
+
+    <div class="field-block">
+        <label for="category">Rarity</label>
+        <div class="field-wrap">
+            <select id="category">
+                <option value="">Select rarity...</option>
+                <option>Mythic</option>
+                <option>Dark</option>
+                <option>Legendary</option>
+                <option>Epic</option>
+                <option>Rare</option>
+                <option>Common</option>
+            </select>
+            <button type="button" class="clear-field" onclick="clearField('category')">×</button>
+        </div>
+    </div>
+
+    <div class="field-block">
+        <label for="currentLevel">Current Level</label>
+        <div class="field-wrap">
+            <input type="number" id="currentLevel" min="1" max="18">
+            <button type="button" class="clear-field" onclick="clearField('currentLevel')">×</button>
+        </div>
+    </div>
+
+    <div class="field-block">
+        <label for="ownedCards">Owned</label>
+        <div class="field-wrap">
+            <input type="number" id="ownedCards" min="0" value="0">
+            <button type="button" class="clear-field" onclick="clearField('ownedCards')">×</button>
+        </div>
+    </div>
+
+    <div class="field-block">
+        <label for="desiredLevel">Desired Level</label>
+        <div class="field-wrap">
+            <input type="number" id="desiredLevel" min="1" max="18">
+            <button type="button" class="clear-field" onclick="clearField('desiredLevel')">×</button>
+        </div>
+    </div>
+
+    <div class="field-block">
+        <label for="tradeTokens">Trade Tokens</label>
+        <div class="field-wrap">
+            <input type="number" id="tradeTokens" min="0" value="0">
+            <button type="button" class="clear-field" onclick="clearField('tradeTokens')">×</button>
+        </div>
+    </div>
+
+    <div class="field-block">
+        <label for="normalCrystals">Normal Crystals</label>
+        <div class="field-wrap">
+            <input type="number" id="normalCrystals" min="0" placeholder="">
+            <button type="button" class="clear-field" onclick="clearField('normalCrystals')">×</button>
+        </div>
+    </div>
+
+    <div class="field-block">
+        <label for="wildCards">Wild Cards</label>
+        <div class="field-wrap">
+            <input type="number" id="wildCards" min="0" value="0">
+            <button type="button" class="clear-field" onclick="clearField('wildCards')">×</button>
+        </div>
+    </div>
+
+    <div class="field-block">
+        <label for="refinedCrystals">Refined Crystals</label>
+        <div class="field-wrap">
+            <input type="number" id="refinedCrystals" min="0" placeholder="">
+            <button type="button" class="clear-field" onclick="clearField('refinedCrystals')">×</button>
+        </div>
+    </div>
+
+    <div class="field-block button-field-block">
+        <button class="calculate-button calculate-button-compact" onclick="calculateCards()">
+            Cast Calculation
+        </button>
+    </div>
+
+</div>
+
+        <div id="result"></div>
+
+        <div class="footer">
+            Mischief Managed ✨
+        </div>
+
+    </div>
+
+    <aside class="summary-panel">
+        <h2>Calculation Summary</h2>
+
+        <div id="summaryList" class="summary-empty">
+            No calculations yet.
+        </div>
+
+<div class="summary-button-row">
+    <button class="clear-button export-button" onclick="exportResults()">
+        Export Results
+    </button>
+
+    <button class="clear-button import-button" onclick="triggerImportResults()">
+        Import Results
+    </button>
+</div>
+
+<input 
+    type="file" 
+    id="importResultsFile" 
+    accept=".csv" 
+    style="display: none;"
+    onchange="importResultsFromFile(event)"
+>
+
+<button class="clear-button" onclick="clearSummary()">
+    Clear Summary
+</button>
+    </aside>
+
+</div>
+
+<script>
+const cardRarities = {
+    "Prior Incantato": "Epic",
+    "Broomstick": "Rare",
+    "Swelling Solution": "Common",
+    "Expulso": "Rare",
+    "Oppugno": "Common",
+    "Nebulus": "Rare",
+    "Floo Network": "Rare",
+    "Transfiguration": "Epic",
+    "Side-Along Apparition": "Rare",
+    "The Tales of Beedle the Bard": "Legendary",
+    "Confundus Charm": "Rare",
+    "Incarcerous": "Common",
+    "Episkey": "Rare",
+    "Expelliarmus": "Epic",
+    "Petrificus Totalus": "Rare",
+    "Essence of Dittany": "Common",
+    "Protego": "Rare",
+    "Expecto Patronum": "Mythic",
+    "Stupefy": "Common",
+    "Inflatus": "Rare",
+    "Fanged Flyer": "Epic",
+    "The Standard Book of Spells": "Legendary",
+    "Portkey": "Common",
+    "Bewitched Snowballs": "Rare",
+    "Flipendo": "Common",
+    "Invisibility Cloak": "Legendary",
+    "Carpe Retractum": "Common",
+    "Group Counter-Spell": "Mythic",
+    "Gobstones": "Epic",
+    "Felix Felicis": "Mythic",
+    "Hot Air Charm": "Rare",
+    "Incendio": "Epic",
+    "Acromantula Venom": "Common",
+    "Bludger": "Epic",
+    "Ventus": "Epic",
+    "Gubraithian Fire": "Mythic",
+    "Avis": "Epic",
+    "Sectumsempra": "Epic",
+    "Tebo": "Epic",
+    "Atmospheric Charm": "Rare",
+    "Legilimency": "Epic",
+    "Howler": "Common",
+    "Accio": "Epic",
+    "Time-Turner": "Epic",
+    "Crystal Ball": "Epic",
+    "Enchanted Popping Candy": "Common",
+    "Rennervate": "Common",
+    "Diffindo": "Epic",
+    "Glacius": "Rare",
+    "Confringo": "Epic",
+    "Crucio": "Dark",
+    "Protego Totalum": "Common",
+    "Headless Hunt": "Legendary",
+    "Protego Diabolica": "Legendary",
+    "Aguamenti": "Rare",
+    "Obscurus": "Dark",
+    "Meteolojinx": "Legendary",
+    "Bat-Bogey Hex": "Legendary",
+    "Avada Kedavra": "Dark",
+    "Thunderstorm": "Legendary",
+    "Orb of Water": "Legendary",
+    "Glacius Maxima": "Epic",
+    "Zouwu": "Legendary",
+    "Weasleys' Whiz-bangs": "Epic",
+    "Weasleys' Wildfire Whiz-bangs": "Epic",
+    "Azkaban": "Dark",
+
+    "Niffler": "Epic",
+    "Accio Snowman": "Epic",
+    "Vanishing Cabinet": "Rare",
+    "Book of Spells": "Rare",
+    "Spiders": "Common",
+    "The Monster Book of Monsters": "Rare",
+    "Ashwinder": "Epic",
+    "Hinkypunk": "Epic",
+    "Centaur": "Common",
+    "Cornish Pixies": "Common",
+    "Knight Bus": "Epic",
+    "Weasley's Firework Box": "Epic",
+    "Bombtastic Bomb Box": "Epic",
+    "Baby Manticores": "Epic",
+    "Murtlap": "Common",
+    "Pranktastic Present": "Common",
+    "Scamander's Suitcase": "Legendary",
+    "Occamy": "Epic",
+    "Thunderbird": "Epic",
+    "Matagot": "Rare",
+    "Swooping Evil": "Epic",
+    "Mooncalf": "Rare",
+    "Pawn": "Rare",
+    "Peeves": "Epic",
+    "Troll": "Rare",
+    "Golden Snitch": "Legendary",
+    "Unicorn": "Epic",
+    "Erumpent": "Rare",
+    "Dessert Master": "Epic",
+    "Fire Crab": "Rare",
+    "Acromantula's Nest": "Rare",
+    "Fwoopers": "Rare",
+    "Baby Chinese Fireball": "Legendary",
+    "Whomping Willow": "Rare",
+    "Winged Catapult": "Common",
+    "Yeti": "Rare",
+    "Memory Vial": "Rare",
+    "Death Eater": "Epic",
+    "Demiguise": "Epic",
+    "Kelpie": "Legendary",
+    "Piertotum Locomotor": "Legendary",
+    "Baby Antipodean Opaleye": "Legendary",
+    "En Pointe": "Epic",
+    "Mimbulus Mimbletonia": "Legendary",
+    "Fiendfyre": "Legendary",
+    "Norwegian Ridgeback Egg": "Legendary",
+    "Phoenix": "Legendary",
+    "Stack of Monster Book of Monsters": "Epic",
+    "Giant Squid": "Legendary",
+    "Three-Headed Puppy": "Epic",
+    "Blast-Ended Skrewt": "Rare",
+
+    "Cassandra Vole": "Epic",
+    "Daniel Page": "Rare",
+    "Lottie Turner": "Epic",
+    "Dolores Umbridge": "Common",
+    "Ivy Warrington": "Epic",
+    "Kevin Farrell": "Rare",
+    "Rubeus Hagrid": "Epic",
+    "Robyn Thistlethwaite": "Rare",
+    "Hermione Granger": "Legendary",
+    "Minerva McGonagall": "Legendary",
+    "Grawp": "Epic",
+    "Harry Potter": "Legendary",
+    "Ron Weasley": "Mythic",
+    "Malfoy Gang": "Legendary",
+    "Hermione Granger (Throwback)": "Mythic",
+    "Albus Dumbledore": "Mythic",
+    "Severus Snape": "Mythic",
+    "Long Shouren": "Legendary",
+    "Newt Scamander": "Mythic",
+    "Frey Twins": "Epic",
+    "Dobby": "Mythic",
+    "Luna Lovegood": "Legendary",
+    "Harry Potter (Throwback)": "Mythic",
+    "Abigail Grey": "Epic"
+};
+const CARD_IMAGE_FOLDER = "card-images";
+
+const cardImageAliases = {
+    "Abigail Grey": "Abigail Gray",
+    "Regenerate": "Rennervate"
+};
+
+function getCardImageFileName(cardName) {
+    return cardImageAliases[cardName] || cardName;
+}
+
+function getCardImageSlug(cardName) {
+    return getCardImageFileName(cardName)
+        .trim()
+        .replace(/\s+/g, "-");
+}
+
+function encodePathSegment(value) {
+    return encodeURIComponent(value)
+        .replace(/'/g, "%27")
+        .replace(/\(/g, "%28")
+        .replace(/\)/g, "%29");
+}
+
+function getCardImagePath(cardName) {
+    const fileName = getCardImageSlug(cardName);
+    return `${CARD_IMAGE_FOLDER}/${encodePathSegment(fileName)}.png`;
+}
+
+function getSummaryImageHtml(cardName) {
+    return `
+        <img
+            class="summary-card-thumbnail"
+            src="${getCardImagePath(cardName)}"
+            alt="${cardName} card image"
+            onerror="
+                const layout = this.closest('.summary-card-layout');
+                if (layout) layout.classList.add('no-image');
+                this.remove();
+            "
+        >
+    `;
+}
+const cards = {
+    Legendary: {
+        1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0,
+        9:0, 10:1, 11:2, 12:3, 13:4, 14:5, 15:6, 16:8, 17:10, 18:12
+    },
+    Epic: {
+        1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:1, 8:2,
+        9:3, 10:4, 11:6, 12:8, 13:10, 14:13, 15:16, 16:20, 17:25, 18:30
+    },
+    Rare: {
+        1:0, 2:0, 3:0, 4:1, 5:2, 6:3, 7:5, 8:8,
+        9:10, 10:12, 11:18, 12:25, 13:35, 14:50, 15:70, 16:95, 17:125, 18:160
+    },
+    Common: {
+        1:0, 2:1, 3:2, 4:3, 5:5, 6:8, 7:12, 8:20,
+        9:30, 10:45, 11:70, 12:100, 13:140, 14:190, 15:250, 16:320, 17:410, 18:510
+    }
+};
+
+const goldCosts = {
+    1: 0,
+    2: 100,
+    3: 150,
+    4: 200,
+    5: 300,
+    6: 500,
+    7: 750,
+    8: 1000,
+    9: 1500,
+    10: 2000,
+    11: 3000,
+    12: 5000,
+    13: 7500,
+    14: 10000,
+    15: 15000,
+    16: 20000,
+    17: 25000,
+    18: 30000
+};
+
+let calculationHistory = [];
+let activeSuggestionIndex = -1;
+let currentCardSuggestions = [];
+
+function calculateGoldCost(current, desired) {
+    let goldCost = 0;
+
+    for (let level = current + 1; level <= desired; level++) {
+        goldCost += goldCosts[level] || 0;
+    }
+
+    return goldCost;
+}
+const GOLD_IMAGE_PATH = "assets/Gold.webp";
+function calculateCrystalSavings(category, current, desired, normalCrystals, refinedCrystals) {
+    const usedLevels = new Set();
+
+    let normalUsed = 0;
+    let refinedUsed = 0;
+
+    let normalSavings = 0;
+    let refinedSavings = 0;
+
+    const upgradeLevels = [];
+
+    for (let level = current + 1; level <= desired; level++) {
+        upgradeLevels.push(level);
+    }
+
+    const highestFirst = [...upgradeLevels].sort((a, b) => b - a);
+
+    // Refined crystals are most valuable above level 15.
+    highestFirst.forEach(level => {
+        if (
+            refinedUsed < refinedCrystals &&
+            level > 15 &&
+            !usedLevels.has(level)
+        ) {
+            refinedSavings += cards[category][level] || 0;
+            refinedUsed++;
+            usedLevels.add(level);
+        }
+    });
+
+    // Normal crystals can be used up to level 15.
+    highestFirst.forEach(level => {
+        if (
+            normalUsed < normalCrystals &&
+            level <= 15 &&
+            !usedLevels.has(level)
+        ) {
+            normalSavings += cards[category][level] || 0;
+            normalUsed++;
+            usedLevels.add(level);
+        }
+    });
+
+    // If refined crystals remain, allow them to apply to the next highest remaining levels.
+    // This keeps the calculator useful if someone chooses to spend refined crystals below 16.
+    highestFirst.forEach(level => {
+        if (
+            refinedUsed < refinedCrystals &&
+            !usedLevels.has(level)
+        ) {
+            refinedSavings += cards[category][level] || 0;
+            refinedUsed++;
+            usedLevels.add(level);
+        }
+    });
+
+    return {
+        normalUsed,
+        refinedUsed,
+        normalSavings,
+        refinedSavings,
+        totalCrystalSavings: normalSavings + refinedSavings
+    };
+}
+function goldIconHtml(size = "summary") {
+    const sizeClass = size === "result" ? "gold-icon-result" : "gold-icon-summary";
+
+    return `
+        <img 
+            class="gold-icon ${sizeClass}" 
+            src="${GOLD_IMAGE_PATH}" 
+            alt="Gold"
+        >
+    `;
+}
+function getAllowedRarities(selectedRarity) {
+    if (selectedRarity === "Legendary") {
+        return ["Legendary", "Mythic", "Dark"];
+    }
+
+    if (selectedRarity) {
+        return [selectedRarity];
+    }
+
+    return [];
+}
+
+function getFilteredCards() {
+    const selectedRarity = document.getElementById("category").value;
+    const allowedRarities = getAllowedRarities(selectedRarity);
+    const searchTerm = document.getElementById("cardName").value.trim().toLowerCase();
+
+    return Object.keys(cardRarities)
+        .filter(card => {
+            const rarityMatches =
+                allowedRarities.length === 0 ||
+                allowedRarities.includes(cardRarities[card]);
+
+            const searchMatches =
+                searchTerm === "" ||
+                card.toLowerCase().includes(searchTerm);
+
+            return rarityMatches && searchMatches;
+        })
+        .sort();
+}
+
+function renderCardSuggestions() {
+    const menu = document.getElementById("cardSuggestions");
+    const filteredCards = getFilteredCards();
+
+    currentCardSuggestions = filteredCards;
+    activeSuggestionIndex = -1;
+
+    menu.innerHTML = "";
+
+    if (filteredCards.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "autocomplete-empty";
+        empty.textContent = "No matching cards found.";
+        menu.appendChild(empty);
+        menu.classList.add("show");
+        return;
+    }
+
+    filteredCards.forEach((card, index) => {
+        const item = document.createElement("div");
+        item.className = "autocomplete-item";
+        item.dataset.index = index;
+
+        const name = document.createElement("div");
+        name.textContent = card;
+
+        const rarity = document.createElement("span");
+        rarity.className = "autocomplete-rarity";
+        rarity.textContent = cardRarities[card];
+
+        item.appendChild(name);
+        item.appendChild(rarity);
+
+        item.addEventListener("mousedown", function(event) {
+            event.preventDefault();
+            chooseCard(card);
+        });
+
+        menu.appendChild(item);
+    });
+
+    menu.classList.add("show");
+}
+
+function hideCardSuggestions() {
+    document.getElementById("cardSuggestions").classList.remove("show");
+    activeSuggestionIndex = -1;
+}
+
+function setActiveSuggestion(index) {
+    const items = document.querySelectorAll("#cardSuggestions .autocomplete-item");
+
+    if (items.length === 0) {
+        activeSuggestionIndex = -1;
+        return;
+    }
+
+    if (index < 0) {
+        index = items.length - 1;
+    }
+
+    if (index >= items.length) {
+        index = 0;
+    }
+
+    items.forEach(item => item.classList.remove("active"));
+
+    activeSuggestionIndex = index;
+    items[activeSuggestionIndex].classList.add("active");
+    items[activeSuggestionIndex].scrollIntoView({
+        block: "nearest"
+    });
+}
+
+function formIsReadyForCalculation() {
+    const cardName = document.getElementById("cardName").value.trim();
+    const category = document.getElementById("category").value;
+    const currentLevel = document.getElementById("currentLevel").value;
+    const desiredLevel = document.getElementById("desiredLevel").value;
+
+    return (
+        cardName !== "" &&
+        cardRarities[cardName] &&
+        category !== "" &&
+        currentLevel !== "" &&
+        desiredLevel !== ""
+    );
+}
+
+function chooseCard(card) {
+    document.getElementById("cardName").value = card;
+    autoFillRarity();
+    hideCardSuggestions();
+}
+
+function clearField(fieldId) {
+    const field = document.getElementById(fieldId);
+    field.value = "";
+    field.focus();
+
+if (fieldId === "cardName") {
+    clearCardAndAllFields();
+    renderCardSuggestions();
+    return;
+}
+
+    if (fieldId === "category") {
+        document.getElementById("currentLevel").value = "";
+        document.getElementById("desiredLevel").value = "";
+        renderCardSuggestions();
+        return;
+    }
+
+    if (fieldId === "currentLevel") {
+        document.getElementById("desiredLevel").value = "";
+        return;
+    }
+}
+
+function autoFillRarity() {
+    const cardName = document.getElementById("cardName").value.trim();
+    const category = document.getElementById("category");
+
+    if (cardRarities[cardName]) {
+        category.value = cardRarities[cardName];
+        autoFillCurrentLevel();
+    }
+}
+
+function filterCardsByRarity() {
+    const cardInput = document.getElementById("cardName");
+    const selectedRarity = document.getElementById("category").value;
+    const selectedCard = cardInput.value.trim();
+
+    autoFillCurrentLevel();
+
+    if (selectedCard && cardRarities[selectedCard]) {
+        const allowedRarities = getAllowedRarities(selectedRarity);
+
+        if (
+            allowedRarities.length > 0 &&
+            !allowedRarities.includes(cardRarities[selectedCard])
+        ) {
+            cardInput.value = "";
+        }
+    }
+
+    renderCardSuggestions();
+}
+
+function getStartingLevel(displayCategory) {
+    if (
+        displayCategory === "Legendary" ||
+        displayCategory === "Mythic" ||
+        displayCategory === "Dark"
+    ) {
+        return 9;
+    }
+
+    if (displayCategory === "Epic") {
+        return 6;
+    }
+
+    if (displayCategory === "Rare") {
+        return 3;
+    }
+
+    if (displayCategory === "Common") {
+        return 1;
+    }
+
+    return "";
+}
+
+function autoFillCurrentLevel() {
+    const displayCategory = document.getElementById("category").value;
+    const currentLevel = document.getElementById("currentLevel");
+
+    const startingLevel = getStartingLevel(displayCategory);
+
+    if (startingLevel !== "") {
+        currentLevel.value = startingLevel;
+        autoFillDesiredLevel();
+    }
+}
+
+function autoFillDesiredLevel() {
+    const currentLevel = document.getElementById("currentLevel");
+    const desiredLevel = document.getElementById("desiredLevel");
+
+    const current = Number(currentLevel.value);
+    const desired = Number(desiredLevel.value);
+
+    if (!current || current < 1 || current >= 18) {
+        return;
+    }
+
+    const minimumDesired = current + 1;
+
+    desiredLevel.min = minimumDesired;
+
+    if (!desired || desired <= current) {
+        desiredLevel.value = minimumDesired;
+    }
+}
+
+function getCalculationCategory(displayCategory) {
+    if (displayCategory === "Mythic" || displayCategory === "Dark") {
+        return "Legendary";
+    }
+
+    return displayCategory;
+}
+
+function calculateCards() {
+    const cardName = document.getElementById("cardName").value.trim();
+    const current = Number(document.getElementById("currentLevel").value);
+    const desired = Number(document.getElementById("desiredLevel").value);
+    const displayCategory = document.getElementById("category").value;
+    const category = getCalculationCategory(displayCategory);
+
+const ownedCards = Number(document.getElementById("ownedCards").value) || 0;
+const tradeTokens = Number(document.getElementById("tradeTokens").value) || 0;
+const wildCards = Number(document.getElementById("wildCards").value) || 0;
+const normalCrystals = Number(document.getElementById("normalCrystals").value) || 0;
+const refinedCrystals = Number(document.getElementById("refinedCrystals").value) || 0;
+
+    const result = document.getElementById("result");
+
+    if (!cardName) {
+        result.textContent = "Choose or type a card name.";
+        return;
+    }
+
+    if (!cardRarities[cardName]) {
+        result.textContent = "Select a card from the suggested list.";
+        return;
+    }
+
+    if (!displayCategory) {
+        result.textContent = "Select a rarity.";
+        return;
+    }
+
+    if (!current || !desired) {
+        result.textContent = "Enter both levels.";
+        return;
+    }
+
+    if (current < 1 || current > 18 || desired < 1 || desired > 18) {
+        result.textContent = "Levels must be between 1 and 18.";
+        return;
+    }
+
+    if (desired <= current) {
+        result.textContent = "Desired level must be higher.";
+        return;
+    }
+
+    let baseNeed = 0;
+
+    for (let level = current + 1; level <= desired; level++) {
+        baseNeed += cards[category][level] || 0;
+    }
+
+    const goldCost = calculateGoldCost(current, desired);
+
+const crystalSavings = calculateCrystalSavings(
+    category,
+    current,
+    desired,
+    normalCrystals,
+    refinedCrystals
+);
+
+const deductions =
+    ownedCards +
+    tradeTokens +
+    wildCards +
+    crystalSavings.totalCrystalSavings;
+
+const finalNeed = Math.max(baseNeed - deductions, 0);
+    let deductionDetails = "";
+
+    if (ownedCards > 0) {
+        deductionDetails += `Owned: ${ownedCards.toLocaleString()} `;
+    }
+
+    if (tradeTokens > 0) {
+        deductionDetails += `Trade Tokens: ${tradeTokens.toLocaleString()} `;
+    }
+
+    if (wildCards > 0) {
+        deductionDetails += `Wild Cards: ${wildCards.toLocaleString()} `;
+    }
+if (crystalSavings.normalUsed > 0) {
+    deductionDetails += `Normal Crystals: ${crystalSavings.normalUsed.toLocaleString()} saved ${crystalSavings.normalSavings.toLocaleString()} cards `;
+}
+
+if (crystalSavings.refinedUsed > 0) {
+    deductionDetails += `Refined Crystals: ${crystalSavings.refinedUsed.toLocaleString()} saved ${crystalSavings.refinedSavings.toLocaleString()} cards `;
+}
+    result.innerHTML = `
+        ✨ ${finalNeed.toLocaleString()} Cards Needed ✨
+        <span class="result-detail">
+            ${cardName}<br>
+            Rarity: ${displayCategory}<br>
+            Base Need: ${baseNeed.toLocaleString()}<br>
+            <span class="gold-line">
+                ${goldIconHtml("result")} Gold Cost: ${goldCost.toLocaleString()}
+            </span>
+            ${deductions > 0 ? `<br>${deductionDetails}<br>Total Deducted: ${deductions.toLocaleString()}` : ""}
+        </span>
+    `;
+
+    addToSummary({
+        cardName,
+        current,
+        desired,
+        category: displayCategory,
+        baseNeed,
+        goldCost,
+        ownedCards,
+        tradeTokens,
+        wildCards,
+        normalCrystals,
+refinedCrystals,
+normalCrystalsUsed: crystalSavings.normalUsed,
+refinedCrystalsUsed: crystalSavings.refinedUsed,
+normalCrystalSavings: crystalSavings.normalSavings,
+refinedCrystalSavings: crystalSavings.refinedSavings,
+totalCrystalSavings: crystalSavings.totalCrystalSavings,
+        deductions,
+        finalNeed,
+        timestamp: Date.now()
+    });
+}
+
+function addToSummary(entry) {
+    calculationHistory.unshift(entry);
+    renderSummary();
+}
+
+function renderSummary() {
+    const summaryList = document.getElementById("summaryList");
+
+    if (calculationHistory.length === 0) {
+        summaryList.className = "summary-empty";
+        summaryList.textContent = "No calculations yet.";
+        return;
+    }
+
+    summaryList.className = "";
+
+    const groupedByCard = {};
+
+    calculationHistory.forEach(item => {
+        if (!groupedByCard[item.cardName]) {
+            groupedByCard[item.cardName] = [];
+        }
+
+        groupedByCard[item.cardName].push(item);
+    });
+
+    const sortedCardGroups = Object.entries(groupedByCard).sort((a, b) => {
+        const latestA = Math.max(...a[1].map(item => item.timestamp));
+        const latestB = Math.max(...b[1].map(item => item.timestamp));
+        return latestB - latestA;
+    });
+
+    summaryList.innerHTML = sortedCardGroups.map(([cardName, entries]) => {
+        entries.sort((a, b) => b.timestamp - a.timestamp);
+
+        const cardsHtml = entries.map((item, index) => {
+            let deductionLines = "";
+
+            if (item.ownedCards > 0) {
+                deductionLines += `<div><strong>Owned:</strong> ${item.ownedCards.toLocaleString()}</div>`;
+            }
+
+            if (item.tradeTokens > 0) {
+                deductionLines += `<div><strong>Trade:</strong> ${item.tradeTokens.toLocaleString()}</div>`;
+            }
+
+            if (item.wildCards > 0) {
+                deductionLines += `<div><strong>Wild:</strong> ${item.wildCards.toLocaleString()}</div>`;
+            }
+if (item.normalCrystalsUsed > 0) {
+    deductionLines += `
+        <div>
+            <strong>Normal Crystal:</strong> ${item.normalCrystalsUsed.toLocaleString()}
+            <br>Saved: ${item.normalCrystalSavings.toLocaleString()}
+        </div>
+    `;
+}
+
+if (item.refinedCrystalsUsed > 0) {
+    deductionLines += `
+        <div>
+            <strong>Refined Crystal:</strong> ${item.refinedCrystalsUsed.toLocaleString()}
+            <br>Saved: ${item.refinedCrystalSavings.toLocaleString()}
+        </div>
+    `;
+}
+            if (item.deductions > 0) {
+                deductionLines += `<div><strong>Deducted:</strong> ${item.deductions.toLocaleString()}</div>`;
+            }
+
+            return `
+                <div class="summary-card">
+                    <div class="summary-final">
+                        ${index === 0 ? "Latest: " : ""}${item.finalNeed.toLocaleString()} Needed
+                    </div>
+
+                    <div class="summary-meta">
+                        ${item.category} | Lvl ${item.current} → ${item.desired}
+                    </div>
+
+                    <div>
+                        <strong>Base:</strong> ${item.baseNeed.toLocaleString()}
+                    </div>
+
+                    ${deductionLines ? `
+                        <div class="summary-deductions">
+                            ${deductionLines}
+                        </div>
+                    ` : ""}
+
+                    <div class="summary-gold-bottom">
+                        <span class="gold-line">
+                            ${goldIconHtml("summary")} <strong>Gold:</strong> ${(item.goldCost || 0).toLocaleString()}
+                        </span>
+                    </div>
+                </div>
+            `;
+        }).join("");
+
+    return `
+    <div class="card-group">
+        <div class="summary-card-layout">
+            ${getSummaryImageHtml(cardName)}
+
+            <div>
+                <div class="card-group-title">${cardName}</div>
+                <div class="summary-history-row">
+                    ${cardsHtml}
+                </div>
+            </div>
+        </div>
+    </div>
+`;
+    }).join("");
+}
+
+function exportResults() {
+    if (calculationHistory.length === 0) {
+        alert("No calculation results to export yet.");
+        return;
+    }
+
+    const headers = [
+        "Date",
+        "Card",
+        "Rarity",
+        "Current Level",
+        "Desired Level",
+        "Base Need",
+        "Gold Cost",
+        "Owned",
+        "Trade Tokens",
+"Wild Cards",
+"Normal Crystals Used",
+"Normal Crystal Savings",
+"Refined Crystals Used",
+"Refined Crystal Savings",
+"Total Crystal Savings",
+"Total Deducted",
+"Final Cards Needed"
+    ];
+
+    const rows = calculationHistory.map(item => {
+        const date = new Date(item.timestamp).toLocaleString();
+
+        return [
+            date,
+            item.cardName,
+            item.category,
+            item.current,
+            item.desired,
+            item.baseNeed,
+            item.goldCost || 0,
+            item.ownedCards,
+            item.tradeTokens,
+item.wildCards,
+item.normalCrystalsUsed || 0,
+item.normalCrystalSavings || 0,
+item.refinedCrystalsUsed || 0,
+item.refinedCrystalSavings || 0,
+item.totalCrystalSavings || 0,
+item.deductions,
+item.finalNeed
+        ];
+    });
+
+    const csvContent = [
+        headers,
+        ...rows
+    ]
+        .map(row => row.map(escapeCSV).join(","))
+        .join("\n");
+
+    const blob = new Blob(["\uFEFF" + csvContent], {
+        type: "text/csv;charset=utf-8;"
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    const fileDate = new Date()
+        .toISOString()
+        .slice(0, 10);
+
+    link.href = url;
+    link.download = `voodoo-card-calculations-${fileDate}.csv`;
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+function escapeCSV(value) {
+    const stringValue = String(value ?? "");
+
+    if (
+        stringValue.includes(",") ||
+        stringValue.includes('"') ||
+        stringValue.includes("\n")
+    ) {
+        return `"${stringValue.replace(/"/g, '""')}"`;
+    }
+
+    return stringValue;
+}
+function triggerImportResults() {
+    document.getElementById("importResultsFile").click();
+}
+
+function importResultsFromFile(event) {
+    const file = event.target.files[0];
+
+    if (!file) {
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        try {
+            const csvText = e.target.result;
+            const rows = parseCSV(csvText);
+
+            if (rows.length < 2) {
+                alert("This file does not contain any calculation results.");
+                return;
+            }
+
+            const headers = rows[0].map(header => header.trim());
+            const importedEntries = [];
+
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+
+                if (!row || row.length === 0 || row.every(cell => String(cell).trim() === "")) {
+                    continue;
+                }
+
+                const entry = createHistoryEntryFromCSV(headers, row);
+
+                if (entry) {
+                    importedEntries.push(entry);
+                }
+            }
+
+            if (importedEntries.length === 0) {
+                alert("No valid calculation results were found in this file.");
+                return;
+            }
+
+            calculationHistory = [
+                ...importedEntries,
+                ...calculationHistory
+            ];
+
+            calculationHistory.sort((a, b) => b.timestamp - a.timestamp);
+
+            renderSummary();
+
+            alert(`${importedEntries.length} calculation result${importedEntries.length === 1 ? "" : "s"} imported.`);
+        } catch (error) {
+            console.error(error);
+            alert("Something went wrong while importing the file.");
+        }
+
+        event.target.value = "";
+    };
+
+    reader.readAsText(file);
+}
+
+function createHistoryEntryFromCSV(headers, row) {
+    function getValue(columnName) {
+        const index = headers.indexOf(columnName);
+        return index >= 0 ? row[index] : "";
+    }
+
+    const cardName = getValue("Card").trim();
+    const category = getValue("Rarity").trim();
+
+    if (!cardName || !cardRarities[cardName]) {
+        return null;
+    }
+
+    const current = Number(getValue("Current Level"));
+    const desired = Number(getValue("Desired Level"));
+
+    if (!current || !desired) {
+        return null;
+    }
+
+    const baseNeed = Number(getValue("Base Need")) || 0;
+    const goldCost = Number(getValue("Gold Cost")) || calculateGoldCost(current, desired);
+    const ownedCards = Number(getValue("Owned")) || 0;
+    const tradeTokens = Number(getValue("Trade Tokens")) || 0;
+    const wildCards = Number(getValue("Wild Cards")) || 0;
+const normalCrystalsUsed = Number(getValue("Normal Crystals Used")) || 0;
+const normalCrystalSavings = Number(getValue("Normal Crystal Savings")) || 0;
+const refinedCrystalsUsed = Number(getValue("Refined Crystals Used")) || 0;
+const refinedCrystalSavings = Number(getValue("Refined Crystal Savings")) || 0;
+const totalCrystalSavings = Number(getValue("Total Crystal Savings")) || normalCrystalSavings + refinedCrystalSavings;
+const deductions =
+    Number(getValue("Total Deducted")) ||
+    ownedCards + tradeTokens + wildCards + totalCrystalSavings;
+    const finalNeed = Number(getValue("Final Cards Needed")) || Math.max(baseNeed - deductions, 0);
+
+    const dateValue = getValue("Date");
+    const parsedDate = Date.parse(dateValue);
+    const timestamp = Number.isNaN(parsedDate) ? Date.now() : parsedDate;
+
+    return {
+        cardName,
+        current,
+        desired,
+        category,
+        baseNeed,
+        goldCost,
+        ownedCards,
+        tradeTokens,
+        wildCards,
+        normalCrystals: normalCrystalsUsed,
+refinedCrystals: refinedCrystalsUsed,
+normalCrystalsUsed,
+refinedCrystalsUsed,
+normalCrystalSavings,
+refinedCrystalSavings,
+totalCrystalSavings,
+        deductions,
+        finalNeed,
+        timestamp
+    };
+}
+
+function parseCSV(csvText) {
+    const rows = [];
+    let currentRow = [];
+    let currentCell = "";
+    let insideQuotes = false;
+
+    for (let i = 0; i < csvText.length; i++) {
+        const char = csvText[i];
+        const nextChar = csvText[i + 1];
+
+        if (char === '"' && insideQuotes && nextChar === '"') {
+            currentCell += '"';
+            i++;
+            continue;
+        }
+
+        if (char === '"') {
+            insideQuotes = !insideQuotes;
+            continue;
+        }
+
+        if (char === "," && !insideQuotes) {
+            currentRow.push(currentCell);
+            currentCell = "";
+            continue;
+        }
+
+        if ((char === "\n" || char === "\r") && !insideQuotes) {
+            if (char === "\r" && nextChar === "\n") {
+                i++;
+            }
+
+            currentRow.push(currentCell);
+            rows.push(currentRow);
+
+            currentRow = [];
+            currentCell = "";
+            continue;
+        }
+
+        currentCell += char;
+    }
+
+    if (currentCell !== "" || currentRow.length > 0) {
+        currentRow.push(currentCell);
+        rows.push(currentRow);
+    }
+
+    return rows;
+}
+function clearSummary() {
+    calculationHistory = [];
+    renderSummary();
+}
+
+/* Event Listeners */
+    function clearCardAndAllFields() {
+    document.getElementById("cardName").value = "";
+    document.getElementById("category").value = "";
+    document.getElementById("currentLevel").value = "";
+    document.getElementById("desiredLevel").value = "";
+
+    document.getElementById("ownedCards").value = 0;
+    document.getElementById("tradeTokens").value = 0;
+    document.getElementById("wildCards").value = 0;
+
+    document.getElementById("normalCrystals").value = "";
+    document.getElementById("refinedCrystals").value = "";
+
+    document.getElementById("result").innerHTML = "";
+
+    hideCardSuggestions();
+    document.getElementById("cardName").focus();
+}
+document.getElementById("cardName").addEventListener("focus", renderCardSuggestions);
+document.getElementById("cardName").addEventListener("click", renderCardSuggestions);
+
+document.getElementById("currentLevel").addEventListener("input", autoFillDesiredLevel);
+document.getElementById("currentLevel").addEventListener("change", autoFillDesiredLevel);
+
+document.getElementById("cardName").addEventListener("input", function() {
+    const cardName = document.getElementById("cardName").value.trim();
+
+    if (cardName === "") {
+        document.getElementById("category").value = "";
+        document.getElementById("currentLevel").value = "";
+        document.getElementById("desiredLevel").value = "";
+    } else {
+        autoFillRarity();
+    }
+
+    renderCardSuggestions();
+});
+
+document.getElementById("cardName").addEventListener("keydown", function(event) {
+    const menu = document.getElementById("cardSuggestions");
+    const menuIsOpen = menu.classList.contains("show");
+
+    if (event.key === "ArrowDown") {
+        event.preventDefault();
+
+        if (!menuIsOpen) {
+            renderCardSuggestions();
+        }
+
+        if (currentCardSuggestions.length > 0) {
+            setActiveSuggestion(activeSuggestionIndex + 1);
+        }
+
+        return;
+    }
+
+    if (event.key === "ArrowUp") {
+        event.preventDefault();
+
+        if (!menuIsOpen) {
+            renderCardSuggestions();
+        }
+
+        if (currentCardSuggestions.length > 0) {
+            setActiveSuggestion(activeSuggestionIndex - 1);
+        }
+
+        return;
+    }
+
+    if (event.key === "Enter") {
+        if (menuIsOpen && activeSuggestionIndex >= 0) {
+            event.preventDefault();
+            chooseCard(currentCardSuggestions[activeSuggestionIndex]);
+            return;
+        }
+
+        if (formIsReadyForCalculation()) {
+            event.preventDefault();
+            calculateCards();
+        }
+
+        return;
+    }
+
+    if (event.key === "Escape") {
+        event.preventDefault();
+        clearCardAndAllFields();
+        return;
+    }
+});
+document.getElementById("category").addEventListener("change", filterCardsByRarity);
+
+document.getElementById("category").addEventListener("keydown", function(event) {
+    if (event.key === "Enter" && formIsReadyForCalculation()) {
+        event.preventDefault();
+        calculateCards();
+    }
+});
+
+[
+    "currentLevel",
+    "desiredLevel",
+    "ownedCards",
+    "tradeTokens",
+    "wildCards",
+    "normalCrystals",
+    "refinedCrystals"
+].forEach(fieldId => {
+    document.getElementById(fieldId).addEventListener("keydown", function(event) {
+        if (event.key === "Enter" && formIsReadyForCalculation()) {
+            event.preventDefault();
+            calculateCards();
+        }
+    });
+});
+
+document.addEventListener("click", function(event) {
+    const cardField = document.getElementById("cardName");
+    const menu = document.getElementById("cardSuggestions");
+
+    if (!cardField.contains(event.target) && !menu.contains(event.target)) {
+        hideCardSuggestions();
+    }
+});
+</script>
+
+</body>
+</html>
