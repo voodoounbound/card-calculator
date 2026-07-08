@@ -346,7 +346,26 @@ select:focus {
     color: #9f9270;
     font-family: 'Witches Magic', sans-serif;
 }
+.clear-calculator-button {
+    width: 100%;
+    margin-top: 10px;
+    padding: 7px;
+    border: 1px solid rgba(212,175,55,.75);
+    border-radius: 5px;
+    background: rgba(15, 15, 26, 0.45);
+    color: #d4af37;
+    font-family: 'Mendalion', sans-serif;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: .2s;
+}
 
+.clear-calculator-button:hover {
+    background: rgba(212,175,55,.16);
+    box-shadow:
+        0 0 8px rgba(212,175,55,.45),
+        0 0 18px rgba(212,175,55,.16);
+}
 /* Summary Panel */
 .summary-panel {
     width: 100%;
@@ -812,9 +831,12 @@ select:focus {
         <div id="result"></div>
 
         <div class="footer">
-            Mischief Managed ✨
+            ✨ Mischief Managed ✨
         </div>
 
+        <button class="clear-calculator-button" onclick="clearCardAndAllFields()">
+    Clear Calculator
+</button>
     </div>
 
     <aside class="summary-panel">
@@ -1300,7 +1322,6 @@ function clearField(fieldId) {
     field.focus();
 
 if (fieldId === "cardName") {
-    clearCardAndAllFields();
     renderCardSuggestions();
     return;
 }
@@ -2070,11 +2091,7 @@ document.getElementById("currentLevel").addEventListener("change", autoFillDesir
 document.getElementById("cardName").addEventListener("input", function() {
     const cardName = document.getElementById("cardName").value.trim();
 
-    if (cardName === "") {
-        document.getElementById("category").value = "";
-        document.getElementById("currentLevel").value = "";
-        document.getElementById("desiredLevel").value = "";
-    } else {
+    if (cardName !== "") {
         autoFillRarity();
     }
 
@@ -2129,10 +2146,10 @@ document.getElementById("cardName").addEventListener("keydown", function(event) 
     }
 
     if (event.key === "Escape") {
-        event.preventDefault();
-        clearCardAndAllFields();
-        return;
-    }
+    event.preventDefault();
+    hideCardSuggestions();
+    return;
+}
 });
 document.getElementById("category").addEventListener("change", filterCardsByRarity);
 
