@@ -325,23 +325,45 @@ input:disabled {
 
 #result {
     margin-top: 22px;
-    text-align: center;
+    min-height: 62px;
+    color: #f4e7c5;
+}
+
+.result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 18px;
+    row-gap: 6px;
+    max-width: 360px;
+    margin: 0 auto;
+    text-align: left;
+    font-size: 1rem;
+    line-height: 1.25;
+}
+
+.result-grid-item {
+    min-width: 0;
+}
+
+.result-grid-item strong {
+    color: #d4af37;
+}
+
+.result-grid-full {
+    grid-column: 1 / -1;
+}
+
+.result-cards-needed {
+    color: #d4af37;
     font-size: 1.15rem;
     font-weight: bold;
-    color: #d4af37;
-    min-height: 62px;
     text-shadow: 0 0 10px rgba(212,175,55,.45);
 }
 
-.result-detail {
-    display: block;
-    margin-top: 8px;
-    font-size: 1rem;
-    color: #f4e7c5;
-    font-weight: normal;
-    line-height: 1.35;
+.result-muted {
+    color: #c8b98f;
 }
-
+    
 .footer {
     margin-top: 34px;
     text-align: center;
@@ -479,13 +501,6 @@ input:disabled {
     line-height: 20px;
     cursor: pointer;
     transition: .2s;
-}
-
-.delete-scenario-button:hover {
-    background: rgba(120, 35, 35, 0.85);
-    color: #f4e7c5;
-    border-color: rgba(244, 231, 197, .65);
-    box-shadow: 0 0 6px rgba(120, 35, 35, .65);
 }
 
 .delete-scenario-button:hover {
@@ -1525,12 +1540,12 @@ function calculateCards() {
     const displayCategory = document.getElementById("category").value;
     const category = getCalculationCategory(displayCategory);
 
-const ownedCards = Number(document.getElementById("ownedCards").value) || 0;
-const rawTradeTokens = Number(document.getElementById("tradeTokens").value) || 0;
-const tradeTokens = canUseTradeTokens(displayCategory) ? rawTradeTokens : 0;
-const wildCards = Number(document.getElementById("wildCards").value) || 0;
-const normalCrystals = Number(document.getElementById("normalCrystals").value) || 0;
-const refinedCrystals = Number(document.getElementById("refinedCrystals").value) || 0;
+    const ownedCards = Number(document.getElementById("ownedCards").value) || 0;
+    const rawTradeTokens = Number(document.getElementById("tradeTokens").value) || 0;
+    const tradeTokens = canUseTradeTokens(displayCategory) ? rawTradeTokens : 0;
+    const wildCards = Number(document.getElementById("wildCards").value) || 0;
+    const normalCrystals = Number(document.getElementById("normalCrystals").value) || 0;
+    const refinedCrystals = Number(document.getElementById("refinedCrystals").value) || 0;
 
     const result = document.getElementById("result");
 
@@ -1572,52 +1587,107 @@ const refinedCrystals = Number(document.getElementById("refinedCrystals").value)
 
     const goldCost = calculateGoldCost(current, desired);
 
-const crystalSavings = calculateCrystalSavings(
-    category,
-    current,
-    desired,
-    normalCrystals,
-    refinedCrystals
-);
+    const crystalSavings = calculateCrystalSavings(
+        category,
+        current,
+        desired,
+        normalCrystals,
+        refinedCrystals
+    );
 
-const deductions =
-    ownedCards +
-    tradeTokens +
-    wildCards +
-    crystalSavings.totalCrystalSavings;
+    const deductions =
+        ownedCards +
+        tradeTokens +
+        wildCards +
+        crystalSavings.totalCrystalSavings;
 
-const finalNeed = Math.max(baseNeed - deductions, 0);
-    let deductionDetails = "";
+    const finalNeed = Math.max(baseNeed - deductions, 0);
+
+    let resourceCells = "";
 
     if (ownedCards > 0) {
-        deductionDetails += `Owned: ${ownedCards.toLocaleString()} `;
+        resourceCells += `
+            <div class="result-grid-item">
+                <strong>Owned:</strong><br>
+                ${ownedCards.toLocaleString()}
+            </div>
+        `;
     }
 
     if (tradeTokens > 0) {
-        deductionDetails += `Trade Tokens: ${tradeTokens.toLocaleString()} `;
+        resourceCells += `
+            <div class="result-grid-item">
+                <strong>Trade Tokens:</strong><br>
+                ${tradeTokens.toLocaleString()}
+            </div>
+        `;
     }
 
     if (wildCards > 0) {
-        deductionDetails += `Wild Cards: ${wildCards.toLocaleString()} `;
+        resourceCells += `
+            <div class="result-grid-item">
+                <strong>Wild Cards:</strong><br>
+                ${wildCards.toLocaleString()}
+            </div>
+        `;
     }
-if (crystalSavings.normalUsed > 0) {
-    deductionDetails += `Normal Crystals: ${crystalSavings.normalUsed.toLocaleString()} saved ${crystalSavings.normalSavings.toLocaleString()} cards `;
-}
 
-if (crystalSavings.refinedUsed > 0) {
-    deductionDetails += `Refined Crystals: ${crystalSavings.refinedUsed.toLocaleString()} saved ${crystalSavings.refinedSavings.toLocaleString()} cards `;
-}
+    if (crystalSavings.normalUsed > 0) {
+        resourceCells += `
+            <div class="result-grid-item">
+                <strong>Normal Crystals:</strong><br>
+                ${crystalSavings.normalUsed.toLocaleString()}<br>
+                <span class="result-muted">Saved ${crystalSavings.normalSavings.toLocaleString()} cards</span>
+            </div>
+        `;
+    }
+
+    if (crystalSavings.refinedUsed > 0) {
+        resourceCells += `
+            <div class="result-grid-item">
+                <strong>Refined Crystals:</strong><br>
+                ${crystalSavings.refinedUsed.toLocaleString()}<br>
+                <span class="result-muted">Saved ${crystalSavings.refinedSavings.toLocaleString()} cards</span>
+            </div>
+        `;
+    }
+
     result.innerHTML = `
-        ✨ ${finalNeed.toLocaleString()} Cards Needed ✨
-        <span class="result-detail">
-            ${cardName}<br>
-            Rarity: ${displayCategory}<br>
-            Base Need: ${baseNeed.toLocaleString()}<br>
-            <span class="gold-line">
-                ${goldIconHtml("result")} Gold Cost: ${goldCost.toLocaleString()}
-            </span>
-            ${deductions > 0 ? `<br>${deductionDetails}<br>Total Deducted: ${deductions.toLocaleString()}` : ""}
-        </span>
+        <div class="result-grid">
+            <div class="result-grid-item">
+                <strong>Card:</strong><br>
+                ${cardName}
+            </div>
+
+            <div class="result-grid-item">
+                <strong>Rarity:</strong><br>
+                ${displayCategory}
+            </div>
+
+            <div class="result-grid-item">
+                <strong>Base Need:</strong><br>
+                ${baseNeed.toLocaleString()}
+            </div>
+
+            <div class="result-grid-item">
+                <span class="gold-line">
+                    ${goldIconHtml("result")} <strong>Gold:</strong><br>
+                    ${goldCost.toLocaleString()}
+                </span>
+            </div>
+
+            ${resourceCells}
+
+            <div class="result-grid-item result-cards-needed">
+                Cards Needed:<br>
+                ${finalNeed.toLocaleString()}
+            </div>
+
+            <div class="result-grid-item">
+                <strong>Total Deducted:</strong><br>
+                ${deductions.toLocaleString()}
+            </div>
+        </div>
     `;
 
     addToSummary({
@@ -1631,18 +1701,17 @@ if (crystalSavings.refinedUsed > 0) {
         tradeTokens,
         wildCards,
         normalCrystals,
-refinedCrystals,
-normalCrystalsUsed: crystalSavings.normalUsed,
-refinedCrystalsUsed: crystalSavings.refinedUsed,
-normalCrystalSavings: crystalSavings.normalSavings,
-refinedCrystalSavings: crystalSavings.refinedSavings,
-totalCrystalSavings: crystalSavings.totalCrystalSavings,
+        refinedCrystals,
+        normalCrystalsUsed: crystalSavings.normalUsed,
+        refinedCrystalsUsed: crystalSavings.refinedUsed,
+        normalCrystalSavings: crystalSavings.normalSavings,
+        refinedCrystalSavings: crystalSavings.refinedSavings,
+        totalCrystalSavings: crystalSavings.totalCrystalSavings,
         deductions,
         finalNeed,
         timestamp: Date.now()
     });
 }
-
 function addToSummary(entry) {
     entry.scenarioId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
     entry.isPinned = false;
@@ -2161,15 +2230,13 @@ function parseCSV(csvText) {
 
     return rows;
 }
+
 function clearSummary() {
     calculationHistory = [];
     renderSummary();
 }
-    
-    function clearCardAndAllFields() {
-        
-/* Event Listeners */
 
+function clearCardAndAllFields() {
     document.getElementById("cardName").value = "";
     document.getElementById("category").value = "";
     document.getElementById("currentLevel").value = "";
@@ -2187,6 +2254,8 @@ function clearSummary() {
     hideCardSuggestions();
     document.getElementById("cardName").focus();
 }
+
+/* Event Listeners */
 document.getElementById("cardName").addEventListener("focus", renderCardSuggestions);
 document.getElementById("cardName").addEventListener("click", renderCardSuggestions);
 
