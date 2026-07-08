@@ -455,7 +455,32 @@ select:focus {
     color: #111;
     box-shadow: 0 0 6px rgba(212,175,55,.55);
 }
+.scenario-action-row {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 5px;
+    margin-bottom: 5px;
+}
 
+.delete-scenario-button {
+    width: 100%;
+    padding: 3px 4px;
+    border: 1px solid rgba(212,175,55,.45);
+    border-radius: 999px;
+    background: rgba(15, 15, 26, 0.65);
+    color: #c8b98f;
+    font-family: 'Mendalion', sans-serif;
+    font-size: .8rem;
+    cursor: pointer;
+    line-height: 1.15;
+}
+
+.delete-scenario-button:hover {
+    background: rgba(120, 35, 35, 0.8);
+    color: #f4e7c5;
+    border-color: rgba(244, 231, 197, .65);
+    box-shadow: 0 0 6px rgba(120, 35, 35, .65);
+}
 .summary-card.pinned-summary-card {
     border: 1px solid rgba(212,175,55,.85);
     border-radius: 7px;
@@ -1575,6 +1600,16 @@ function toggleScenarioPin(scenarioId) {
     scenario.isPinned = !scenario.isPinned;
     renderSummary();
 }
+function deleteScenario(scenarioId) {
+    const shouldDelete = confirm("Delete this calculation from the summary?");
+
+    if (!shouldDelete) {
+        return;
+    }
+
+    calculationHistory = calculationHistory.filter(item => item.scenarioId !== scenarioId);
+    renderSummary();
+}    
 function renderSummary() {
     const summaryList = document.getElementById("summaryList");
 
@@ -1653,6 +1688,16 @@ if (item.refinedCrystalsUsed > 0) {
 
             return `
                 <div class="summary-card ${item.isPinned ? "pinned-summary-card" : ""}">
+<div class="scenario-action-row">
+    <button 
+        type="button" 
+        class="delete-scenario-button"
+        onclick="deleteScenario('${item.scenarioId}')"
+        title="Delete calculation"
+    >
+        🗑️
+    </button>
+
     <button 
         type="button" 
         class="pin-scenario-button ${item.isPinned ? "pinned" : ""}"
@@ -1660,7 +1705,7 @@ if (item.refinedCrystalsUsed > 0) {
     >
         ${item.isPinned ? "✨ Pinned" : "✨ Pin"}
     </button>
-
+</div>
     <div class="summary-final">
         ${item.isPinned ? "Pinned: " : index === 0 ? "Latest: " : ""}${item.finalNeed.toLocaleString()} Needed
     </div>
