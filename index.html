@@ -1608,8 +1608,7 @@ function calculateCards() {
     if (ownedCards > 0) {
         resourceCells += `
             <div class="result-grid-item">
-                <strong>Owned:</strong><br>
-                ${ownedCards.toLocaleString()}
+                <strong>Owned:</strong> ${ownedCards.toLocaleString()}
             </div>
         `;
     }
@@ -1617,8 +1616,7 @@ function calculateCards() {
     if (tradeTokens > 0) {
         resourceCells += `
             <div class="result-grid-item">
-                <strong>Trade Tokens:</strong><br>
-                ${tradeTokens.toLocaleString()}
+                <strong>Trade Tokens:</strong> ${tradeTokens.toLocaleString()}
             </div>
         `;
     }
@@ -1626,8 +1624,7 @@ function calculateCards() {
     if (wildCards > 0) {
         resourceCells += `
             <div class="result-grid-item">
-                <strong>Wild Cards:</strong><br>
-                ${wildCards.toLocaleString()}
+                <strong>Wild Cards:</strong> ${wildCards.toLocaleString()}
             </div>
         `;
     }
@@ -1635,9 +1632,8 @@ function calculateCards() {
     if (crystalSavings.normalUsed > 0) {
         resourceCells += `
             <div class="result-grid-item">
-                <strong>Normal Crystals:</strong><br>
-                ${crystalSavings.normalUsed.toLocaleString()}<br>
-                <span class="result-muted">Saved ${crystalSavings.normalSavings.toLocaleString()} cards</span>
+               <strong>Normal Crystals:</strong> ${crystalSavings.normalUsed.toLocaleString()}<br>
+<span class="result-muted">Saved ${crystalSavings.normalSavings.toLocaleString()} cards</span>
             </div>
         `;
     }
@@ -1645,50 +1641,43 @@ function calculateCards() {
     if (crystalSavings.refinedUsed > 0) {
         resourceCells += `
             <div class="result-grid-item">
-                <strong>Refined Crystals:</strong><br>
-                ${crystalSavings.refinedUsed.toLocaleString()}<br>
-                <span class="result-muted">Saved ${crystalSavings.refinedSavings.toLocaleString()} cards</span>
+                <strong>Refined Crystals:</strong> ${crystalSavings.refinedUsed.toLocaleString()}<br>
+<span class="result-muted">Saved ${crystalSavings.refinedSavings.toLocaleString()} cards</span>
             </div>
         `;
     }
 
     result.innerHTML = `
-        <div class="result-grid">
-            <div class="result-grid-item">
-                <strong>Card:</strong><br>
-                ${cardName}
-            </div>
-
-            <div class="result-grid-item">
-                <strong>Rarity:</strong><br>
-                ${displayCategory}
-            </div>
-
-            <div class="result-grid-item">
-                <strong>Base Need:</strong><br>
-                ${baseNeed.toLocaleString()}
-            </div>
-
-            <div class="result-grid-item">
-                <span class="gold-line">
-                    ${goldIconHtml("result")} <strong>Gold:</strong><br>
-                    ${goldCost.toLocaleString()}
-                </span>
-            </div>
-
-            ${resourceCells}
-
-            <div class="result-grid-item result-cards-needed">
-                Cards Needed:<br>
-                ${finalNeed.toLocaleString()}
-            </div>
-
-            <div class="result-grid-item">
-                <strong>Total Deducted:</strong><br>
-                ${deductions.toLocaleString()}
-            </div>
+    <div class="result-grid">
+        <div class="result-grid-item">
+            <strong>Card:</strong> ${cardName}
         </div>
-    `;
+
+        <div class="result-grid-item">
+            <strong>Rarity:</strong> ${displayCategory}
+        </div>
+
+        <div class="result-grid-item">
+            <strong>Base Need:</strong> ${baseNeed.toLocaleString()}
+        </div>
+
+        <div class="result-grid-item">
+            <span class="gold-line">
+                ${goldIconHtml("result")} <strong>Gold:</strong> ${goldCost.toLocaleString()}
+            </span>
+        </div>
+
+        ${resourceCells}
+
+        <div class="result-grid-item result-cards-needed">
+            Cards Needed: ${finalNeed.toLocaleString()}
+        </div>
+
+        <div class="result-grid-item">
+            <strong>Total Deducted:</strong> ${deductions.toLocaleString()}
+        </div>
+    </div>
+`;
 
     addToSummary({
         cardName,
