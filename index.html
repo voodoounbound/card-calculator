@@ -827,7 +827,7 @@ input:disabled {
     </div>
 
     <div class="field-block">
-        <label for="tradeTokens">Trade Tokens</label>
+<label for="tradeTokens" id="tradeTokensLabel">Trade Tokens</label>
         <div class="field-wrap">
             <input type="number" id="tradeTokens" min="0" value="0">
             <button type="button" class="clear-field" onclick="clearField('tradeTokens')">×</button>
@@ -835,7 +835,7 @@ input:disabled {
     </div>
 
     <div class="field-block">
-        <label for="normalCrystals">Normal Crystals</label>
+<label for="normalCrystals" id="normalCrystalsLabel">Normal Crystals</label>
         <div class="field-wrap">
             <input type="number" id="normalCrystals" min="0" placeholder="">
             <button type="button" class="clear-field" onclick="clearField('normalCrystals')">×</button>
@@ -843,7 +843,7 @@ input:disabled {
     </div>
 
     <div class="field-block">
-        <label for="wildCards">Wild Cards</label>
+<label for="wildCards" id="wildCardsLabel">Wild Cards</label>
         <div class="field-wrap">
             <input type="number" id="wildCards" min="0" value="0">
             <button type="button" class="clear-field" onclick="clearField('wildCards')">×</button>
@@ -851,16 +851,13 @@ input:disabled {
     </div>
 
     <div class="field-block">
-        <label for="refinedCrystals">Refined Crystals</label>
+<label for="refinedCrystals" id="refinedCrystalsLabel">Refined Crystals</label>
         <div class="field-wrap">
             <input type="number" id="refinedCrystals" min="0" placeholder="">
             <button type="button" class="clear-field" onclick="clearField('refinedCrystals')">×</button>
         </div>
     </div>
-<label for="tradeTokens" id="tradeTokensLabel">Trade Tokens</label>
-<label for="normalCrystals" id="normalCrystalsLabel">Normal Crystals</label>
-<label for="wildCards" id="wildCardsLabel">Wild Cards</label>
-<label for="refinedCrystals" id="refinedCrystalsLabel">Refined Crystals</label>
+
     <div class="field-block button-field-block">
         <button class="calculate-button calculate-button-compact" onclick="calculateCards()">
             Cast Calculation
@@ -1243,30 +1240,24 @@ function getAllowedRarities(selectedRarity) {
 }
 function updateResourceLabels() {
     const displayCategory = document.getElementById("category").value;
-    const poolLabel = getResourcePoolLabel(displayCategory);
     const tradeTokensInput = document.getElementById("tradeTokens");
 
+    document.getElementById("tradeTokensLabel").textContent = "Trade Tokens";
+    document.getElementById("normalCrystalsLabel").textContent = "Normal Crystals";
+    document.getElementById("wildCardsLabel").textContent = "Wild Cards";
+    document.getElementById("refinedCrystalsLabel").textContent = "Refined Crystals";
+
     if (!displayCategory) {
-        document.getElementById("tradeTokensLabel").textContent = "Trade Tokens";
-        document.getElementById("normalCrystalsLabel").textContent = "Normal Crystals";
-        document.getElementById("wildCardsLabel").textContent = "Wild Cards";
-        document.getElementById("refinedCrystalsLabel").textContent = "Refined Crystals";
         tradeTokensInput.disabled = false;
         return;
     }
 
     if (canUseTradeTokens(displayCategory)) {
-        document.getElementById("tradeTokensLabel").textContent = `${displayCategory} Trade Tokens`;
         tradeTokensInput.disabled = false;
     } else {
-        document.getElementById("tradeTokensLabel").textContent = "Trade Tokens unavailable";
         tradeTokensInput.value = 0;
         tradeTokensInput.disabled = true;
     }
-
-    document.getElementById("normalCrystalsLabel").textContent = `${poolLabel} Normal Crystals`;
-    document.getElementById("wildCardsLabel").textContent = `${poolLabel} Wild Cards`;
-    document.getElementById("refinedCrystalsLabel").textContent = `${poolLabel} Refined Crystals`;
 }
 function getFilteredCards() {
     const selectedRarity = document.getElementById("category").value;
