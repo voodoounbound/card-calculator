@@ -411,7 +411,40 @@ select:focus {
     background: transparent;
     box-shadow: none;
 }
+.pin-scenario-button {
+    width: 100%;
+    margin-bottom: 5px;
+    padding: 3px 5px;
+    border: 1px solid rgba(212,175,55,.55);
+    border-radius: 999px;
+    background: rgba(15, 15, 26, 0.65);
+    color: #c8b98f;
+    font-family: 'Mendalion', sans-serif;
+    font-size: .8rem;
+    cursor: pointer;
+    line-height: 1.15;
+}
 
+.pin-scenario-button:hover,
+.pin-scenario-button.pinned {
+    background: linear-gradient(
+        135deg,
+        #d4af37 0%,
+        #f4d76b 45%,
+        #b88a1f 100%
+    );
+    color: #111;
+    box-shadow: 0 0 6px rgba(212,175,55,.55);
+}
+
+.summary-card.pinned-summary-card {
+    border: 1px solid rgba(212,175,55,.85);
+    border-radius: 7px;
+    background: rgba(212,175,55,.08);
+    box-shadow:
+        0 0 7px rgba(212,175,55,.35),
+        inset 0 0 8px rgba(212,175,55,.08);
+}
 .summary-history-row {
     display: flex;
     gap: 8px;
@@ -430,7 +463,55 @@ select:focus {
     font-size: 1rem;
     line-height: 1.22;
 }
+.recommended-summary-card {
+    flex: 0 0 155px;
+    min-width: 155px;
+    padding: 7px 8px;
+    border: 1px solid rgba(212,175,55,.85);
+    border-radius: 7px;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(212,175,55,.22),
+            rgba(37, 37, 66, 0.92)
+        );
+    box-shadow:
+        0 0 8px rgba(212,175,55,.45),
+        inset 0 0 10px rgba(212,175,55,.12);
+    font-size: 1rem;
+    line-height: 1.22;
+}
 
+.recommended-label {
+    color: #111;
+    background: linear-gradient(
+        135deg,
+        #d4af37 0%,
+        #f4d76b 45%,
+        #b88a1f 100%
+    );
+    border-radius: 999px;
+    padding: 3px 7px;
+    display: inline-block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    box-shadow: 0 0 6px rgba(212,175,55,.55);
+}
+
+.recommended-title {
+    color: #d4af37;
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+.recommended-details {
+    color: #f4e7c5;
+}
+
+.recommended-resources {
+    color: #c8b98f;
+    margin-top: 4px;
+}
 .summary-card:last-child {
     border-right: none;
 }
@@ -1457,10 +1538,22 @@ totalCrystalSavings: crystalSavings.totalCrystalSavings,
 }
 
 function addToSummary(entry) {
+    entry.scenarioId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    entry.isPinned = false;
+
     calculationHistory.unshift(entry);
     renderSummary();
 }
+function toggleScenarioPin(scenarioId) {
+    const scenario = calculationHistory.find(item => item.scenarioId === scenarioId);
 
+    if (!scenario) {
+        return;
+    }
+
+    scenario.isPinned = !scenario.isPinned;
+    renderSummary();
+}
 function renderSummary() {
     const summaryList = document.getElementById("summaryList");
 
@@ -1489,8 +1582,19 @@ function renderSummary() {
     });
 
     summaryList.innerHTML = sortedCardGroups.map(([cardName, entries]) => {
-        entries.sort((a, b) => b.timestamp - a.timestamp);
+        entries.sort((a, b) => {
+    const pinnedA = a.isPinned ? 1 : 0;
+    const pinnedB = b.isPinned ? 1 : 0;
 
+    if (pinnedA !== pinnedB) {
+        return pinnedB - pinnedA;
+    }
+
+    return b.timestamp - a.timestamp;
+});
+        
+const recommendedScenario = getRecommendedScenario(entries);
+const recommendedHtml = getRecommendedScenarioHtml(recommendedScenario);
         const cardsHtml = entries.map((item, index) => {
             let deductionLines = "";
 
@@ -1527,10 +1631,18 @@ if (item.refinedCrystalsUsed > 0) {
             }
 
             return `
-                <div class="summary-card">
-                    <div class="summary-final">
-                        ${index === 0 ? "Latest: " : ""}${item.finalNeed.toLocaleString()} Needed
-                    </div>
+                <div class="summary-card ${item.isPinned ? "pinned-summary-card" : ""}">
+    <button 
+        type="button" 
+        class="pin-scenario-button ${item.isPinned ? "pinned" : ""}"
+        onclick="toggleScenarioPin('${item.scenarioId}')"
+    >
+        ${item.isPinned ? "✨ Pinned" : "✨ Pin"}
+    </button>
+
+    <div class="summary-final">
+        ${item.isPinned ? "Pinned: " : index === 0 ? "Latest: " : ""}${item.finalNeed.toLocaleString()} Needed
+    </div>
 
                     <div class="summary-meta">
                         ${item.category} | Lvl ${item.current} → ${item.desired}
@@ -1563,15 +1675,91 @@ if (item.refinedCrystalsUsed > 0) {
             <div>
                 <div class="card-group-title">${cardName}</div>
                 <div class="summary-history-row">
-                    ${cardsHtml}
-                </div>
+    ${cardsHtml}
+    ${recommendedHtml}
+</div>
             </div>
         </div>
     </div>
 `;
     }).join("");
 }
+function getRecommendedScenario(entries) {
+    const highestDesired = Math.max(...entries.map(item => Number(item.desired) || 0));
 
+    return entries
+        .filter(item => Number(item.desired) === highestDesired)
+        .sort((a, b) => {
+            if (a.finalNeed !== b.finalNeed) {
+                return a.finalNeed - b.finalNeed;
+            }
+
+            if ((a.goldCost || 0) !== (b.goldCost || 0)) {
+                return (a.goldCost || 0) - (b.goldCost || 0);
+            }
+
+            return b.timestamp - a.timestamp;
+        })[0];
+}
+
+function getRecommendedResourcesText(item) {
+    const resources = [];
+
+    if ((item.ownedCards || 0) > 0) {
+        resources.push(`Owned: ${item.ownedCards.toLocaleString()}`);
+    }
+
+    if ((item.tradeTokens || 0) > 0) {
+        resources.push(`Trade: ${item.tradeTokens.toLocaleString()}`);
+    }
+
+    if ((item.wildCards || 0) > 0) {
+        resources.push(`Wild: ${item.wildCards.toLocaleString()}`);
+    }
+
+    if ((item.normalCrystalsUsed || 0) > 0) {
+        resources.push(`Normal Crystal: ${item.normalCrystalsUsed.toLocaleString()}`);
+    }
+
+    if ((item.refinedCrystalsUsed || 0) > 0) {
+        resources.push(`Refined Crystal: ${item.refinedCrystalsUsed.toLocaleString()}`);
+    }
+
+    if (resources.length === 0) {
+        return "No extra resources entered";
+    }
+
+    return resources.join("<br>");
+}
+
+function getRecommendedScenarioHtml(item) {
+    if (!item) {
+        return "";
+    }
+
+    return `
+        <div class="recommended-summary-card">
+            <div class="recommended-label">Recommended</div>
+
+            <div class="recommended-title">
+                Best for Lvl ${item.desired}
+            </div>
+
+            <div class="recommended-details">
+                Lvl ${item.current} → ${item.desired}<br>
+                ${item.finalNeed.toLocaleString()} Needed<br>
+                Base: ${item.baseNeed.toLocaleString()}<br>
+                <span class="gold-line">
+                    ${goldIconHtml("summary")} Gold: ${(item.goldCost || 0).toLocaleString()}
+                </span>
+            </div>
+
+            <div class="recommended-resources">
+                ${getRecommendedResourcesText(item)}
+            </div>
+        </div>
+    `;
+}
 function exportResults() {
     if (calculationHistory.length === 0) {
         alert("No calculation results to export yet.");
@@ -1580,6 +1768,8 @@ function exportResults() {
 
     const headers = [
         "Date",
+        "Scenario ID",
+        "Pinned",
         "Card",
         "Rarity",
         "Current Level",
@@ -1603,6 +1793,8 @@ function exportResults() {
 
         return [
             date,
+            item.scenarioId || "",
+            item.isPinned ? "Yes" : "No",
             item.cardName,
             item.category,
             item.current,
@@ -1747,7 +1939,8 @@ function createHistoryEntryFromCSV(headers, row) {
     if (!current || !desired) {
         return null;
     }
-
+const scenarioId = getValue("Scenario ID") || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+const isPinned = getValue("Pinned").trim().toLowerCase() === "yes";
     const baseNeed = Number(getValue("Base Need")) || 0;
     const goldCost = Number(getValue("Gold Cost")) || calculateGoldCost(current, desired);
     const ownedCards = Number(getValue("Owned")) || 0;
@@ -1772,6 +1965,8 @@ const deductions =
         current,
         desired,
         category,
+        scenarioId,
+        isPinned,    
         baseNeed,
         goldCost,
         ownedCards,
@@ -1844,9 +2039,11 @@ function clearSummary() {
     calculationHistory = [];
     renderSummary();
 }
-
-/* Event Listeners */
+    
     function clearCardAndAllFields() {
+        
+/* Event Listeners */
+
     document.getElementById("cardName").value = "";
     document.getElementById("category").value = "";
     document.getElementById("currentLevel").value = "";
