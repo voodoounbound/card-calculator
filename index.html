@@ -165,7 +165,10 @@ select:focus {
         0 0 6px rgba(212,175,55,.75),
         0 0 16px rgba(212,175,55,.2);
 }
-
+input:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
 .clear-field {
     position: absolute;
     top: 50%;
@@ -854,7 +857,10 @@ select:focus {
             <button type="button" class="clear-field" onclick="clearField('refinedCrystals')">×</button>
         </div>
     </div>
-
+<label for="tradeTokens" id="tradeTokensLabel">Trade Tokens</label>
+<label for="normalCrystals" id="normalCrystalsLabel">Normal Crystals</label>
+<label for="wildCards" id="wildCardsLabel">Wild Cards</label>
+<label for="refinedCrystals" id="refinedCrystalsLabel">Refined Crystals</label>
     <div class="field-block button-field-block">
         <button class="calculate-button calculate-button-compact" onclick="calculateCards()">
             Cast Calculation
@@ -1235,7 +1241,33 @@ function getAllowedRarities(selectedRarity) {
 
     return [];
 }
+function updateResourceLabels() {
+    const displayCategory = document.getElementById("category").value;
+    const poolLabel = getResourcePoolLabel(displayCategory);
+    const tradeTokensInput = document.getElementById("tradeTokens");
 
+    if (!displayCategory) {
+        document.getElementById("tradeTokensLabel").textContent = "Trade Tokens";
+        document.getElementById("normalCrystalsLabel").textContent = "Normal Crystals";
+        document.getElementById("wildCardsLabel").textContent = "Wild Cards";
+        document.getElementById("refinedCrystalsLabel").textContent = "Refined Crystals";
+        tradeTokensInput.disabled = false;
+        return;
+    }
+
+    if (canUseTradeTokens(displayCategory)) {
+        document.getElementById("tradeTokensLabel").textContent = `${displayCategory} Trade Tokens`;
+        tradeTokensInput.disabled = false;
+    } else {
+        document.getElementById("tradeTokensLabel").textContent = "Trade Tokens unavailable";
+        tradeTokensInput.value = 0;
+        tradeTokensInput.disabled = true;
+    }
+
+    document.getElementById("normalCrystalsLabel").textContent = `${poolLabel} Normal Crystals`;
+    document.getElementById("wildCardsLabel").textContent = `${poolLabel} Wild Cards`;
+    document.getElementById("refinedCrystalsLabel").textContent = `${poolLabel} Refined Crystals`;
+}
 function getFilteredCards() {
     const selectedRarity = document.getElementById("category").value;
     const allowedRarities = getAllowedRarities(selectedRarity);
@@ -1380,6 +1412,7 @@ function autoFillRarity() {
 
     if (cardRarities[cardName]) {
         category.value = cardRarities[cardName];
+        updateResourceLabels();
         autoFillCurrentLevel();
     }
 }
@@ -1389,6 +1422,7 @@ function filterCardsByRarity() {
     const selectedRarity = document.getElementById("category").value;
     const selectedCard = cardInput.value.trim();
 
+    updateResourceLabels();
     autoFillCurrentLevel();
 
     if (selectedCard && cardRarities[selectedCard]) {
@@ -1468,7 +1502,31 @@ function getCalculationCategory(displayCategory) {
 
     return displayCategory;
 }
+function getResourcePool(displayCategory) {
+    if (
+        displayCategory === "Legendary" ||
+        displayCategory === "Mythic" ||
+        displayCategory === "Dark"
+    ) {
+        return "Legendary";
+    }
 
+    return displayCategory;
+}
+
+function getResourcePoolLabel(displayCategory) {
+    const pool = getResourcePool(displayCategory);
+
+    if (pool === "Legendary") {
+        return "Legendary / Mythic / Dark";
+    }
+
+    return pool;
+}
+
+function canUseTradeTokens(displayCategory) {
+    return displayCategory !== "Mythic" && displayCategory !== "Dark";
+}
 function calculateCards() {
     const cardName = document.getElementById("cardName").value.trim();
     const current = Number(document.getElementById("currentLevel").value);
@@ -1477,7 +1535,8 @@ function calculateCards() {
     const category = getCalculationCategory(displayCategory);
 
 const ownedCards = Number(document.getElementById("ownedCards").value) || 0;
-const tradeTokens = Number(document.getElementById("tradeTokens").value) || 0;
+const rawTradeTokens = Number(document.getElementById("tradeTokens").value) || 0;
+const tradeTokens = canUseTradeTokens(displayCategory) ? rawTradeTokens : 0;
 const wildCards = Number(document.getElementById("wildCards").value) || 0;
 const normalCrystals = Number(document.getElementById("normalCrystals").value) || 0;
 const refinedCrystals = Number(document.getElementById("refinedCrystals").value) || 0;
