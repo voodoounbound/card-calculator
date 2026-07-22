@@ -50,8 +50,12 @@
     --c-rare: #4f8ff0;
     --c-epic: #a262e8;
     --c-legendary: #d4af37;
-    --c-mythic: #ea7a3c;
-    --c-dark: #c23b52;
+    --c-mythic: #f3f1fa;
+    --c-dark: #f3f1fa;
+    --c-opal-1: #ffffff;
+    --c-opal-2: #dce9ff;
+    --c-opal-3: #f5dcff;
+    --c-opal-4: #fff6da;
 
     --radius-sm: 6px;
     --radius-md: 10px;
@@ -70,6 +74,34 @@
 ::selection {
     background: rgba(212, 175, 55, 0.35);
     color: #fff;
+}
+
+/* ---------- Scrollbars ---------- */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(212, 175, 55, 0.3) transparent;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(212, 175, 55, 0.28);
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(212, 175, 55, 0.5);
+}
+
+::-webkit-scrollbar-corner {
+    background: transparent;
 }
 
 body {
@@ -212,11 +244,21 @@ a { color: var(--gold); }
 /* ============================================================
    CALCULATOR VIEW
    ============================================================ */
+.view-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+}
+
 .calc-grid {
     display: grid;
     grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
     gap: 20px;
     align-items: start;
+}
+
+.calc-grid.calc-grid--single {
+    grid-template-columns: minmax(0, 1fr);
 }
 
 .panel {
@@ -479,15 +521,20 @@ input:disabled {
 .rarity-rare    { color: var(--c-rare); background: rgba(79,143,240,.12); }
 .rarity-epic    { color: var(--c-epic); background: rgba(162,98,232,.12); }
 .rarity-legendary { color: var(--c-legendary); background: rgba(212,175,55,.12); }
-.rarity-mythic  { color: var(--c-mythic); background: rgba(234,122,60,.12); }
-.rarity-dark    { color: var(--c-dark); background: rgba(194,59,82,.12); }
+.rarity-mythic, .rarity-dark {
+    color: var(--c-mythic);
+    background: linear-gradient(120deg, rgba(255,255,255,.14), rgba(220,233,255,.1) 35%, rgba(245,220,255,.1) 65%, rgba(255,246,218,.14));
+    text-shadow: 0 0 8px rgba(255,255,255,.35);
+}
 
 .gem.rarity-common  { background: var(--c-common); }
 .gem.rarity-rare    { background: var(--c-rare); }
 .gem.rarity-epic    { background: var(--c-epic); }
 .gem.rarity-legendary { background: var(--c-legendary); }
-.gem.rarity-mythic  { background: var(--c-mythic); }
-.gem.rarity-dark    { background: var(--c-dark); }
+.gem.rarity-mythic, .gem.rarity-dark {
+    background: linear-gradient(135deg, var(--c-opal-1) 0%, var(--c-opal-2) 30%, var(--c-opal-3) 60%, var(--c-opal-4) 100%);
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.55);
+}
 
 /* Buttons */
 .btn {
@@ -749,7 +796,7 @@ input:disabled {
 
 .scenario-action-row {
     display: grid;
-    grid-template-columns: 22px 1fr;
+    grid-template-columns: 22px 22px 1fr;
     gap: 6px;
     align-items: center;
     margin-bottom: 6px;
@@ -772,6 +819,25 @@ input:disabled {
     background: rgba(192, 71, 90, 0.15);
     color: var(--danger);
     border-color: rgba(192, 71, 90, 0.4);
+}
+
+.save-scenario-button {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 1px solid var(--hairline-soft);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink-dim);
+    font-size: 0.75rem;
+    line-height: 20px;
+    cursor: pointer;
+}
+
+.save-scenario-button:hover {
+    background: rgba(212, 175, 55, 0.14);
+    color: var(--gold-bright);
+    border-color: rgba(212, 175, 55, 0.4);
 }
 
 .pin-scenario-button {
@@ -812,6 +878,254 @@ input:disabled {
 /* ============================================================
    INVENTORY VIEW
    ============================================================ */
+.inv-layout {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+}
+
+.inv-layout.inv-layout--full {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.inv-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: sticky;
+    top: 20px;
+}
+
+.resource-panel-body {
+    max-height: calc(100vh - 220px);
+    overflow-y: auto;
+}
+
+.resource-section {
+    margin-bottom: 16px;
+}
+
+.resource-section:last-child { margin-bottom: 0; }
+
+.resource-section-title {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    appearance: none;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gold-dim);
+    margin-bottom: 8px;
+    padding: 0 0 6px;
+    border-bottom: 1px solid var(--hairline-soft);
+    cursor: pointer;
+}
+
+.resource-section-title:hover { color: var(--gold-bright); }
+
+.resource-chevron {
+    width: 9px;
+    height: 6px;
+    flex: none;
+    transition: transform .15s ease;
+}
+
+.resource-section.is-collapsed .resource-chevron { transform: rotate(-90deg); }
+
+.resource-section.is-collapsed .resource-section-content { display: none; }
+
+.resource-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.resource-row:last-child { margin-bottom: 0; }
+
+.resource-row-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--ink-dim);
+}
+
+.resource-input-wrap {
+    width: 96px;
+    flex: none;
+}
+
+.resource-input-wrap input {
+    height: 32px;
+    padding: 4px 26px 4px 8px;
+    font-size: 0.82rem;
+    text-align: right;
+}
+
+.resource-input-wrap .stepper { top: 2px; right: 2px; bottom: 2px; width: 18px; }
+.resource-input-wrap .stepper-btn svg { width: 7px; height: 4px; }
+
+/* Upgrade plan panel */
+.plan-empty {
+    text-align: center;
+    color: var(--ink-dim);
+    font-size: 0.82rem;
+    padding: 20px 6px;
+}
+
+.plan-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 14px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.plan-row {
+    border: 1px solid var(--hairline-soft);
+    border-radius: var(--radius-sm);
+    padding: 10px 10px 10px 12px;
+    position: relative;
+}
+
+.plan-row-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.plan-row-name {
+    font-size: 0.82rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.plan-row-name span.name-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.plan-remove-btn {
+    width: 18px;
+    height: 18px;
+    flex: none;
+    border: none;
+    background: transparent;
+    color: var(--ink-faint);
+    cursor: pointer;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    line-height: 16px;
+}
+
+.plan-remove-btn:hover { color: var(--danger); background: rgba(192,71,90,0.14); }
+
+.plan-row-levels {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--ink-dim);
+    margin-bottom: 8px;
+}
+
+.plan-target-wrap {
+    width: 74px;
+    flex: none;
+}
+
+.plan-target-wrap input {
+    height: 30px;
+    padding: 4px 24px 4px 8px;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.plan-target-wrap .stepper { top: 2px; right: 2px; bottom: 2px; width: 18px; }
+.plan-target-wrap .stepper-btn svg { width: 7px; height: 4px; }
+
+.plan-row-result {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    color: var(--ink);
+    padding-top: 8px;
+    border-top: 1px dashed var(--hairline-soft);
+}
+
+.plan-row-result strong { color: var(--gold-bright); }
+
+.plan-totals {
+    border-top: 1px solid var(--hairline-soft);
+    padding-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.plan-total-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.82rem;
+}
+
+.plan-total-line strong {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    color: var(--gold-bright);
+}
+
+.plan-total-line.is-short strong { color: var(--danger); }
+.plan-total-line.is-ok strong { color: var(--success); }
+
+.plan-pool-usage {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--hairline-soft);
+    font-size: 0.72rem;
+    color: var(--ink-dim);
+    font-family: var(--font-mono);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.plan-pool-usage .short { color: var(--danger); }
+
+.inv-card-select {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    accent-color: var(--gold);
+    cursor: pointer;
+}
+
+.inv-card.is-selected {
+    border-color: rgba(212, 175, 55, 0.65);
+    box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.25) inset, 0 0 20px -8px rgba(212, 175, 55, 0.4);
+}
+
+
 .inv-stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -886,8 +1200,9 @@ input:disabled {
 .inv-card.rarity-rare::before    { background: var(--c-rare); }
 .inv-card.rarity-epic::before    { background: var(--c-epic); }
 .inv-card.rarity-legendary::before { background: var(--c-legendary); }
-.inv-card.rarity-mythic::before  { background: var(--c-mythic); }
-.inv-card.rarity-dark::before    { background: var(--c-dark); }
+.inv-card.rarity-mythic::before, .inv-card.rarity-dark::before {
+    background: linear-gradient(180deg, var(--c-opal-1), var(--c-opal-2), var(--c-opal-3), var(--c-opal-4));
+}
 
 .inv-card.is-ready {
     border-color: rgba(79, 174, 122, 0.45);
@@ -1039,7 +1354,8 @@ input:disabled {
 /* ---------- Responsive ---------- */
 @media (max-width: 900px) {
     .calc-grid { grid-template-columns: 1fr; }
-    .inv-stats { grid-template-columns: repeat(2, 1fr); }
+    .inv-layout { grid-template-columns: 1fr; }
+    .inv-sidebar { position: static; }
 }
 
 @media (max-width: 640px) {
@@ -1049,6 +1365,10 @@ input:disabled {
     .inv-grid { grid-template-columns: 1fr; }
     .inv-toolbar-actions { width: 100%; margin-left: 0; }
     .inv-toolbar-actions .btn { flex: 1; }
+    .inv-stats { gap: 8px; }
+    .inv-stat { padding: 10px 8px; }
+    .inv-stat-value { font-size: 1.1rem; }
+    .inv-stat-label { font-size: 0.58rem; margin-top: 4px; letter-spacing: 0.02em; }
 }
 </style>
 </head>
@@ -1083,13 +1403,17 @@ input:disabled {
 
     <!-- ===================== CALCULATOR VIEW ===================== -->
     <section id="view-calculator" class="view active">
-        <div class="calc-grid">
 
-            <div class="panel">
+        <div class="view-toolbar">
+            <button type="button" class="btn btn-ghost btn-sm" id="toggleCalculatorBtn" onclick="toggleCalculatorPanel()">Hide calculator</button>
+        </div>
+
+        <div class="calc-grid" id="calcGrid">
+
+            <div class="panel" id="calculatorPanel">
                 <div class="panel-header">
                     <div>
-                        <h2 class="panel-title">Upgrade Calculator</h2>
-                        <p class="panel-subtitle">Work out what a level target will cost you</p>
+                        <h2 class="panel-title">Magic Awakened Card Upgrade Calculator</h2>
                     </div>
                 </div>
 
@@ -1228,73 +1552,244 @@ input:disabled {
     <!-- ===================== INVENTORY VIEW ===================== -->
     <section id="view-inventory" class="view">
 
-        <div class="inv-stats">
-            <div class="inv-stat">
-                <div class="inv-stat-value" id="invStatTotal">0</div>
-                <div class="inv-stat-label">Cards tracked</div>
+        <div class="inv-layout" id="invLayout">
+
+            <aside class="inv-sidebar" id="invSidebar">
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h2 class="panel-title">Available Resources</h2>
+                            <p class="panel-subtitle">What you have on hand to spend</p>
+                        </div>
+                    </div>
+                    <div class="panel-body resource-panel-body">
+
+                        <div class="resource-section" data-section="gold">
+                            <button type="button" class="resource-section-title" onclick="toggleResourceSection('gold')" aria-expanded="true">
+                                <span>Gold</span>
+                                <svg class="resource-chevron" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <div class="resource-section-content" data-section-content="gold">
+                                <div class="resource-row">
+                                    <span class="resource-row-label">Gold</span>
+                                    <div class="field-wrap resource-input-wrap">
+                                        <input type="number" min="0" value="0" class="resource-input" data-type="gold">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="resource-section" data-section="normalCrystals">
+                            <button type="button" class="resource-section-title" onclick="toggleResourceSection('normalCrystals')" aria-expanded="true">
+                                <span>Normal Crystals</span>
+                                <svg class="resource-chevron" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <div class="resource-section-content" data-section-content="normalCrystals">
+                                <div class="resource-row" data-tier="Common">
+                                    <span class="resource-row-label"><span class="gem rarity-common"></span>Common</span>
+                                    <div class="field-wrap resource-input-wrap"><input type="number" min="0" value="0" class="resource-input" data-type="normalCrystals" data-tier="Common"></div>
+                                </div>
+                                <div class="resource-row" data-tier="Rare">
+                                    <span class="resource-row-label"><span class="gem rarity-rare"></span>Rare</span>
+                                    <div class="field-wrap resource-input-wrap"><input type="number" min="0" value="0" class="resource-input" data-type="normalCrystals" data-tier="Rare"></div>
+                                </div>
+                                <div class="resource-row" data-tier="Epic">
+                                    <span class="resource-row-label"><span class="gem rarity-epic"></span>Epic</span>
+                                    <div class="field-wrap resource-input-wrap"><input type="number" min="0" value="0" class="resource-input" data-type="normalCrystals" data-tier="Epic"></div>
+                                </div>
+                                <div class="resource-row" data-tier="Legendary">
+                                    <span class="resource-row-label"><span class="gem rarity-legendary"></span>Legendary+</span>
+                                    <div class="field-wrap resource-input-wrap"><input type="number" min="0" value="0" class="resource-input" data-type="normalCrystals" data-tier="Legendary"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="resource-section" data-section="refinedCrystals">
+                            <button type="button" class="resource-section-title" onclick="toggleResourceSection('refinedCrystals')" aria-expanded="true">
+                                <span>Refined Crystals</span>
+                                <svg class="resource-chevron" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <div class="resource-section-content" data-section-content="refinedCrystals">
+                                <div class="resource-row" data-tier="Common">
+                                    <span class="resource-row-label"><span class="gem rarity-common"></span>Common</span>
+                                    <div class="field-wrap resource-input-wrap"><input type="number" min="0" value="0" class="resource-input" data-type="refinedCrystals" data-tier="Common"></div>
+                                </div>
+                                <div class="resource-row" data-tier="Rare">
+                                    <span class="resource-row-label"><span class="gem rarity-rare"></span>Rare</span>
+                                    <div class="field-wrap resource-input-wrap"><input type="number" min="0" value="0" class="resource-input" data-type="refinedCrystals" data-tier="Rare"></div>
+                                </div>
+                                <div class="resource-row" data-tier="Epic">
+                                    <span class="resource-row-label"><span class="gem rarity-epic"></span>Epic</span>
+                                    <div class="field-wrap resource-input-wrap"><input type="number" min="0" value="0" class="resource-input" data-type="refinedCrystals" data-tier="Epic"></div>
+                                </div>
+                                <div class="resource-row" data-tier="Legendary">
+                                    <span class="resource-row-label"><span class="gem rarity-legendary"></span>Legendary+</span>
+                                    <div class="field-wrap resource-input-wrap"><input type="number" min="0" value="0" class="resource-input" data-type="refinedCrystals" data-tier="Legendary"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="resource-section" data-section="wildCards">
+                            <button type="button" class="resource-section-title" onclick="toggleResourceSection('wildCards')" aria-expanded="true">
+                                <span>Wild Cards</span>
+                                <svg class="resource-chevron" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <div class="resource-section-content" data-section-content="wildCards">
+                                <div class="resource-row" data-tier="Common">
+                                    <span class="resource-row-label"><span class="gem rarity-common"></span>Common</span>
+                                    <div class="field-wrap resource-input-wrap"><input type="number" min="0" value="0" class="resource-input" data-type="wildCards" data-tier="Common"></div>
+                                </div>
+                                <div class="resource-row" data-tier="Rare">
+                                    <span class="resource-row-label"><span class="gem rarity-rare"></span>Rare</span>
+                                    <div class="field-wrap resource-input-wrap"><input type="number" min="0" value="0" class="resource-input" data-type="wildCards" data-tier="Rare"></div>
+                                </div>
+                                <div class="resource-row" data-tier="Epic">
+                                    <span class="resource-row-label"><span class="gem rarity-epic"></span>Epic</span>
+                                    <div class="field-wrap resource-input-wrap"><input type="number" min="0" value="0" class="resource-input" data-type="wildCards" data-tier="Epic"></div>
+                                </div>
+                                <div class="resource-row" data-tier="Legendary">
+                                    <span class="resource-row-label"><span class="gem rarity-legendary"></span>Legendary</span>
+                                    <div class="field-wrap resource-input-wrap"><input type="number" min="0" value="0" class="resource-input" data-type="wildCards" data-tier="Legendary"></div>
+                                </div>
+                                <div class="resource-row" data-tier="MythicDark">
+                                    <span class="resource-row-label"><span class="gem rarity-mythic"></span>Mythic/Dark</span>
+                                    <div class="field-wrap resource-input-wrap"><input type="number" min="0" value="0" class="resource-input" data-type="wildCards" data-tier="MythicDark"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="resource-section" data-section="tradeTokens">
+                            <button type="button" class="resource-section-title" onclick="toggleResourceSection('tradeTokens')" aria-expanded="true">
+                                <span>Trade Tokens</span>
+                                <svg class="resource-chevron" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <div class="resource-section-content" data-section-content="tradeTokens">
+                                <div class="resource-row" data-tier="Common">
+                                    <span class="resource-row-label"><span class="gem rarity-common"></span>Common</span>
+                                    <div class="field-wrap resource-input-wrap"><input type="number" min="0" value="0" class="resource-input" data-type="tradeTokens" data-tier="Common"></div>
+                                </div>
+                                <div class="resource-row" data-tier="Rare">
+                                    <span class="resource-row-label"><span class="gem rarity-rare"></span>Rare</span>
+                                    <div class="field-wrap resource-input-wrap"><input type="number" min="0" value="0" class="resource-input" data-type="tradeTokens" data-tier="Rare"></div>
+                                </div>
+                                <div class="resource-row" data-tier="Epic">
+                                    <span class="resource-row-label"><span class="gem rarity-epic"></span>Epic</span>
+                                    <div class="field-wrap resource-input-wrap"><input type="number" min="0" value="0" class="resource-input" data-type="tradeTokens" data-tier="Epic"></div>
+                                </div>
+                                <div class="resource-row" data-tier="Legendary">
+                                    <span class="resource-row-label"><span class="gem rarity-legendary"></span>Legendary</span>
+                                    <div class="field-wrap resource-input-wrap"><input type="number" min="0" value="0" class="resource-input" data-type="tradeTokens" data-tier="Legendary"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="resource-section" data-section="hourglassTokens">
+                            <button type="button" class="resource-section-title" onclick="toggleResourceSection('hourglassTokens')" aria-expanded="true">
+                                <span>Hourglass Tokens</span>
+                                <svg class="resource-chevron" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <div class="resource-section-content" data-section-content="hourglassTokens">
+                                <div class="resource-row">
+                                    <span class="resource-row-label">⏳ Hourglass balance</span>
+                                    <div class="field-wrap resource-input-wrap">
+                                        <input type="number" min="0" value="0" class="resource-input" data-type="hourglassTokens">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="panel" id="upgradePlanPanel" style="display:none;">
+                    <div class="panel-header">
+                        <div>
+                            <h2 class="panel-title">Upgrade Plan</h2>
+                            <p class="panel-subtitle">Selected cards, planned together</p>
+                        </div>
+                    </div>
+                    <div class="panel-body" id="upgradePlanBody"></div>
+                </div>
+
+            </aside>
+
+            <div class="inv-main">
+
+                <div class="inv-stats">
+                    <div class="inv-stat">
+                        <div class="inv-stat-value" id="invStatTotal">0</div>
+                        <div class="inv-stat-label">Cards tracked</div>
+                    </div>
+                    <div class="inv-stat">
+                        <div class="inv-stat-value" id="invStatReady">0</div>
+                        <div class="inv-stat-label">Ready to upgrade</div>
+                    </div>
+                    <div class="inv-stat">
+                        <div class="inv-stat-value" id="invStatMaxed">0</div>
+                        <div class="inv-stat-label">At max level</div>
+                    </div>
+                    <div class="inv-stat">
+                        <div class="inv-stat-value" id="invStatHourglass">0</div>
+                        <div class="inv-stat-label">Hourglass tokens</div>
+                    </div>
+                </div>
+
+                <div class="inv-toolbar">
+                    <div class="field-wrap">
+                        <input type="text" id="invSearch" placeholder="Search your cards..." autocomplete="off" oninput="renderInventory()">
+                    </div>
+
+                    <select id="invRarityFilter" onchange="renderInventory()">
+                        <option value="">All rarities</option>
+                        <option>Mythic</option>
+                        <option>Dark</option>
+                        <option>Legendary</option>
+                        <option>Epic</option>
+                        <option>Rare</option>
+                        <option>Common</option>
+                    </select>
+
+                    <select id="invStatusFilter" onchange="renderInventory()">
+                        <option value="all">All cards</option>
+                        <option value="tracked">Tracked only</option>
+                        <option value="ready">Ready to upgrade</option>
+                        <option value="selected">Selected only</option>
+                    </select>
+
+                    <select id="invSort" onchange="renderInventory()">
+                        <option value="progress">Sort: Upgrade progress</option>
+                        <option value="name">Sort: Name (A–Z)</option>
+                        <option value="rarity">Sort: Rarity</option>
+                        <option value="level-desc">Sort: Level (high–low)</option>
+                        <option value="level-asc">Sort: Level (low–high)</option>
+                        <option value="owned">Sort: Owned</option>
+                    </select>
+
+                    <div class="inv-toolbar-actions">
+                        <button class="btn btn-ghost btn-sm" id="toggleInventorySidebarBtn" onclick="toggleInventorySidebar()">Hide sidebar</button>
+                        <button class="btn btn-ghost btn-sm" onclick="exportInventory()">Export</button>
+                        <button class="btn btn-ghost btn-sm" onclick="triggerImportInventory()">Import</button>
+                        <button class="btn btn-danger-ghost btn-sm" onclick="resetInventory()">Reset</button>
+                    </div>
+                    <input
+                        type="file"
+                        id="importInventoryFile"
+                        accept=".csv"
+                        style="display: none;"
+                        onchange="importInventoryFromFile(event)"
+                    >
+                </div>
+
+                <div id="inventoryGrid" class="inv-grid"></div>
+
             </div>
-            <div class="inv-stat">
-                <div class="inv-stat-value" id="invStatReady">0</div>
-                <div class="inv-stat-label">Ready to upgrade</div>
-            </div>
-            <div class="inv-stat">
-                <div class="inv-stat-value" id="invStatMaxed">0</div>
-                <div class="inv-stat-label">At max level</div>
-            </div>
-            <div class="inv-stat">
-                <div class="inv-stat-value" id="invStatOwned">0</div>
-                <div class="inv-stat-label">Total cards owned</div>
-            </div>
+
         </div>
-
-        <div class="inv-toolbar">
-            <div class="field-wrap">
-                <input type="text" id="invSearch" placeholder="Search your cards..." autocomplete="off" oninput="renderInventory()">
-            </div>
-
-            <select id="invRarityFilter" onchange="renderInventory()">
-                <option value="">All rarities</option>
-                <option>Mythic</option>
-                <option>Dark</option>
-                <option>Legendary</option>
-                <option>Epic</option>
-                <option>Rare</option>
-                <option>Common</option>
-            </select>
-
-            <select id="invStatusFilter" onchange="renderInventory()">
-                <option value="all">All cards</option>
-                <option value="tracked">Tracked only</option>
-                <option value="ready">Ready to upgrade</option>
-            </select>
-
-            <select id="invSort" onchange="renderInventory()">
-                <option value="progress">Sort: Upgrade progress</option>
-                <option value="name">Sort: Name (A–Z)</option>
-                <option value="rarity">Sort: Rarity</option>
-                <option value="level-desc">Sort: Level (high–low)</option>
-                <option value="level-asc">Sort: Level (low–high)</option>
-                <option value="owned">Sort: Owned</option>
-            </select>
-
-            <div class="inv-toolbar-actions">
-                <button class="btn btn-ghost btn-sm" onclick="exportInventory()">Export</button>
-                <button class="btn btn-ghost btn-sm" onclick="triggerImportInventory()">Import</button>
-                <button class="btn btn-danger-ghost btn-sm" onclick="resetInventory()">Reset</button>
-            </div>
-            <input
-                type="file"
-                id="importInventoryFile"
-                accept=".csv"
-                style="display: none;"
-                onchange="importInventoryFromFile(event)"
-            >
-        </div>
-
-        <div id="inventoryGrid" class="inv-grid"></div>
     </section>
 
 </div>
+
 
 <div class="toast" id="toast"></div>
 
@@ -2212,6 +2707,15 @@ if (item.refinedCrystalsUsed > 0) {
     ×
 </button>
 
+    <button
+        type="button"
+        class="save-scenario-button"
+        onclick="saveScenarioToInventory('${item.scenarioId}')"
+        title="Save Lv ${item.current} / ${item.ownedCards} owned to inventory"
+    >
+        💾
+    </button>
+
     <button 
         type="button" 
         class="pin-scenario-button ${item.isPinned ? "pinned" : ""}"
@@ -2337,6 +2841,15 @@ function getRecommendedScenarioHtml(item) {
             <div class="recommended-resources">
                 ${getRecommendedResourcesText(item)}
             </div>
+
+            <button
+                type="button"
+                class="btn btn-ghost btn-sm btn-block"
+                style="margin-top:8px; font-size:0.68rem; padding:6px 8px;"
+                onclick="saveScenarioToInventory('${item.scenarioId}')"
+            >
+                💾 Save to inventory
+            </button>
         </div>
     `;
 }
@@ -2794,6 +3307,162 @@ function showToast(message) {
 const INVENTORY_STORAGE_KEY = "voodooUnboundInventoryV1";
 let cardInventory = loadInventoryFromStorage();
 
+const RESOURCE_STORAGE_KEY = "voodooUnboundResourcesV1";
+let resourcePools = loadResourcesFromStorage();
+let selectedCards = new Map(); // cardName -> targetLevel
+
+function getDefaultResources() {
+    return {
+        gold: 0,
+        hourglassTokens: 0,
+        normalCrystals: { Common: 0, Rare: 0, Epic: 0, Legendary: 0 },
+        refinedCrystals: { Common: 0, Rare: 0, Epic: 0, Legendary: 0 },
+        wildCards: { Common: 0, Rare: 0, Epic: 0, Legendary: 0, MythicDark: 0 },
+        tradeTokens: { Common: 0, Rare: 0, Epic: 0, Legendary: 0 }
+    };
+}
+
+function loadResourcesFromStorage() {
+    const defaults = getDefaultResources();
+
+    try {
+        const raw = localStorage.getItem(RESOURCE_STORAGE_KEY);
+        if (!raw) return defaults;
+
+        const parsed = JSON.parse(raw);
+        return {
+            gold: Number(parsed.gold) || 0,
+            hourglassTokens: Number(parsed.hourglassTokens) || 0,
+            normalCrystals: Object.assign({}, defaults.normalCrystals, parsed.normalCrystals),
+            refinedCrystals: Object.assign({}, defaults.refinedCrystals, parsed.refinedCrystals),
+            wildCards: Object.assign({}, defaults.wildCards, parsed.wildCards),
+            tradeTokens: Object.assign({}, defaults.tradeTokens, parsed.tradeTokens)
+        };
+    } catch (error) {
+        console.error("Could not read resources from storage", error);
+        return defaults;
+    }
+}
+
+function saveResourcesToStorage() {
+    try {
+        localStorage.setItem(RESOURCE_STORAGE_KEY, JSON.stringify(resourcePools));
+    } catch (error) {
+        console.error("Could not save resources to storage", error);
+    }
+}
+
+/* ============================================================
+   UI PREFERENCES (collapsed resource sections, hide toggles)
+   ============================================================ */
+const UI_PREFS_KEY = "voodooUnboundUIPrefsV1";
+
+function loadUIPrefs() {
+    try {
+        const raw = localStorage.getItem(UI_PREFS_KEY);
+        return raw ? JSON.parse(raw) : { collapsedSections: {}, calculatorHidden: false, inventorySidebarHidden: false };
+    } catch (error) {
+        return { collapsedSections: {}, calculatorHidden: false, inventorySidebarHidden: false };
+    }
+}
+
+let uiPrefs = loadUIPrefs();
+
+function saveUIPrefs() {
+    try {
+        localStorage.setItem(UI_PREFS_KEY, JSON.stringify(uiPrefs));
+    } catch (error) {
+        console.error("Could not save UI preferences", error);
+    }
+}
+
+function toggleResourceSection(sectionKey) {
+    const isCollapsed = !!uiPrefs.collapsedSections[sectionKey];
+    uiPrefs.collapsedSections[sectionKey] = !isCollapsed;
+    saveUIPrefs();
+    applyResourceSectionState(sectionKey);
+}
+
+function applyResourceSectionState(sectionKey) {
+    const section = document.querySelector(`.resource-section[data-section="${sectionKey}"]`);
+    if (!section) return;
+
+    const collapsed = !!uiPrefs.collapsedSections[sectionKey];
+    section.classList.toggle("is-collapsed", collapsed);
+
+    const btn = section.querySelector(".resource-section-title");
+    if (btn) btn.setAttribute("aria-expanded", String(!collapsed));
+}
+
+function applyAllResourceSectionStates() {
+    document.querySelectorAll(".resource-section[data-section]").forEach(section => {
+        applyResourceSectionState(section.dataset.section);
+    });
+}
+
+function toggleCalculatorPanel() {
+    uiPrefs.calculatorHidden = !uiPrefs.calculatorHidden;
+    saveUIPrefs();
+    applyCalculatorPanelState();
+}
+
+function applyCalculatorPanelState() {
+    const grid = document.getElementById("calcGrid");
+    const panel = document.getElementById("calculatorPanel");
+    const btn = document.getElementById("toggleCalculatorBtn");
+
+    if (!grid || !panel || !btn) return;
+
+    grid.classList.toggle("calc-grid--single", uiPrefs.calculatorHidden);
+    panel.style.display = uiPrefs.calculatorHidden ? "none" : "";
+    btn.textContent = uiPrefs.calculatorHidden ? "Show calculator" : "Hide calculator";
+}
+
+function toggleInventorySidebar() {
+    uiPrefs.inventorySidebarHidden = !uiPrefs.inventorySidebarHidden;
+    saveUIPrefs();
+    applyInventorySidebarState();
+}
+
+function applyInventorySidebarState() {
+    const layout = document.getElementById("invLayout");
+    const sidebar = document.getElementById("invSidebar");
+    const btn = document.getElementById("toggleInventorySidebarBtn");
+
+    if (!layout || !sidebar || !btn) return;
+
+    layout.classList.toggle("inv-layout--full", uiPrefs.inventorySidebarHidden);
+    sidebar.style.display = uiPrefs.inventorySidebarHidden ? "none" : "";
+    btn.textContent = uiPrefs.inventorySidebarHidden ? "Show sidebar" : "Hide sidebar";
+}
+
+function populateResourceInputs() {
+    document.querySelectorAll(".resource-input").forEach(input => {
+        const type = input.dataset.type;
+        const tier = input.dataset.tier;
+
+        input.value = (type === "gold" || type === "hourglassTokens") ? resourcePools[type] : (resourcePools[type][tier] || 0);
+    });
+}
+
+function handleResourceInputChange(event) {
+    const input = event.target;
+    const type = input.dataset.type;
+    const tier = input.dataset.tier;
+    const value = Math.max(0, Number(input.value) || 0);
+
+    input.value = value;
+
+    if (type === "gold" || type === "hourglassTokens") {
+        resourcePools[type] = value;
+    } else {
+        resourcePools[type][tier] = value;
+    }
+
+    saveResourcesToStorage();
+    renderUpgradePlan();
+}
+
 function loadInventoryFromStorage() {
     try {
         const raw = localStorage.getItem(INVENTORY_STORAGE_KEY);
@@ -2816,6 +3485,33 @@ function getDefaultLevelForCard(cardName) {
     const displayCategory = cardRarities[cardName];
     const startingLevel = getStartingLevel(displayCategory);
     return startingLevel === "" ? 1 : startingLevel;
+}
+
+/* Extra copies of a maxed card convert to Hourglass Tokens at these rates.
+   Legendary, Mythic, and Dark share the Legendary rate (same pooling convention
+   used everywhere else in this app — see getResourcePool). */
+const HOURGLASS_RATES = { Common: 1, Rare: 5, Epic: 75, Legendary: 750 };
+
+function getHourglassRate(displayCategory) {
+    const pool = getResourcePool(displayCategory);
+    return HOURGLASS_RATES[pool] || 0;
+}
+
+function isCardMaxLevel(cardName) {
+    return getInventoryEntry(cardName).level >= 18;
+}
+
+function getHourglassTokenValue(cardName) {
+    if (!isCardMaxLevel(cardName)) {
+        return 0;
+    }
+
+    const entry = getInventoryEntry(cardName);
+    return entry.owned * getHourglassRate(cardRarities[cardName]);
+}
+
+function getTotalHourglassPotential() {
+    return Object.keys(cardRarities).reduce((total, cardName) => total + getHourglassTokenValue(cardName), 0);
 }
 
 function getInventoryEntry(cardName) {
@@ -2871,6 +3567,215 @@ function isCardTracked(cardName) {
     return entry.owned > 0 || entry.level !== getDefaultLevelForCard(cardName);
 }
 
+/* ---------- Multi-card selection & upgrade planning ---------- */
+function getCrystalTradePoolKey(displayCategory) {
+    // Legendary, Mythic, and Dark all draw from the same Legendary+ crystal/trade pool.
+    return getResourcePool(displayCategory);
+}
+
+function getWildCardPoolKey(displayCategory) {
+    // Wild cards keep Legendary separate from Mythic/Dark.
+    if (displayCategory === "Mythic" || displayCategory === "Dark") {
+        return "MythicDark";
+    }
+    return displayCategory;
+}
+
+function toggleCardSelection(cardName, isSelected) {
+    if (!cardRarities[cardName]) {
+        return;
+    }
+
+    if (isSelected) {
+        const entry = getInventoryEntry(cardName);
+        const defaultTarget = Math.min(18, entry.level + 1);
+        selectedCards.set(cardName, defaultTarget);
+    } else {
+        selectedCards.delete(cardName);
+    }
+
+    renderInventory();
+}
+
+function removeFromPlan(cardName) {
+    selectedCards.delete(cardName);
+    renderInventory();
+}
+
+function clearPlanSelection() {
+    selectedCards.clear();
+    renderInventory();
+}
+
+function updatePlanTargetLevel(cardName, rawValue) {
+    const entry = getInventoryEntry(cardName);
+    const min = Math.min(18, entry.level + 1);
+    let value = Math.round(Number(rawValue)) || min;
+    value = Math.min(18, Math.max(min, value));
+
+    selectedCards.set(cardName, value);
+    renderUpgradePlan();
+}
+
+function renderUpgradePlan() {
+    const panel = document.getElementById("upgradePlanPanel");
+    const body = document.getElementById("upgradePlanBody");
+
+    if (selectedCards.size === 0) {
+        panel.style.display = "none";
+        body.innerHTML = "";
+        return;
+    }
+
+    panel.style.display = "";
+
+    // Work against a scratch copy of the pools so the real pools aren't mutated while planning.
+    const remaining = JSON.parse(JSON.stringify(resourcePools));
+
+    let totalBaseNeed = 0;
+    let totalFinalNeed = 0;
+    let totalGoldCost = 0;
+    const touchedPools = new Set();
+
+    const rows = Array.from(selectedCards.entries()).map(([cardName, targetLevel]) => {
+        const displayCategory = cardRarities[cardName];
+        const category = getCalculationCategory(displayCategory);
+        const entry = getInventoryEntry(cardName);
+        const current = Math.min(entry.level, targetLevel - 1);
+
+        let baseNeed = 0;
+        let goldCost = 0;
+        for (let lvl = current + 1; lvl <= targetLevel; lvl++) {
+            baseNeed += (cards[category] && cards[category][lvl]) || 0;
+            goldCost += goldCosts[lvl] || 0;
+        }
+
+        const crystalPool = getCrystalTradePoolKey(displayCategory);
+        const wildPool = getWildCardPoolKey(displayCategory);
+        const tradeApplicable = canUseTradeTokens(displayCategory);
+
+        let remainingNeed = Math.max(baseNeed - entry.owned, 0);
+        const ownedDeduction = Math.min(entry.owned, baseNeed);
+
+        let tradeDeduction = 0;
+        if (tradeApplicable) {
+            tradeDeduction = Math.min(remaining.tradeTokens[crystalPool] || 0, remainingNeed);
+            remaining.tradeTokens[crystalPool] -= tradeDeduction;
+            remainingNeed -= tradeDeduction;
+            if (tradeDeduction > 0) touchedPools.add(`tradeTokens:${crystalPool}`);
+        }
+
+        const wildDeduction = Math.min(remaining.wildCards[wildPool] || 0, remainingNeed);
+        remaining.wildCards[wildPool] -= wildDeduction;
+        remainingNeed -= wildDeduction;
+        if (wildDeduction > 0) touchedPools.add(`wildCards:${wildPool}`);
+
+        const crystalSavings = calculateCrystalSavings(
+            category,
+            current,
+            targetLevel,
+            remaining.normalCrystals[crystalPool] || 0,
+            remaining.refinedCrystals[crystalPool] || 0
+        );
+
+        remaining.normalCrystals[crystalPool] -= crystalSavings.normalUsed;
+        remaining.refinedCrystals[crystalPool] -= crystalSavings.refinedUsed;
+        if (crystalSavings.normalUsed > 0) touchedPools.add(`normalCrystals:${crystalPool}`);
+        if (crystalSavings.refinedUsed > 0) touchedPools.add(`refinedCrystals:${crystalPool}`);
+
+        const deductions = ownedDeduction + tradeDeduction + wildDeduction + crystalSavings.totalCrystalSavings;
+        const finalNeed = Math.max(baseNeed - deductions, 0);
+
+        totalBaseNeed += baseNeed;
+        totalFinalNeed += finalNeed;
+        totalGoldCost += goldCost;
+
+        return { cardName, displayCategory, current, targetLevel, entry, baseNeed, finalNeed, goldCost };
+    });
+
+    const goldRemaining = resourcePools.gold - totalGoldCost;
+
+    const rowsHtml = rows.map(row => {
+        const rarityClass = "rarity-" + row.displayCategory.toLowerCase();
+        const maxSelectable = 18;
+
+        return `
+            <div class="plan-row">
+                <div class="plan-row-head">
+                    <div class="plan-row-name">
+                        <span class="gem ${rarityClass}"></span>
+                        <span class="name-text">${row.cardName}</span>
+                    </div>
+                    <button type="button" class="plan-remove-btn" title="Remove from plan" onclick="removeFromPlan('${escapeForAttribute(row.cardName)}')">×</button>
+                </div>
+
+                <div class="plan-row-levels">
+                    <span>Lv ${row.current} →</span>
+                    <div class="field-wrap plan-target-wrap">
+                        <input type="number" min="${row.current + 1}" max="18" value="${row.targetLevel}"
+                            onchange="updatePlanTargetLevel('${escapeForAttribute(row.cardName)}', this.value)">
+                        <div class="stepper">
+                            <button type="button" class="stepper-btn" tabindex="-1" aria-label="Increase target level" onclick="stepNumberInput(this, 1)">
+                                <svg viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <button type="button" class="stepper-btn" tabindex="-1" aria-label="Decrease target level" onclick="stepNumberInput(this, -1)">
+                                <svg viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="plan-row-result">
+                    <span>${row.baseNeed.toLocaleString()} base</span>
+                    <strong>${row.finalNeed.toLocaleString()} needed</strong>
+                </div>
+            </div>
+        `;
+    }).join("");
+
+    const poolLabels = {
+        tradeTokens: "Trade Tokens",
+        wildCards: "Wild Cards",
+        normalCrystals: "Normal Crystals",
+        refinedCrystals: "Refined Crystals"
+    };
+
+    const poolUsageHtml = Array.from(touchedPools).map(key => {
+        const [type, tier] = key.split(":");
+        const tierLabel = tier === "MythicDark" ? "Mythic/Dark" : tier === "Legendary" ? "Legendary+" : tier;
+        const used = (resourcePools[type][tier] || 0) - (remaining[type][tier] || 0);
+        const left = remaining[type][tier] || 0;
+        const shortClass = left <= 0 ? "short" : "";
+
+        return `<div class="${shortClass}">${poolLabels[type]} · ${tierLabel}: ${used.toLocaleString()} used, ${left.toLocaleString()} left</div>`;
+    }).join("");
+
+    body.innerHTML = `
+        <div class="plan-list">${rowsHtml}</div>
+
+        <div class="plan-totals">
+            <div class="plan-total-line">
+                <span>Base need (all cards)</span>
+                <strong>${totalBaseNeed.toLocaleString()}</strong>
+            </div>
+            <div class="plan-total-line">
+                <span>Needed after resources</span>
+                <strong>${totalFinalNeed.toLocaleString()}</strong>
+            </div>
+            <div class="plan-total-line ${goldRemaining < 0 ? "is-short" : "is-ok"}">
+                <span class="gold-line">${goldIconHtml("summary")} Gold cost</span>
+                <strong>${totalGoldCost.toLocaleString()} <span style="color:var(--ink-dim); font-size:0.7rem;">(${goldRemaining < 0 ? "short " + Math.abs(goldRemaining).toLocaleString() : goldRemaining.toLocaleString() + " left"})</span></strong>
+            </div>
+        </div>
+
+        ${poolUsageHtml ? `<div class="plan-pool-usage">${poolUsageHtml}</div>` : ""}
+
+        <button type="button" class="btn btn-ghost btn-sm btn-block" style="margin-top:12px;" onclick="clearPlanSelection()">
+            Clear selection
+        </button>
+    `;
+}
+
 function renderInventory() {
     const grid = document.getElementById("inventoryGrid");
     const searchTerm = document.getElementById("invSearch").value.trim().toLowerCase();
@@ -2915,6 +3820,8 @@ function renderInventory() {
         rows = rows.filter(row => row.tracked);
     } else if (statusFilter === "ready") {
         rows = rows.filter(row => row.isReady);
+    } else if (statusFilter === "selected") {
+        rows = rows.filter(row => selectedCards.has(row.cardName));
     }
 
     rows.sort((a, b) => {
@@ -2941,19 +3848,24 @@ function renderInventory() {
 
     if (rows.length === 0) {
         grid.innerHTML = `<div class="inv-empty-state">No cards match these filters.</div>`;
+        renderUpgradePlan();
         return;
     }
 
     grid.innerHTML = rows.map(row => renderInventoryCard(row)).join("");
+    renderUpgradePlan();
 }
 
 function renderInventoryCard(row) {
     const { cardName, rarity, entry, nextInfo, progress, isReady } = row;
     const rarityClass = "rarity-" + rarity.toLowerCase();
     const imgPath = getCardImagePath(cardName);
+    const isSelected = selectedCards.has(cardName);
+    const hourglassRate = getHourglassRate(rarity);
+    const hourglassValue = entry.owned * hourglassRate;
 
     const progressLabel = nextInfo.isMax
-        ? "Max level reached"
+        ? `${entry.owned.toLocaleString()} extra → ${hourglassValue.toLocaleString()} tokens`
         : `${entry.owned.toLocaleString()} / ${nextInfo.needed.toLocaleString()} to Lv ${nextInfo.nextLevel}`;
 
     const badge = nextInfo.isMax
@@ -2963,12 +3875,15 @@ function renderInventoryCard(row) {
             : "";
 
     const goldNote = nextInfo.isMax
-        ? ""
+        ? `<div class="inv-gold-note">⏳ ${hourglassRate.toLocaleString()} tokens per extra copy</div>`
         : `<div class="inv-gold-note">${goldIconHtml("summary")} ${nextInfo.goldCost.toLocaleString()} gold to reach Lv ${nextInfo.nextLevel}</div>`;
 
     return `
-        <div class="inv-card ${rarityClass} ${isReady ? "is-ready" : ""}">
+        <div class="inv-card ${rarityClass} ${isReady ? "is-ready" : ""} ${isSelected ? "is-selected" : ""}">
             <div class="inv-card-head">
+                <input type="checkbox" class="inv-card-select" ${isSelected ? "checked" : ""}
+                    aria-label="Select ${cardName} for the upgrade plan"
+                    onchange="toggleCardSelection('${escapeForAttribute(cardName)}', this.checked)">
                 <img class="inv-card-thumb" src="${imgPath}" alt="" onerror="this.style.display='none'">
                 <div style="min-width:0; flex:1;">
                     <div class="inv-card-name">${cardName}</div>
@@ -2994,7 +3909,7 @@ function renderInventoryCard(row) {
                     </div>
                 </div>
                 <div>
-                    <label>Owned</label>
+                    <label>${nextInfo.isMax ? "Extra" : "Owned"}</label>
                     <div class="field-wrap">
                         <input type="number" min="0" value="${entry.owned}"
                             onchange="handleInventoryFieldChange('${escapeForAttribute(cardName)}', null, this.value)">
@@ -3041,7 +3956,6 @@ function handleInventoryFieldChange(cardName, levelValue, ownedValue) {
 function updateInventoryStats(allNames) {
     let ready = 0;
     let maxed = 0;
-    let totalOwned = 0;
     let tracked = 0;
 
     allNames.forEach(cardName => {
@@ -3049,7 +3963,6 @@ function updateInventoryStats(allNames) {
         const nextInfo = getNextLevelInfo(cardName, entry.level);
 
         if (isCardTracked(cardName)) tracked++;
-        totalOwned += entry.owned;
 
         if (nextInfo.isMax) {
             maxed++;
@@ -3061,7 +3974,7 @@ function updateInventoryStats(allNames) {
     document.getElementById("invStatTotal").textContent = tracked.toLocaleString();
     document.getElementById("invStatReady").textContent = ready.toLocaleString();
     document.getElementById("invStatMaxed").textContent = maxed.toLocaleString();
-    document.getElementById("invStatOwned").textContent = totalOwned.toLocaleString();
+    document.getElementById("invStatHourglass").textContent = getTotalHourglassPotential().toLocaleString();
 }
 
 function resetInventory() {
@@ -3105,6 +4018,19 @@ function loadCardFromInventory() {
     autoFillDesiredLevel();
 
     showToast(`Loaded ${cardName} from inventory.`);
+}
+
+function saveScenarioToInventory(scenarioId) {
+    const scenario = calculationHistory.find(item => item.scenarioId === scenarioId);
+
+    if (!scenario || !cardRarities[scenario.cardName]) {
+        return;
+    }
+
+    setInventoryEntry(scenario.cardName, scenario.current, scenario.ownedCards);
+    updateLoadInventoryButtonState();
+    updateInventoryTabCount();
+    showToast(`Saved ${scenario.cardName} — Lv ${scenario.current}, ${scenario.ownedCards} owned — to inventory.`);
 }
 
 function saveCurrentCardToInventory() {
@@ -3239,6 +4165,15 @@ function importInventoryFromFile(event) {
 /* ---------- Init ---------- */
 updateInventoryTabCount();
 updateLoadInventoryButtonState();
+
+populateResourceInputs();
+document.querySelectorAll(".resource-input").forEach(input => {
+    input.addEventListener("change", handleResourceInputChange);
+});
+
+applyAllResourceSectionStates();
+applyCalculatorPanelState();
+applyInventorySidebarState();
 
 /* ---------- Custom number steppers ---------- */
 function stepNumberInput(buttonEl, direction) {
