@@ -25,787 +25,1183 @@
 <meta name="twitter:description" content="A magical Harry Potter: Magic Awakened card upgrade calculator.">
 <meta name="twitter:image" content="https://voodoounbound.github.io/card-calculator/discord-preview.png">
 
-<link href="https://fonts.cdnfonts.com/css/witches-magic" rel="stylesheet">
-<link href="https://fonts.cdnfonts.com/css/mendalion" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
+:root {
+    --void: #0a0b12;
+    --bg: #0d0f18;
+    --panel: #12141f;
+    --panel-raised: #171a28;
+    --hairline: rgba(212, 175, 55, 0.14);
+    --hairline-soft: rgba(255, 255, 255, 0.06);
+    --gold: #d4af37;
+    --gold-bright: #f2ce6b;
+    --gold-dim: rgba(212, 175, 55, 0.55);
+    --ink: #eae5d8;
+    --ink-dim: #93909f;
+    --ink-faint: #5f5d6b;
+    --danger: #c0475a;
+    --success: #4fae7a;
+
+    --c-common: #838a97;
+    --c-rare: #4f8ff0;
+    --c-epic: #a262e8;
+    --c-legendary: #d4af37;
+    --c-mythic: #ea7a3c;
+    --c-dark: #c23b52;
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --shadow-panel: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 20px 40px -20px rgba(0, 0, 0, 0.6);
+    --font-ui: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --font-display: 'Cinzel Decorative', var(--font-ui);
+}
+
 * {
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+    background: rgba(212, 175, 55, 0.35);
+    color: #fff;
 }
 
 body {
     margin: 0;
     min-height: 100vh;
-    overflow-x: auto;
     background:
-        radial-gradient(circle at top left, rgba(44, 42, 82, 0.55), transparent 35%),
-        radial-gradient(circle at top right, rgba(8, 8, 18, 0.8), transparent 40%),
-        linear-gradient(135deg, #10101d 0%, #060711 100%);
-    color: #f4e7c5;
-    font-family: 'Mendalion', sans-serif;
-    padding: 18px;
+        radial-gradient(circle at 12% 0%, rgba(212, 175, 55, 0.05), transparent 40%),
+        radial-gradient(circle at 88% 8%, rgba(162, 98, 232, 0.05), transparent 38%),
+        var(--bg);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    -webkit-font-smoothing: antialiased;
 }
 
-.page {
-    width: 100%;
-    min-width: 980px;
+button, input, select {
+    font-family: inherit;
+}
+
+a { color: var(--gold); }
+
+/* ---------- Skip link / focus ---------- */
+:focus-visible {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* ---------- Shell ---------- */
+.app {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 22px 24px 60px;
+}
+
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    padding-bottom: 18px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid var(--hairline-soft);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-mark {
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    flex: none;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 45%, #a97c14 100%);
     display: grid;
-    grid-template-columns: 420px minmax(520px, 1fr);
-    gap: 18px;
-    align-items: start;
-}
-/* Calculator */
-.calculator {
-    width: 100%;
-    min-height: calc(100vh - 36px);
-    background: rgba(27, 27, 47, 0.95);
-    border: 2px solid #d4af37;
-    border-radius: 10px;
-    padding: 18px 20px;
-    box-shadow:
-        0 0 8px rgba(212,175,55,.55),
-        0 0 25px rgba(212,175,55,.14);
+    place-items: center;
+    box-shadow: 0 6px 18px -6px rgba(212, 175, 55, 0.55);
 }
 
-h1 {
-    margin: 0 0 14px 0;
-    text-align: center;
-    color: #d4af37;
-    font-family: 'Witches Magic', sans-serif;
+.brand-mark svg { width: 20px; height: 20px; }
 
-    background: linear-gradient(
-        135deg,
-        #d4af37 0%,
-        #f4d76b 45%,
-        #b88a1f 100%
-    );
+.brand-text-eyebrow {
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin: 0 0 1px;
+    font-weight: 600;
+}
 
+.brand-text-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.55rem;
+    letter-spacing: 0.8px;
+    line-height: 1.25;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 50%, #c79a2f 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-
-    filter:
-        drop-shadow(0 0 5px rgba(212,175,55,.75))
-        drop-shadow(0 0 16px rgba(212,175,55,.35));
-
-    animation: titleGlow 2.4s ease-in-out infinite;
 }
 
-.title-main {
-    display: block;
-    font-size: 2.8rem;
-    line-height: 1.15;
-    letter-spacing: 1px;
+/* ---------- Tabs ---------- */
+.tab-nav {
+    display: inline-flex;
+    gap: 2px;
+    padding: 4px;
+    background: var(--panel);
+    border: 1px solid var(--hairline-soft);
+    border-radius: 999px;
 }
-.subtitle {
-    text-align: center;
-    margin-top: 0;
-    margin-bottom: 8px;
-    color: #c8b98f;
-    font-family: 'Mendalion', serif;
-    font-size: 1.7rem;
-    letter-spacing: .5px;
+
+.tab-button {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: var(--ink-dim);
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    padding: 9px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: color .15s ease, background .15s ease;
+}
+
+.tab-button svg { width: 15px; height: 15px; opacity: .85; }
+
+.tab-button:hover {
+    color: var(--ink);
+}
+
+.tab-button.active {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
+    color: #14131a;
+}
+
+.tab-count {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.tab-button.active .tab-count {
+    background: rgba(0, 0, 0, 0.18);
+}
+
+.view { display: none; }
+.view.active { display: block; }
+
+/* ============================================================
+   CALCULATOR VIEW
+   ============================================================ */
+.calc-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+}
+
+.panel {
+    background: var(--panel);
+    border: 1px solid var(--hairline-soft);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-panel);
+}
+
+.panel-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid var(--hairline-soft);
+}
+
+.panel-title {
+    margin: 0;
+    font-size: 1.02rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+.panel-subtitle {
+    margin: 2px 0 0;
+    font-size: 0.8rem;
+    color: var(--ink-dim);
+}
+
+.panel-body {
+    padding: 18px 20px 20px;
 }
 
 label {
     display: block;
-    margin-top: 9px;
-    margin-bottom: 4px;
-    font-size: 1.15rem;
-    font-weight: bold;
-    color: #f4e7c5; 
+    margin-bottom: 6px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
 }
 
-.field-wrap {
-    position: relative;
-}
+.field-wrap { position: relative; }
+
 .input-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    column-gap: 18px;
-    row-gap: 0;
-    margin-top: 4px;
+    gap: 14px 16px;
 }
 
-.field-block {
-    min-width: 0;
+.field-block { min-width: 0; }
+
+.field-block-row-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
 }
+
+.field-block-row-actions label { margin-bottom: 0; }
+
+.inline-action {
+    appearance: none;
+    background: none;
+    border: none;
+    color: var(--gold-dim);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.inline-action:hover { color: var(--gold-bright); }
+.inline-action:disabled { color: var(--ink-faint); cursor: not-allowed; }
 
 .button-field-block {
+    grid-column: 1 / -1;
     display: flex;
-    align-items: flex-end;
+    align-items: stretch;
 }
 
-.button-field-block .calculate-button {
-    margin-top: 0;
-    min-height: 44px;
-}
-input,
-select {
+input, select {
     width: 100%;
-    height: 44px;
-    padding: 8px 34px 8px 10px;
-    border-radius: 6px;
-    border: 1px solid #d4af37;
-    background: #252542;
-    color: #f4e7c5;
-    font-family: 'Mendalion', sans-serif;
-    font-size: 1rem;
-    line-height: 1.2;
+    height: 42px;
+    padding: 8px 34px 8px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--hairline-soft);
+    background: var(--panel-raised);
+    color: var(--ink);
+    font-size: 0.92rem;
+    font-family: var(--font-mono);
+    transition: border-color .15s ease, box-shadow .15s ease;
 }
 
-input::placeholder {
-    color: rgba(244, 231, 197, 0.5);
-}
+#cardName { font-family: var(--font-ui); }
+select { font-family: var(--font-ui); cursor: pointer; }
 
-input:focus,
-select:focus {
+input::placeholder { color: var(--ink-faint); font-family: var(--font-ui); }
+
+input:hover, select:hover { border-color: rgba(212, 175, 55, 0.35); }
+
+input:focus, select:focus {
     outline: none;
-    box-shadow:
-        0 0 6px rgba(212,175,55,.75),
-        0 0 16px rgba(212,175,55,.2);
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
 }
+
 input:disabled {
-    opacity: .5;
+    opacity: .45;
     cursor: not-allowed;
 }
+
 .clear-field {
     position: absolute;
-    top: 50%;
+    top: 32px;
     right: 8px;
-    transform: translateY(-50%);
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     margin: 0;
     padding: 0;
-    border: 1px solid rgba(212,175,55,.65);
+    border: none;
     border-radius: 50%;
-    background: rgba(15, 15, 26, 0.75);
-    color: #d4af37;
-    font-size: 14px;
-    line-height: 18px;
-    font-family: 'Mendalion', sans-serif;
+    background: transparent;
+    color: var(--ink-faint);
+    font-size: 13px;
+    line-height: 20px;
     cursor: pointer;
-    transition: .2s;
-    z-index: 5;
+    transition: .15s;
 }
 
 .clear-field:hover {
-    background: #d4af37;
-    color: #111;
-    box-shadow: 0 0 6px #d4af37;
+    background: rgba(212, 175, 55, 0.16);
+    color: var(--gold-bright);
 }
 
-/* Lower input layout */
-.lower-fields {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
-    margin-top: 4px;
-}
-
-.lower-fields .right-fields {
-    border-left: none;
-    padding-left: 0;
-}
-
-/* Custom card autocomplete */
+/* Autocomplete */
 .autocomplete-menu {
     display: none;
     position: absolute;
-    top: calc(100% + 5px);
+    top: calc(100% + 6px);
     left: 0;
     right: 0;
-    max-height: 230px;
+    max-height: 260px;
     overflow-y: auto;
-    background: rgba(15, 15, 26, 0.98);
-    border: 1px solid #d4af37;
-    border-radius: 8px;
-    box-shadow:
-        0 0 10px rgba(212,175,55,.45),
-        0 0 25px rgba(212,175,55,.15);
+    background: var(--panel-raised);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.65);
     z-index: 50;
 }
 
-.autocomplete-menu.show {
-    display: block;
-}
+.autocomplete-menu.show { display: block; }
 
 .autocomplete-item {
-    padding: 8px 10px;
+    padding: 9px 12px;
     cursor: pointer;
-    border-bottom: 1px solid rgba(212,175,55,.16);
-    color: #f4e7c5;
-    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border-bottom: 1px solid var(--hairline-soft);
+    font-size: 0.88rem;
 }
 
-.autocomplete-item:hover,
-.autocomplete-item.active {
-    background: rgba(212,175,55,.22);
-    color: #d4af37;
-    box-shadow: inset 0 0 8px rgba(212,175,55,.18);
+.autocomplete-item:last-child { border-bottom: none; }
+
+.autocomplete-item:hover, .autocomplete-item.active {
+    background: rgba(212, 175, 55, 0.1);
 }
 
 .autocomplete-rarity {
-    display: block;
-    margin-top: 2px;
-    color: #c8b98f;
-    font-size: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    flex: none;
 }
 
 .autocomplete-empty {
-    padding: 8px 10px;
-    color: #c8b98f;
-    font-style: italic;
+    padding: 14px 12px;
+    color: var(--ink-dim);
+    font-size: 0.85rem;
+}
+
+/* Rarity chip / gem */
+.gem {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 2px;
+    transform: rotate(45deg);
+    flex: none;
+}
+
+.rarity-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 3px 8px 3px 6px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.rarity-common  { color: var(--c-common); background: rgba(131,138,151,.12); }
+.rarity-rare    { color: var(--c-rare); background: rgba(79,143,240,.12); }
+.rarity-epic    { color: var(--c-epic); background: rgba(162,98,232,.12); }
+.rarity-legendary { color: var(--c-legendary); background: rgba(212,175,55,.12); }
+.rarity-mythic  { color: var(--c-mythic); background: rgba(234,122,60,.12); }
+.rarity-dark    { color: var(--c-dark); background: rgba(194,59,82,.12); }
+
+.gem.rarity-common  { background: var(--c-common); }
+.gem.rarity-rare    { background: var(--c-rare); }
+.gem.rarity-epic    { background: var(--c-epic); }
+.gem.rarity-legendary { background: var(--c-legendary); }
+.gem.rarity-mythic  { background: var(--c-mythic); }
+.gem.rarity-dark    { background: var(--c-dark); }
+
+/* Buttons */
+.btn {
+    appearance: none;
+    border: 1px solid var(--hairline-soft);
+    background: var(--panel-raised);
+    color: var(--ink);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: border-color .15s ease, background .15s ease, transform .1s ease;
+}
+
+.btn svg { width: 14px; height: 14px; }
+
+.btn:hover { border-color: rgba(212, 175, 55, 0.4); background: #1b1e2f; }
+.btn:active { transform: scale(0.98); }
+
+.btn-primary {
+    width: 100%;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 55%, #b98f21 100%);
+    color: #14131a;
+    border: none;
+    font-size: 0.95rem;
+    box-shadow: 0 10px 24px -10px rgba(212, 175, 55, 0.55);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 55%, #b98f21 100%);
+    box-shadow: 0 14px 30px -10px rgba(212, 175, 55, 0.75);
+    filter: brightness(1.06);
+}
+
+.btn-primary:active {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 55%, #b98f21 100%);
+    filter: brightness(0.96);
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--ink-dim);
+    border: 1px solid var(--hairline-soft);
+}
+
+.btn-ghost:hover { color: var(--ink); border-color: rgba(212,175,55,.3); }
+
+.btn-danger-ghost {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid rgba(192, 71, 90, 0.35);
+}
+.btn-danger-ghost:hover { background: rgba(192, 71, 90, 0.1); }
+
+.btn-block { width: 100%; }
+.btn-sm { padding: 7px 12px; font-size: 0.78rem; }
+
+.button-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Result panel */
+#result { margin-top: 18px; }
+
+.result-card {
+    border: 1px solid var(--hairline);
+    background: linear-gradient(160deg, rgba(212,175,55,0.06), rgba(212,175,55,0) 55%), var(--panel-raised);
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+}
+
+.result-headline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--hairline-soft);
+}
+
+.result-headline-title {
+    font-weight: 700;
     font-size: 1rem;
 }
 
-/* Calculate Button */
-.calculate-button {
-    width: 100%;
-    margin-top: 20px;
-    padding: 9px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+.result-needed {
+    text-align: right;
+}
 
-    background: linear-gradient(
-        135deg,
-        #d4af37 0%,
-        #f4d76b 45%,
-        #b88a1f 100%
-    );
-
-    color: #111;
-    transition: .25s;
-    font-family: 'Mendalion', sans-serif;
+.result-needed-num {
+    font-family: var(--font-mono);
     font-size: 1.5rem;
-    letter-spacing: .5px;
-
-    box-shadow:
-        0 0 8px rgba(212,175,55,.65),
-        0 0 18px rgba(212,175,55,.35);
-
-    animation: buttonGlow 2.4s ease-in-out infinite;
-    position: relative;
-    overflow: hidden;
-}
-.calculate-button-compact {
-    padding: 10px 8px;
-    font-size: 1.25rem;
-}
-.calculate-button:hover {
-    transform: scale(1.025);
-    box-shadow:
-        0 0 12px #d4af37,
-        0 0 28px rgba(212,175,55,.85),
-        0 0 48px rgba(212,175,55,.45);
+    font-weight: 700;
+    color: var(--gold-bright);
+    line-height: 1;
 }
 
-.calculate-button:active {
-    transform: scale(0.98);
-}
-
-.calculate-button::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -75%;
-    width: 50%;
-    height: 100%;
-    background: linear-gradient(
-        120deg,
-        transparent,
-        rgba(255,255,255,.45),
-        transparent
-    );
-    transform: skewX(-20deg);
-    animation: buttonShine 3.2s ease-in-out infinite;
-}
-
-#result {
-    margin-top: 22px;
-    min-height: 62px;
-    color: #f4e7c5;
+.result-needed-label {
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-dim);
 }
 
 .result-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    column-gap: 18px;
-    row-gap: 6px;
-    max-width: 360px;
-    margin: 0 auto;
-    text-align: left;
-    font-size: 1rem;
-    line-height: 1.25;
-}
-
-.result-grid-item {
-    min-width: 0;
+    gap: 10px 18px;
+    font-size: 0.86rem;
 }
 
 .result-grid-item strong {
-    color: #d4af37;
+    display: block;
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-dim);
+    font-weight: 600;
+    margin-bottom: 2px;
 }
 
-.result-grid-full {
-    grid-column: 1 / -1;
+.result-grid-item span, .result-grid-value {
+    font-family: var(--font-mono);
 }
 
-.result-cards-needed {
-    color: #d4af37;
-    font-size: 1.15rem;
-    font-weight: bold;
-    text-shadow: 0 0 10px rgba(212,175,55,.45);
+.result-grid-full { grid-column: 1 / -1; }
+
+.result-muted { color: var(--ink-dim); font-size: 0.78rem; }
+
+.result-note {
+    margin-top: 4px;
+    font-size: 0.8rem;
+    color: var(--ink-dim);
 }
 
-.result-muted {
-    color: #c8b98f;
-}
-    
-.footer {
-    margin-top: 34px;
-    text-align: center;
-    font-size: 1.15rem;
-    color: #9f9270;
-    font-family: 'Witches Magic', sans-serif;
-}
-.clear-calculator-button {
-    width: 100%;
-    margin-top: 10px;
-    padding: 7px;
-    border: 1px solid rgba(212,175,55,.75);
-    border-radius: 5px;
-    background: rgba(15, 15, 26, 0.45);
-    color: #d4af37;
-    font-family: 'Mendalion', sans-serif;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: .2s;
+.result-actions {
+    margin-top: 14px;
+    display: flex;
+    gap: 8px;
 }
 
-.clear-calculator-button:hover {
-    background: rgba(212,175,55,.16);
-    box-shadow:
-        0 0 8px rgba(212,175,55,.45),
-        0 0 18px rgba(212,175,55,.16);
+.gold-line { display: inline-flex; align-items: center; gap: 5px; }
+.gold-icon { display: inline-block; object-fit: contain; }
+.gold-icon-result { width: 15px; height: auto; }
+.gold-icon-summary { width: 13px; height: auto; }
+
+/* ---------- Summary panel ---------- */
+.summary-toolbar {
+    display: flex;
+    gap: 8px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--hairline-soft);
 }
-/* Summary Panel */
-.summary-panel {
-    width: 100%;
-    min-height: 94px;
-    max-height: calc(100vh - 36px);
+
+.summary-scroll {
+    max-height: calc(100vh - 260px);
+    min-height: 160px;
     overflow-y: auto;
-    background: rgba(15, 15, 26, 0.96);
-    border: 2px solid #d4af37;
-    border-radius: 9px;
-    padding: 10px;
-    box-shadow:
-        0 0 10px rgba(212,175,55,.4),
-        0 0 28px rgba(212,175,55,.12);
-}
-
-.summary-panel h2 {
-    margin: 0 0 8px 0;
-    text-align: center;
-    color: #d4af37;
-    font-family: 'Mendalion', sans-serif;
-    font-size: 2.5rem;
-    letter-spacing: 1px;
+    padding: 6px 20px 18px;
 }
 
 .summary-empty {
     text-align: center;
-    color: #c8b98f;
-    font-style: italic;
-    font-size: 1rem;
-    margin: 2px 0 6px;
+    color: var(--ink-dim);
+    font-size: 0.88rem;
+    padding: 40px 10px;
 }
 
 .card-group {
-    margin-top: 12px;
-    padding-top: 8px;
-    border-top: 1px solid rgba(212,175,55,.35);
+    padding: 16px 0;
+    border-bottom: 1px solid var(--hairline-soft);
 }
 
-.card-group-title {
-    font-family: 'Mendalion', sans-serif;
-    color: #d4af37;
-    font-size: 1.25rem;
-    margin-bottom: 3px;
-}
+.card-group:last-child { border-bottom: none; }
 
-/* Summary image + history layout */
 .summary-card-layout {
     display: grid;
-    grid-template-columns: 80px minmax(0, 1fr);
-    gap: 8px;
+    grid-template-columns: 56px minmax(0, 1fr);
+    gap: 12px;
     align-items: start;
 }
 
-.summary-card-layout.no-image {
-    grid-template-columns: 1fr;
-}
+.summary-card-layout.no-image { grid-template-columns: 1fr; }
 
 .summary-card-thumbnail {
-    width: 80px;
-    border: none;
-    border-radius: 3px;
-    background: transparent;
-    box-shadow: none;
-}
-.pin-scenario-button {
-    width: 100%;
-    margin-bottom: 5px;
-    padding: 3px 5px;
-    border: 1px solid rgba(212,175,55,.55);
-    border-radius: 999px;
-    background: rgba(15, 15, 26, 0.65);
-    color: #c8b98f;
-    font-family: 'Mendalion', sans-serif;
-    font-size: .8rem;
-    cursor: pointer;
-    line-height: 1.15;
+    width: 56px;
+    border-radius: 6px;
+    border: 1px solid var(--hairline-soft);
 }
 
-.pin-scenario-button:hover,
-.pin-scenario-button.pinned {
-    background: linear-gradient(
-        135deg,
-        #d4af37 0%,
-        #f4d76b 45%,
-        #b88a1f 100%
-    );
-    color: #111;
-    box-shadow: 0 0 6px rgba(212,175,55,.55);
-}
-.scenario-action-row {
-    display: grid;
-    grid-template-columns: 24px 1fr;
-    gap: 6px;
+.card-group-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    display: flex;
     align-items: center;
-    margin-bottom: 5px;
+    gap: 8px;
 }
 
-.delete-scenario-button {
-    width: 24px;
-    height: 24px;
-    padding: 0;
-    border: 1px solid rgba(212,175,55,.5);
-    border-radius: 50%;
-    background: rgba(15, 15, 26, 0.65);
-    color: #d4af37;
-    font-family: 'Mendalion', sans-serif;
-    font-size: 1rem;
-    line-height: 20px;
-    cursor: pointer;
-    transition: .2s;
-}
-
-.delete-scenario-button:hover {
-    background: rgba(120, 35, 35, 0.8);
-    color: #f4e7c5;
-    border-color: rgba(244, 231, 197, .65);
-    box-shadow: 0 0 6px rgba(120, 35, 35, .65);
-}
-.summary-card.pinned-summary-card {
-    border: 1px solid rgba(212,175,55,.85);
-    border-radius: 7px;
-    background: rgba(212,175,55,.08);
-    box-shadow:
-        0 0 7px rgba(212,175,55,.35),
-        inset 0 0 8px rgba(212,175,55,.08);
-}
 .summary-history-row {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     overflow-x: auto;
-    padding: 8px;
-    border: none;
-    border-radius: 7px;
-    background: rgba(37, 37, 66, 0.65);
+    padding-bottom: 4px;
 }
 
 .summary-card {
-    flex: 0 0 120px;
-    min-width: 120px;
-    padding: 6px 7px;
-    border-right: 1px solid rgba(212,175,55,.35);
-    font-size: 1rem;
-    line-height: 1.22;
+    flex: 0 0 158px;
+    min-width: 158px;
+    padding: 10px 12px;
+    border: 1px solid var(--hairline-soft);
+    border-radius: var(--radius-sm);
+    background: var(--panel-raised);
+    font-size: 0.8rem;
+    line-height: 1.35;
 }
+
 .recommended-summary-card {
-    flex: 0 0 155px;
-    min-width: 155px;
-    padding: 7px 8px;
-    border: 1px solid rgba(212,175,55,.85);
-    border-radius: 7px;
-    background:
-        linear-gradient(
-            135deg,
-            rgba(212,175,55,.22),
-            rgba(37, 37, 66, 0.92)
-        );
-    box-shadow:
-        0 0 8px rgba(212,175,55,.45),
-        inset 0 0 10px rgba(212,175,55,.12);
-    font-size: 1rem;
-    line-height: 1.22;
+    flex: 0 0 168px;
+    min-width: 168px;
+    padding: 10px 12px;
+    border: 1px solid rgba(212,175,55,.45);
+    border-radius: var(--radius-sm);
+    background: linear-gradient(160deg, rgba(212,175,55,.14), rgba(212,175,55,.02));
+    font-size: 0.8rem;
+    line-height: 1.35;
 }
 
 .recommended-label {
-    color: #111;
-    background: linear-gradient(
-        135deg,
-        #d4af37 0%,
-        #f4d76b 45%,
-        #b88a1f 100%
-    );
+    color: #14131a;
+    background: linear-gradient(135deg, var(--gold), var(--gold-bright));
     border-radius: 999px;
-    padding: 3px 7px;
+    padding: 2px 8px;
     display: inline-block;
-    font-weight: bold;
-    margin-bottom: 5px;
-    box-shadow: 0 0 6px rgba(212,175,55,.55);
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
 }
 
-.recommended-title {
-    color: #d4af37;
-    font-weight: bold;
-    margin-bottom: 3px;
+.recommended-title { font-weight: 700; margin-bottom: 3px; font-size: 0.82rem; }
+.recommended-details { color: var(--ink); font-family: var(--font-mono); font-size: 0.76rem; }
+.recommended-resources { color: var(--ink-dim); margin-top: 5px; font-size: 0.72rem; }
+
+.summary-card strong { color: var(--ink-dim); font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.02em; }
+
+.scenario-action-row {
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 6px;
 }
 
-.recommended-details {
-    color: #f4e7c5;
+.delete-scenario-button {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 1px solid var(--hairline-soft);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink-dim);
+    font-size: 0.9rem;
+    line-height: 20px;
+    cursor: pointer;
 }
 
-.recommended-resources {
-    color: #c8b98f;
-    margin-top: 4px;
-}
-.summary-card:last-child {
-    border-right: none;
+.delete-scenario-button:hover {
+    background: rgba(192, 71, 90, 0.15);
+    color: var(--danger);
+    border-color: rgba(192, 71, 90, 0.4);
 }
 
-.summary-card strong {
-    color: #d4af37;
-}
-.summary-gold-bottom {
-    margin-top: 5px;
-}
-.summary-final {
-    font-size: 1.05rem;
-    color: #d4af37;
-    font-weight: bold;
-    margin-bottom: 3px;
-}
-
-.summary-meta {
-    color: #f4e7c5;
-    margin-bottom: 2px;
+.pin-scenario-button {
+    width: 100%;
+    padding: 3px 6px;
+    border: 1px solid var(--hairline-soft);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink-dim);
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
 }
 
-.summary-deductions {
-    color: #c8b98f;
-    font-size: 1rem;
-    margin-top: 3px;
+.pin-scenario-button:hover, .pin-scenario-button.pinned {
+    background: rgba(212, 175, 55, 0.14);
+    color: var(--gold-bright);
+    border-color: rgba(212, 175, 55, 0.4);
 }
-.summary-button-row {
+
+.summary-card.pinned-summary-card {
+    border-color: rgba(212, 175, 55, 0.55);
+    background: rgba(212, 175, 55, 0.06);
+}
+
+.summary-final { font-weight: 700; color: var(--gold-bright); margin-bottom: 4px; font-family: var(--font-mono); font-size: 0.85rem; }
+.summary-meta { color: var(--ink-dim); margin-bottom: 6px; font-size: 0.74rem; }
+.summary-deductions { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--hairline-soft); color: var(--ink-dim); font-family: var(--font-mono); font-size: 0.72rem; }
+.summary-gold-bottom { margin-top: 6px; font-family: var(--font-mono); }
+
+.footer-note {
+    margin-top: 26px;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+}
+
+/* ============================================================
+   INVENTORY VIEW
+   ============================================================ */
+.inv-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.inv-stat {
+    background: var(--panel);
+    border: 1px solid var(--hairline-soft);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+}
+
+.inv-stat-value {
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gold-bright);
+    line-height: 1;
+}
+
+.inv-stat-label {
+    margin-top: 6px;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-dim);
+}
+
+.inv-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.inv-toolbar .field-wrap { min-width: 220px; flex: 1; }
+.inv-toolbar select { min-width: 150px; }
+.inv-toolbar input { min-width: 0; }
+
+.inv-toolbar-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.inv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(258px, 1fr));
+    gap: 12px;
+}
+
+.inv-card {
+    position: relative;
+    background: var(--panel);
+    border: 1px solid var(--hairline-soft);
+    border-radius: var(--radius-md);
+    padding: 14px 14px 12px;
+    overflow: hidden;
+}
+
+.inv-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 3px;
+}
+
+.inv-card.rarity-common::before  { background: var(--c-common); }
+.inv-card.rarity-rare::before    { background: var(--c-rare); }
+.inv-card.rarity-epic::before    { background: var(--c-epic); }
+.inv-card.rarity-legendary::before { background: var(--c-legendary); }
+.inv-card.rarity-mythic::before  { background: var(--c-mythic); }
+.inv-card.rarity-dark::before    { background: var(--c-dark); }
+
+.inv-card.is-ready {
+    border-color: rgba(79, 174, 122, 0.45);
+    box-shadow: 0 0 0 1px rgba(79, 174, 122, 0.12) inset;
+}
+
+.inv-card-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.inv-card-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    border: 1px solid var(--hairline-soft);
+    object-fit: cover;
+    flex: none;
+    background: var(--panel-raised);
+}
+
+.inv-card-name {
+    font-size: 0.87rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 4px;
+}
+
+.inv-card-fields {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
-    margin-top: 10px;
+    margin-bottom: 12px;
 }
 
-.summary-button-row .clear-button {
-    margin-top: 0;
-}
-.clear-button {
-    width: 100%;
-    background: transparent;
-    color: #d4af37;
-    border: 1px solid #d4af37;
-    margin-top: 6px;
-    padding: 5px;
-    font-size: 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-family: 'Mendalion', sans-serif;
+.inv-card-fields label {
+    font-size: 0.62rem;
+    margin-bottom: 3px;
 }
 
-.export-button {
-    background: linear-gradient(
-        135deg,
-        rgba(212,175,55,.2),
-        rgba(212,175,55,.08)
-    );
-    margin-top: 10px;
+.inv-card-fields input {
+    height: 34px;
+    padding: 4px 8px;
+    font-size: 0.85rem;
+    text-align: center;
 }
 
-.export-button:hover {
-    background: rgba(212,175,55,.18);
-    box-shadow:
-        0 0 8px rgba(212,175,55,.45),
-        0 0 18px rgba(212,175,55,.18);
-}
-.import-button {
-    background: linear-gradient(
-        135deg,
-        rgba(212,175,55,.14),
-        rgba(212,175,55,.04)
-    );
+.inv-progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: var(--ink-dim);
+    margin-bottom: 5px;
+    font-family: var(--font-mono);
 }
 
-.import-button:hover {
-    background: rgba(212,175,55,.16);
-    box-shadow:
-        0 0 8px rgba(212,175,55,.38),
-        0 0 18px rgba(212,175,55,.14);
+.inv-progress-track {
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    overflow: hidden;
+    margin-bottom: 4px;
 }
-    .gold-line {
+
+.inv-progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-bright));
+    transition: width .2s ease;
+}
+
+.inv-progress-fill.is-ready { background: linear-gradient(90deg, var(--success), #6fd39a); }
+.inv-progress-fill.is-max { background: var(--ink-faint); }
+
+.inv-gold-note {
+    font-size: 0.7rem;
+    color: var(--ink-dim);
+    font-family: var(--font-mono);
+    margin-bottom: 10px;
+}
+
+.ready-badge {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    vertical-align: middle;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--success);
+    background: rgba(79, 174, 122, 0.14);
+    padding: 2px 7px;
+    border-radius: 999px;
+    margin-left: auto;
 }
 
-.gold-icon {
-    display: inline-block;
-    object-fit: contain;
-    vertical-align: middle;
-    transform: translateY(-1px);
-    filter:
-        drop-shadow(0 0 3px rgba(212,175,55,.55))
-        drop-shadow(0 0 6px rgba(212,175,55,.25));
-}
-.gold-icon-result {
-    width: 20px;
-    height: auto;
-}
-
-.gold-icon-summary {
-    width: 16px;
-    height: auto;
-}
-/* Animations */
-@keyframes buttonGlow {
-    0% {
-        box-shadow:
-            0 0 6px rgba(212,175,55,.45),
-            0 0 14px rgba(212,175,55,.25);
-    }
-
-    50% {
-        box-shadow:
-            0 0 12px rgba(212,175,55,.9),
-            0 0 30px rgba(212,175,55,.55),
-            0 0 48px rgba(212,175,55,.25);
-    }
-
-    100% {
-        box-shadow:
-            0 0 6px rgba(212,175,55,.45),
-            0 0 14px rgba(212,175,55,.25);
-    }
+.max-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-dim);
+    background: rgba(255,255,255,0.06);
+    padding: 2px 7px;
+    border-radius: 999px;
+    margin-left: auto;
 }
 
-@keyframes buttonShine {
-    0% {
-        left: -75%;
-    }
-
-    45% {
-        left: 125%;
-    }
-
-    100% {
-        left: 125%;
-    }
+.inv-empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--ink-dim);
 }
 
-@keyframes titleGlow {
-    0% {
-        filter:
-            drop-shadow(0 0 4px rgba(212,175,55,.45))
-            drop-shadow(0 0 10px rgba(212,175,55,.25));
-    }
-
-    50% {
-        filter:
-            drop-shadow(0 0 8px rgba(212,175,55,.95))
-            drop-shadow(0 0 20px rgba(212,175,55,.65))
-            drop-shadow(0 0 34px rgba(212,175,55,.35));
-    }
-
-    100% {
-        filter:
-            drop-shadow(0 0 4px rgba(212,175,55,.45))
-            drop-shadow(0 0 10px rgba(212,175,55,.25));
-    }
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    background: var(--panel-raised);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    color: var(--ink);
+    padding: 11px 18px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    box-shadow: 0 16px 40px -12px rgba(0,0,0,.7);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
+    z-index: 200;
 }
 
-@media (max-width: 700px) {
-    body {
-        padding: 14px;
-    }
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
 
-    .page {
-        min-width: 0;
-        grid-template-columns: 1fr;
-    }
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+    .calc-grid { grid-template-columns: 1fr; }
+    .inv-stats { grid-template-columns: repeat(2, 1fr); }
+}
 
-    .calculator {
-        min-height: auto;
-    }
-
-    .summary-panel {
-        max-height: none;
-    }
-
-    .input-grid {
-        grid-template-columns: 1fr 1fr;
-        column-gap: 12px;
-    }
-
-    .title-main {
-        font-size: 2.5rem;
-    }
+@media (max-width: 640px) {
+    .app { padding: 16px 14px 40px; }
+    .app-header { flex-direction: column; align-items: flex-start; }
+    .input-grid { grid-template-columns: 1fr 1fr; }
+    .inv-grid { grid-template-columns: 1fr; }
+    .inv-toolbar-actions { width: 100%; margin-left: 0; }
+    .inv-toolbar-actions .btn { flex: 1; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="page">
+<div class="app">
 
-    <div class="calculator">
-
-        <div class="subtitle">
-            Harry Potter: Magic Awakened
+    <header class="app-header">
+        <div class="brand">
+            <div class="brand-mark">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L14.2 9.2L21.5 9.2L15.6 13.7L17.8 21L12 16.5L6.2 21L8.4 13.7L2.5 9.2L9.8 9.2L12 2Z" fill="#14131a"/></svg>
+            </div>
+            <div>
+                <p class="brand-text-eyebrow">Harry Potter: Magic Awakened</p>
+                <h1 class="brand-text-title">Card Calculator</h1>
+            </div>
         </div>
 
-        <h1>
-            <span class="title-main">Card</span>
-            <span class="title-main">Calculator</span>
-        </h1>
+        <nav class="tab-nav" role="tablist" aria-label="Sections">
+            <button type="button" class="tab-button active" id="tabBtnCalculator" role="tab" aria-selected="true" aria-controls="view-calculator" onclick="switchView('calculator')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01"/></svg>
+                Calculator
+            </button>
+            <button type="button" class="tab-button" id="tabBtnInventory" role="tab" aria-selected="false" aria-controls="view-inventory" onclick="switchView('inventory')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                Inventory
+                <span class="tab-count" id="inventoryTabCount">0</span>
+            </button>
+        </nav>
+    </header>
 
-<div class="input-grid">
+    <!-- ===================== CALCULATOR VIEW ===================== -->
+    <section id="view-calculator" class="view active">
+        <div class="calc-grid">
 
-    <div class="field-block">
-        <label for="cardName">Card</label>
-        <div class="field-wrap">
-            <input type="text" id="cardName" placeholder="Start typing a card name..." autocomplete="off">
-            <button type="button" class="clear-field" onclick="clearField('cardName')">×</button>
-            <div id="cardSuggestions" class="autocomplete-menu"></div>
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h2 class="panel-title">Upgrade Calculator</h2>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <div class="input-grid">
+
+                        <div class="field-block" style="grid-column: 1 / -1;">
+                            <div class="field-block-row-actions">
+                                <label for="cardName">Card</label>
+                                <button type="button" class="inline-action" id="loadInventoryBtn" onclick="loadCardFromInventory()" disabled>
+                                    ↺ Load from inventory
+                                </button>
+                            </div>
+                            <div class="field-wrap">
+                                <input type="text" id="cardName" placeholder="Start typing a card name..." autocomplete="off">
+                                <button type="button" class="clear-field" onclick="clearField('cardName')">×</button>
+                                <div id="cardSuggestions" class="autocomplete-menu"></div>
+                            </div>
+                        </div>
+
+                        <div class="field-block">
+                            <label for="category">Rarity</label>
+                            <div class="field-wrap">
+                                <select id="category">
+                                    <option value="">Select rarity...</option>
+                                    <option>Mythic</option>
+                                    <option>Dark</option>
+                                    <option>Legendary</option>
+                                    <option>Epic</option>
+                                    <option>Rare</option>
+                                    <option>Common</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="field-block">
+                            <label for="currentLevel">Current Level</label>
+                            <div class="field-wrap">
+                                <input type="number" id="currentLevel" min="1" max="18">
+                            </div>
+                        </div>
+
+                        <div class="field-block">
+                            <label for="ownedCards">Owned</label>
+                            <div class="field-wrap">
+                                <input type="number" id="ownedCards" min="0" value="0">
+                            </div>
+                        </div>
+
+                        <div class="field-block">
+                            <label for="desiredLevel">Desired Level</label>
+                            <div class="field-wrap">
+                                <input type="number" id="desiredLevel" min="1" max="18">
+                            </div>
+                        </div>
+
+                        <div class="field-block">
+                            <label for="tradeTokens" id="tradeTokensLabel">Trade Tokens</label>
+                            <div class="field-wrap">
+                                <input type="number" id="tradeTokens" min="0" value="0">
+                            </div>
+                        </div>
+
+                        <div class="field-block">
+                            <label for="normalCrystals" id="normalCrystalsLabel">Normal Crystals</label>
+                            <div class="field-wrap">
+                                <input type="number" id="normalCrystals" min="0" placeholder="0">
+                            </div>
+                        </div>
+
+                        <div class="field-block">
+                            <label for="wildCards" id="wildCardsLabel">Wild Cards</label>
+                            <div class="field-wrap">
+                                <input type="number" id="wildCards" min="0" value="0">
+                            </div>
+                        </div>
+
+                        <div class="field-block">
+                            <label for="refinedCrystals" id="refinedCrystalsLabel">Refined Crystals</label>
+                            <div class="field-wrap">
+                                <input type="number" id="refinedCrystals" min="0" placeholder="0">
+                            </div>
+                        </div>
+
+                        <div class="field-block button-field-block">
+                            <button class="btn btn-primary" onclick="calculateCards()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L14.2 9.2L21.5 9.2L15.6 13.7L17.8 21L12 16.5L6.2 21L8.4 13.7L2.5 9.2L9.8 9.2L12 2Z"/></svg>
+                                Calculate
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <div id="result"></div>
+
+                    <div class="button-row">
+                        <button class="btn btn-ghost" onclick="clearCardAndAllFields()">Clear Form</button>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h2 class="panel-title">Calculation Summary</h2>
+                        <p class="panel-subtitle">Scenarios you've run this session</p>
+                    </div>
+                </div>
+
+                <div class="summary-toolbar">
+                    <button class="btn btn-ghost btn-sm" style="flex:1" onclick="exportResults()">Export CSV</button>
+                    <button class="btn btn-ghost btn-sm" style="flex:1" onclick="triggerImportResults()">Import CSV</button>
+                    <button class="btn btn-danger-ghost btn-sm" onclick="clearSummary()">Clear</button>
+                </div>
+
+                <input
+                    type="file"
+                    id="importResultsFile"
+                    accept=".csv"
+                    style="display: none;"
+                    onchange="importResultsFromFile(event)"
+                >
+
+                <div class="summary-scroll">
+                    <div id="summaryList" class="summary-empty">
+                        No calculations yet. Run one on the left to see it here.
+                    </div>
+                </div>
+            </aside>
+
         </div>
-    </div>
 
-    <div class="field-block">
-        <label for="category">Rarity</label>
-        <div class="field-wrap">
-            <select id="category">
-                <option value="">Select rarity...</option>
+        <p class="footer-note">✨ Mischief Managed ✨</p>
+    </section>
+
+    <!-- ===================== INVENTORY VIEW ===================== -->
+    <section id="view-inventory" class="view">
+
+        <div class="inv-stats">
+            <div class="inv-stat">
+                <div class="inv-stat-value" id="invStatTotal">0</div>
+                <div class="inv-stat-label">Cards tracked</div>
+            </div>
+            <div class="inv-stat">
+                <div class="inv-stat-value" id="invStatReady">0</div>
+                <div class="inv-stat-label">Ready to upgrade</div>
+            </div>
+            <div class="inv-stat">
+                <div class="inv-stat-value" id="invStatMaxed">0</div>
+                <div class="inv-stat-label">At max level</div>
+            </div>
+            <div class="inv-stat">
+                <div class="inv-stat-value" id="invStatOwned">0</div>
+                <div class="inv-stat-label">Total cards owned</div>
+            </div>
+        </div>
+
+        <div class="inv-toolbar">
+            <div class="field-wrap">
+                <input type="text" id="invSearch" placeholder="Search your cards..." autocomplete="off" oninput="renderInventory()">
+            </div>
+
+            <select id="invRarityFilter" onchange="renderInventory()">
+                <option value="">All rarities</option>
                 <option>Mythic</option>
                 <option>Dark</option>
                 <option>Legendary</option>
@@ -813,116 +1209,42 @@ input:disabled {
                 <option>Rare</option>
                 <option>Common</option>
             </select>
-            <button type="button" class="clear-field" onclick="clearField('category')">×</button>
-        </div>
-    </div>
 
-    <div class="field-block">
-        <label for="currentLevel">Current Level</label>
-        <div class="field-wrap">
-            <input type="number" id="currentLevel" min="1" max="18">
-            <button type="button" class="clear-field" onclick="clearField('currentLevel')">×</button>
-        </div>
-    </div>
+            <select id="invStatusFilter" onchange="renderInventory()">
+                <option value="all">All cards</option>
+                <option value="tracked">Tracked only</option>
+                <option value="ready">Ready to upgrade</option>
+            </select>
 
-    <div class="field-block">
-        <label for="ownedCards">Owned</label>
-        <div class="field-wrap">
-            <input type="number" id="ownedCards" min="0" value="0">
-            <button type="button" class="clear-field" onclick="clearField('ownedCards')">×</button>
-        </div>
-    </div>
+            <select id="invSort" onchange="renderInventory()">
+                <option value="progress">Sort: Upgrade progress</option>
+                <option value="name">Sort: Name (A–Z)</option>
+                <option value="rarity">Sort: Rarity</option>
+                <option value="level-desc">Sort: Level (high–low)</option>
+                <option value="level-asc">Sort: Level (low–high)</option>
+                <option value="owned">Sort: Owned</option>
+            </select>
 
-    <div class="field-block">
-        <label for="desiredLevel">Desired Level</label>
-        <div class="field-wrap">
-            <input type="number" id="desiredLevel" min="1" max="18">
-            <button type="button" class="clear-field" onclick="clearField('desiredLevel')">×</button>
+            <div class="inv-toolbar-actions">
+                <button class="btn btn-ghost btn-sm" onclick="exportInventory()">Export</button>
+                <button class="btn btn-ghost btn-sm" onclick="triggerImportInventory()">Import</button>
+                <button class="btn btn-danger-ghost btn-sm" onclick="resetInventory()">Reset</button>
+            </div>
+            <input
+                type="file"
+                id="importInventoryFile"
+                accept=".csv"
+                style="display: none;"
+                onchange="importInventoryFromFile(event)"
+            >
         </div>
-    </div>
 
-    <div class="field-block">
-<label for="tradeTokens" id="tradeTokensLabel">Trade Tokens</label>
-        <div class="field-wrap">
-            <input type="number" id="tradeTokens" min="0" value="0">
-            <button type="button" class="clear-field" onclick="clearField('tradeTokens')">×</button>
-        </div>
-    </div>
-
-    <div class="field-block">
-<label for="normalCrystals" id="normalCrystalsLabel">Normal Crystals</label>
-        <div class="field-wrap">
-            <input type="number" id="normalCrystals" min="0" placeholder="">
-            <button type="button" class="clear-field" onclick="clearField('normalCrystals')">×</button>
-        </div>
-    </div>
-
-    <div class="field-block">
-<label for="wildCards" id="wildCardsLabel">Wild Cards</label>
-        <div class="field-wrap">
-            <input type="number" id="wildCards" min="0" value="0">
-            <button type="button" class="clear-field" onclick="clearField('wildCards')">×</button>
-        </div>
-    </div>
-
-    <div class="field-block">
-<label for="refinedCrystals" id="refinedCrystalsLabel">Refined Crystals</label>
-        <div class="field-wrap">
-            <input type="number" id="refinedCrystals" min="0" placeholder="">
-            <button type="button" class="clear-field" onclick="clearField('refinedCrystals')">×</button>
-        </div>
-    </div>
-
-    <div class="field-block button-field-block">
-        <button class="calculate-button calculate-button-compact" onclick="calculateCards()">
-            Cast Calculation
-        </button>
-    </div>
+        <div id="inventoryGrid" class="inv-grid"></div>
+    </section>
 
 </div>
 
-        <div id="result"></div>
-
-        <div class="footer">
-            ✨ Mischief Managed ✨
-        </div>
-
-        <button class="clear-calculator-button" onclick="clearCardAndAllFields()">
-    Clear Calculator
-</button>
-    </div>
-
-    <aside class="summary-panel">
-        <h2>Calculation Summary</h2>
-
-        <div id="summaryList" class="summary-empty">
-            No calculations yet.
-        </div>
-
-<div class="summary-button-row">
-    <button class="clear-button export-button" onclick="exportResults()">
-        Export Results
-    </button>
-
-    <button class="clear-button import-button" onclick="triggerImportResults()">
-        Import Results
-    </button>
-</div>
-
-<input 
-    type="file" 
-    id="importResultsFile" 
-    accept=".csv" 
-    style="display: none;"
-    onchange="importResultsFromFile(event)"
->
-
-<button class="clear-button" onclick="clearSummary()">
-    Clear Summary
-</button>
-    </aside>
-
-</div>
+<div class="toast" id="toast"></div>
 
 <script>
 const cardRarities = {
@@ -1320,9 +1642,13 @@ function renderCardSuggestions() {
         const name = document.createElement("div");
         name.textContent = card;
 
+        const rarityClass = "rarity-" + cardRarities[card].toLowerCase();
         const rarity = document.createElement("span");
-        rarity.className = "autocomplete-rarity";
-        rarity.textContent = cardRarities[card];
+        rarity.className = "autocomplete-rarity " + rarityClass;
+        rarity.innerHTML = `<span class="gem ${rarityClass}"></span>${cardRarities[card]}`;
+        rarity.style.display = "inline-flex";
+        rarity.style.alignItems = "center";
+        rarity.style.gap = "5px";
 
         item.appendChild(name);
         item.appendChild(rarity);
@@ -1387,6 +1713,7 @@ function chooseCard(card) {
     document.getElementById("cardName").value = card;
     autoFillRarity();
     hideCardSuggestions();
+    updateLoadInventoryButtonState();
 }
 
 function clearField(fieldId) {
@@ -1549,33 +1876,37 @@ function calculateCards() {
 
     const result = document.getElementById("result");
 
+    function showValidationMessage(message) {
+        result.innerHTML = `<div class="result-note">${message}</div>`;
+    }
+
     if (!cardName) {
-        result.textContent = "Choose or type a card name.";
+        showValidationMessage("Choose or type a card name.");
         return;
     }
 
     if (!cardRarities[cardName]) {
-        result.textContent = "Select a card from the suggested list.";
+        showValidationMessage("Select a card from the suggested list.");
         return;
     }
 
     if (!displayCategory) {
-        result.textContent = "Select a rarity.";
+        showValidationMessage("Select a rarity.");
         return;
     }
 
     if (!current || !desired) {
-        result.textContent = "Enter both levels.";
+        showValidationMessage("Enter both levels.");
         return;
     }
 
     if (current < 1 || current > 18 || desired < 1 || desired > 18) {
-        result.textContent = "Levels must be between 1 and 18.";
+        showValidationMessage("Levels must be between 1 and 18.");
         return;
     }
 
     if (desired <= current) {
-        result.textContent = "Desired level must be higher.";
+        showValidationMessage("Desired level must be higher.");
         return;
     }
 
@@ -1608,7 +1939,8 @@ function calculateCards() {
     if (ownedCards > 0) {
         resourceCells += `
             <div class="result-grid-item">
-                <strong>Owned:</strong> ${ownedCards.toLocaleString()}
+                <strong>Owned</strong>
+                <span>${ownedCards.toLocaleString()}</span>
             </div>
         `;
     }
@@ -1616,7 +1948,8 @@ function calculateCards() {
     if (tradeTokens > 0) {
         resourceCells += `
             <div class="result-grid-item">
-                <strong>Trade Tokens:</strong> ${tradeTokens.toLocaleString()}
+                <strong>Trade Tokens</strong>
+                <span>${tradeTokens.toLocaleString()}</span>
             </div>
         `;
     }
@@ -1624,7 +1957,8 @@ function calculateCards() {
     if (wildCards > 0) {
         resourceCells += `
             <div class="result-grid-item">
-                <strong>Wild Cards:</strong> ${wildCards.toLocaleString()}
+                <strong>Wild Cards</strong>
+                <span>${wildCards.toLocaleString()}</span>
             </div>
         `;
     }
@@ -1632,8 +1966,8 @@ function calculateCards() {
     if (crystalSavings.normalUsed > 0) {
         resourceCells += `
             <div class="result-grid-item">
-               <strong>Normal Crystals:</strong> ${crystalSavings.normalUsed.toLocaleString()}<br>
-<span class="result-muted">Saved ${crystalSavings.normalSavings.toLocaleString()} cards</span>
+               <strong>Normal Crystals</strong>
+               <span>${crystalSavings.normalUsed.toLocaleString()} <span class="result-muted">(saved ${crystalSavings.normalSavings.toLocaleString()})</span></span>
             </div>
         `;
     }
@@ -1641,40 +1975,50 @@ function calculateCards() {
     if (crystalSavings.refinedUsed > 0) {
         resourceCells += `
             <div class="result-grid-item">
-                <strong>Refined Crystals:</strong> ${crystalSavings.refinedUsed.toLocaleString()}<br>
-<span class="result-muted">Saved ${crystalSavings.refinedSavings.toLocaleString()} cards</span>
+                <strong>Refined Crystals</strong>
+                <span>${crystalSavings.refinedUsed.toLocaleString()} <span class="result-muted">(saved ${crystalSavings.refinedSavings.toLocaleString()})</span></span>
             </div>
         `;
     }
 
+    const rarityClass = "rarity-" + displayCategory.toLowerCase();
+
     result.innerHTML = `
-    <div class="result-grid">
-        <div class="result-grid-item">
-            <strong>Card:</strong> ${cardName}
+    <div class="result-card">
+        <div class="result-headline">
+            <div>
+                <div class="result-headline-title">${cardName}</div>
+                <span class="rarity-pill ${rarityClass}"><span class="gem ${rarityClass}"></span>${displayCategory} · Lv ${current} → ${desired}</span>
+            </div>
+            <div class="result-needed">
+                <div class="result-needed-num">${finalNeed.toLocaleString()}</div>
+                <div class="result-needed-label">Cards needed</div>
+            </div>
         </div>
 
-        <div class="result-grid-item">
-            <strong>Rarity:</strong> ${displayCategory}
+        <div class="result-grid">
+            <div class="result-grid-item">
+                <strong>Base Need</strong>
+                <span>${baseNeed.toLocaleString()}</span>
+            </div>
+
+            <div class="result-grid-item">
+                <strong>Gold Cost</strong>
+                <span class="gold-line">${goldIconHtml("result")} ${goldCost.toLocaleString()}</span>
+            </div>
+
+            ${resourceCells}
+
+            <div class="result-grid-item result-grid-full">
+                <strong>Total Deducted</strong>
+                <span>${deductions.toLocaleString()}</span>
+            </div>
         </div>
 
-        <div class="result-grid-item">
-            <strong>Base Need:</strong> ${baseNeed.toLocaleString()}
-        </div>
-
-        <div class="result-grid-item">
-            <span class="gold-line">
-                ${goldIconHtml("result")} <strong>Gold:</strong> ${goldCost.toLocaleString()}
-            </span>
-        </div>
-
-        ${resourceCells}
-
-        <div class="result-grid-item result-cards-needed">
-            Cards Needed: ${finalNeed.toLocaleString()}
-        </div>
-
-        <div class="result-grid-item">
-            <strong>Total Deducted:</strong> ${deductions.toLocaleString()}
+        <div class="result-actions">
+            <button class="btn btn-ghost btn-sm btn-block" onclick="saveCurrentCardToInventory()">
+                💾 Save level &amp; owned to inventory
+            </button>
         </div>
     </div>
 `;
@@ -1857,7 +2201,7 @@ if (item.refinedCrystalsUsed > 0) {
             ${getSummaryImageHtml(cardName)}
 
             <div>
-                <div class="card-group-title">${cardName}</div>
+                <div class="card-group-title">${cardRarities[cardName] ? `<span class="gem rarity-${cardRarities[cardName].toLowerCase()}"></span>` : ""}${cardName}</div>
                 <div class="summary-history-row">
     ${cardsHtml}
     ${recommendedHtml}
@@ -2241,6 +2585,7 @@ function clearCardAndAllFields() {
     document.getElementById("result").innerHTML = "";
 
     hideCardSuggestions();
+    updateLoadInventoryButtonState();
     document.getElementById("cardName").focus();
 }
 
@@ -2348,6 +2693,480 @@ document.addEventListener("click", function(event) {
         hideCardSuggestions();
     }
 });
+
+document.getElementById("cardName").addEventListener("input", updateLoadInventoryButtonState);
+document.getElementById("cardName").addEventListener("blur", updateLoadInventoryButtonState);
+
+/* ============================================================
+   TAB NAVIGATION
+   ============================================================ */
+function switchView(viewName) {
+    const isCalculator = viewName === "calculator";
+
+    document.getElementById("view-calculator").classList.toggle("active", isCalculator);
+    document.getElementById("view-inventory").classList.toggle("active", !isCalculator);
+
+    document.getElementById("tabBtnCalculator").classList.toggle("active", isCalculator);
+    document.getElementById("tabBtnCalculator").setAttribute("aria-selected", isCalculator);
+
+    document.getElementById("tabBtnInventory").classList.toggle("active", !isCalculator);
+    document.getElementById("tabBtnInventory").setAttribute("aria-selected", !isCalculator);
+
+    if (!isCalculator) {
+        renderInventory();
+    }
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+let toastTimeout = null;
+
+function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.classList.add("show");
+
+    if (toastTimeout) {
+        clearTimeout(toastTimeout);
+    }
+
+    toastTimeout = setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2600);
+}
+
+/* ============================================================
+   INVENTORY SYSTEM
+   ============================================================ */
+const INVENTORY_STORAGE_KEY = "voodooUnboundInventoryV1";
+let cardInventory = loadInventoryFromStorage();
+
+function loadInventoryFromStorage() {
+    try {
+        const raw = localStorage.getItem(INVENTORY_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+    } catch (error) {
+        console.error("Could not read inventory from storage", error);
+        return {};
+    }
+}
+
+function saveInventoryToStorage() {
+    try {
+        localStorage.setItem(INVENTORY_STORAGE_KEY, JSON.stringify(cardInventory));
+    } catch (error) {
+        console.error("Could not save inventory to storage", error);
+    }
+}
+
+function getDefaultLevelForCard(cardName) {
+    const displayCategory = cardRarities[cardName];
+    const startingLevel = getStartingLevel(displayCategory);
+    return startingLevel === "" ? 1 : startingLevel;
+}
+
+function getInventoryEntry(cardName) {
+    if (cardInventory[cardName]) {
+        return cardInventory[cardName];
+    }
+
+    return {
+        level: getDefaultLevelForCard(cardName),
+        owned: 0
+    };
+}
+
+function setInventoryEntry(cardName, level, owned) {
+    const clampedLevel = Math.min(18, Math.max(1, Number(level) || 1));
+    const clampedOwned = Math.max(0, Number(owned) || 0);
+
+    cardInventory[cardName] = {
+        level: clampedLevel,
+        owned: clampedOwned
+    };
+
+    saveInventoryToStorage();
+}
+
+function getNextLevelInfo(cardName, level) {
+    const displayCategory = cardRarities[cardName];
+    const category = getCalculationCategory(displayCategory);
+
+    if (level >= 18) {
+        return { isMax: true, needed: 0, goldCost: 0, nextLevel: 18 };
+    }
+
+    const nextLevel = level + 1;
+    const needed = (cards[category] && cards[category][nextLevel]) || 0;
+    const goldCost = goldCosts[nextLevel] || 0;
+
+    return { isMax: false, needed, goldCost, nextLevel };
+}
+
+function updateInventoryTabCount() {
+    const trackedCount = Object.keys(cardInventory).filter(name => {
+        const entry = cardInventory[name];
+        return entry.owned > 0 || entry.level !== getDefaultLevelForCard(name);
+    }).length;
+
+    document.getElementById("inventoryTabCount").textContent = trackedCount;
+}
+
+function isCardTracked(cardName) {
+    const entry = cardInventory[cardName];
+    if (!entry) return false;
+    return entry.owned > 0 || entry.level !== getDefaultLevelForCard(cardName);
+}
+
+function renderInventory() {
+    const grid = document.getElementById("inventoryGrid");
+    const searchTerm = document.getElementById("invSearch").value.trim().toLowerCase();
+    const rarityFilter = document.getElementById("invRarityFilter").value;
+    const statusFilter = document.getElementById("invStatusFilter").value;
+    const sortMode = document.getElementById("invSort").value;
+
+    const rarityOrder = { Mythic: 0, Dark: 1, Legendary: 2, Epic: 3, Rare: 4, Common: 5 };
+
+    let allNames = Object.keys(cardRarities);
+
+    let rows = allNames.map(cardName => {
+        const entry = getInventoryEntry(cardName);
+        const nextInfo = getNextLevelInfo(cardName, entry.level);
+        const progress = nextInfo.isMax
+            ? 1
+            : nextInfo.needed === 0
+                ? 1
+                : Math.min(1, entry.owned / nextInfo.needed);
+        const isReady = !nextInfo.isMax && nextInfo.needed > 0 && entry.owned >= nextInfo.needed;
+
+        return {
+            cardName,
+            rarity: cardRarities[cardName],
+            entry,
+            nextInfo,
+            progress,
+            isReady,
+            tracked: isCardTracked(cardName)
+        };
+    });
+
+    if (searchTerm) {
+        rows = rows.filter(row => row.cardName.toLowerCase().includes(searchTerm));
+    }
+
+    if (rarityFilter) {
+        rows = rows.filter(row => row.rarity === rarityFilter);
+    }
+
+    if (statusFilter === "tracked") {
+        rows = rows.filter(row => row.tracked);
+    } else if (statusFilter === "ready") {
+        rows = rows.filter(row => row.isReady);
+    }
+
+    rows.sort((a, b) => {
+        switch (sortMode) {
+            case "name":
+                return a.cardName.localeCompare(b.cardName);
+            case "rarity":
+                return rarityOrder[a.rarity] - rarityOrder[b.rarity] || a.cardName.localeCompare(b.cardName);
+            case "level-desc":
+                return b.entry.level - a.entry.level || a.cardName.localeCompare(b.cardName);
+            case "level-asc":
+                return a.entry.level - b.entry.level || a.cardName.localeCompare(b.cardName);
+            case "owned":
+                return b.entry.owned - a.entry.owned || a.cardName.localeCompare(b.cardName);
+            case "progress":
+            default:
+                if (a.isReady !== b.isReady) return a.isReady ? -1 : 1;
+                return b.progress - a.progress || a.cardName.localeCompare(b.cardName);
+        }
+    });
+
+    updateInventoryStats(allNames);
+    updateInventoryTabCount();
+
+    if (rows.length === 0) {
+        grid.innerHTML = `<div class="inv-empty-state">No cards match these filters.</div>`;
+        return;
+    }
+
+    grid.innerHTML = rows.map(row => renderInventoryCard(row)).join("");
+}
+
+function renderInventoryCard(row) {
+    const { cardName, rarity, entry, nextInfo, progress, isReady } = row;
+    const rarityClass = "rarity-" + rarity.toLowerCase();
+    const imgPath = getCardImagePath(cardName);
+
+    const progressLabel = nextInfo.isMax
+        ? "Max level reached"
+        : `${entry.owned.toLocaleString()} / ${nextInfo.needed.toLocaleString()} to Lv ${nextInfo.nextLevel}`;
+
+    const badge = nextInfo.isMax
+        ? `<span class="max-badge">Max</span>`
+        : isReady
+            ? `<span class="ready-badge">Ready</span>`
+            : "";
+
+    const goldNote = nextInfo.isMax
+        ? ""
+        : `<div class="inv-gold-note">${goldIconHtml("summary")} ${nextInfo.goldCost.toLocaleString()} gold to reach Lv ${nextInfo.nextLevel}</div>`;
+
+    return `
+        <div class="inv-card ${rarityClass} ${isReady ? "is-ready" : ""}">
+            <div class="inv-card-head">
+                <img class="inv-card-thumb" src="${imgPath}" alt="" onerror="this.style.display='none'">
+                <div style="min-width:0; flex:1;">
+                    <div class="inv-card-name">${cardName}</div>
+                    <span class="rarity-pill ${rarityClass}"><span class="gem ${rarityClass}"></span>${rarity}</span>
+                </div>
+                ${badge}
+            </div>
+
+            <div class="inv-card-fields">
+                <div>
+                    <label>Level</label>
+                    <input type="number" min="1" max="18" value="${entry.level}"
+                        onchange="handleInventoryFieldChange('${escapeForAttribute(cardName)}', this.value, null)">
+                </div>
+                <div>
+                    <label>Owned</label>
+                    <input type="number" min="0" value="${entry.owned}"
+                        onchange="handleInventoryFieldChange('${escapeForAttribute(cardName)}', null, this.value)">
+                </div>
+            </div>
+
+            <div class="inv-progress-label">
+                <span>${progressLabel}</span>
+            </div>
+            <div class="inv-progress-track">
+                <div class="inv-progress-fill ${nextInfo.isMax ? "is-max" : isReady ? "is-ready" : ""}" style="width:${Math.round(progress * 100)}%"></div>
+            </div>
+            ${goldNote}
+
+            <button class="btn btn-ghost btn-sm btn-block" onclick="sendCardToCalculator('${escapeForAttribute(cardName)}')">
+                Use in calculator
+            </button>
+        </div>
+    `;
+}
+
+function escapeForAttribute(value) {
+    return String(value).replace(/'/g, "\\'");
+}
+
+function handleInventoryFieldChange(cardName, levelValue, ownedValue) {
+    const current = getInventoryEntry(cardName);
+    const level = levelValue !== null ? levelValue : current.level;
+    const owned = ownedValue !== null ? ownedValue : current.owned;
+
+    setInventoryEntry(cardName, level, owned);
+    renderInventory();
+}
+
+function updateInventoryStats(allNames) {
+    let ready = 0;
+    let maxed = 0;
+    let totalOwned = 0;
+    let tracked = 0;
+
+    allNames.forEach(cardName => {
+        const entry = getInventoryEntry(cardName);
+        const nextInfo = getNextLevelInfo(cardName, entry.level);
+
+        if (isCardTracked(cardName)) tracked++;
+        totalOwned += entry.owned;
+
+        if (nextInfo.isMax) {
+            maxed++;
+        } else if (nextInfo.needed > 0 && entry.owned >= nextInfo.needed) {
+            ready++;
+        }
+    });
+
+    document.getElementById("invStatTotal").textContent = tracked.toLocaleString();
+    document.getElementById("invStatReady").textContent = ready.toLocaleString();
+    document.getElementById("invStatMaxed").textContent = maxed.toLocaleString();
+    document.getElementById("invStatOwned").textContent = totalOwned.toLocaleString();
+}
+
+function resetInventory() {
+    const shouldReset = confirm("Clear all saved card levels and owned counts? This cannot be undone.");
+
+    if (!shouldReset) {
+        return;
+    }
+
+    cardInventory = {};
+    saveInventoryToStorage();
+    renderInventory();
+    showToast("Inventory cleared.");
+}
+
+/* ---------- Calculator <-> Inventory bridge ---------- */
+function updateLoadInventoryButtonState() {
+    const cardName = document.getElementById("cardName").value.trim();
+    const btn = document.getElementById("loadInventoryBtn");
+
+    if (cardRarities[cardName] && cardInventory[cardName]) {
+        btn.disabled = false;
+    } else {
+        btn.disabled = true;
+    }
+}
+
+function loadCardFromInventory() {
+    const cardName = document.getElementById("cardName").value.trim();
+
+    if (!cardRarities[cardName]) {
+        return;
+    }
+
+    const entry = getInventoryEntry(cardName);
+
+    document.getElementById("category").value = cardRarities[cardName];
+    updateResourceLabels();
+    document.getElementById("currentLevel").value = entry.level;
+    document.getElementById("ownedCards").value = entry.owned;
+    autoFillDesiredLevel();
+
+    showToast(`Loaded ${cardName} from inventory.`);
+}
+
+function saveCurrentCardToInventory() {
+    const cardName = document.getElementById("cardName").value.trim();
+    const level = document.getElementById("currentLevel").value;
+    const owned = document.getElementById("ownedCards").value;
+
+    if (!cardRarities[cardName]) {
+        return;
+    }
+
+    setInventoryEntry(cardName, level, owned);
+    updateLoadInventoryButtonState();
+    updateInventoryTabCount();
+    showToast(`Saved ${cardName} — Lv ${level}, ${owned} owned — to inventory.`);
+}
+
+function sendCardToCalculator(cardName) {
+    if (!cardRarities[cardName]) {
+        return;
+    }
+
+    const entry = getInventoryEntry(cardName);
+
+    document.getElementById("cardName").value = cardName;
+    document.getElementById("category").value = cardRarities[cardName];
+    updateResourceLabels();
+    document.getElementById("currentLevel").value = entry.level;
+    document.getElementById("ownedCards").value = entry.owned;
+    autoFillDesiredLevel();
+    updateLoadInventoryButtonState();
+
+    switchView("calculator");
+    document.getElementById("desiredLevel").focus();
+}
+
+/* ---------- Inventory import / export (CSV) ---------- */
+function exportInventory() {
+    const trackedNames = Object.keys(cardInventory);
+
+    if (trackedNames.length === 0) {
+        alert("No inventory data to export yet.");
+        return;
+    }
+
+    const headers = ["Card", "Rarity", "Level", "Owned"];
+
+    const rows = trackedNames
+        .filter(name => cardRarities[name])
+        .map(name => [name, cardRarities[name], cardInventory[name].level, cardInventory[name].owned]);
+
+    const csvContent = [headers, ...rows]
+        .map(row => row.map(escapeCSV).join(","))
+        .join("\n");
+
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    const fileDate = new Date().toISOString().slice(0, 10);
+
+    link.href = url;
+    link.download = `voodoo-card-inventory-${fileDate}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+function triggerImportInventory() {
+    document.getElementById("importInventoryFile").click();
+}
+
+function importInventoryFromFile(event) {
+    const file = event.target.files[0];
+
+    if (!file) {
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        try {
+            const rows = parseCSV(e.target.result);
+
+            if (rows.length < 2) {
+                alert("This file does not contain any inventory data.");
+                return;
+            }
+
+            const headers = rows[0].map(header => header.trim());
+            const cardIndex = headers.indexOf("Card");
+            const levelIndex = headers.indexOf("Level");
+            const ownedIndex = headers.indexOf("Owned");
+
+            let importedCount = 0;
+
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+
+                if (!row || row.length === 0 || row.every(cell => String(cell).trim() === "")) {
+                    continue;
+                }
+
+                const cardName = (row[cardIndex] || "").trim();
+
+                if (!cardName || !cardRarities[cardName]) {
+                    continue;
+                }
+
+                const level = Number(row[levelIndex]) || getDefaultLevelForCard(cardName);
+                const owned = Number(row[ownedIndex]) || 0;
+
+                setInventoryEntry(cardName, level, owned);
+                importedCount++;
+            }
+
+            renderInventory();
+            alert(`${importedCount} inventory ${importedCount === 1 ? "entry" : "entries"} imported.`);
+        } catch (error) {
+            console.error(error);
+            alert("Something went wrong while importing the file.");
+        }
+
+        event.target.value = "";
+    };
+
+    reader.readAsText(file);
+}
+
+/* ---------- Init ---------- */
+updateInventoryTabCount();
+updateLoadInventoryButtonState();
 </script>
 
 </body>
