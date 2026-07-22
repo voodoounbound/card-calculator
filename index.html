@@ -319,6 +319,48 @@ input, select {
     transition: border-color .15s ease, box-shadow .15s ease;
 }
 
+/* Hide native number spin buttons — replaced with .stepper below */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.stepper {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    bottom: 4px;
+    width: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    z-index: 2;
+}
+
+.stepper-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    border-radius: 3px;
+    background: transparent;
+    color: var(--ink-dim);
+    cursor: pointer;
+    transition: color .15s ease, background .15s ease;
+}
+
+.stepper-btn svg { width: 8px; height: 5px; display: block; pointer-events: none; }
+
+.stepper-btn:hover { color: var(--gold-bright); background: rgba(212, 175, 55, 0.14); }
+.stepper-btn:active { color: var(--gold); background: rgba(212, 175, 55, 0.22); }
+
 #cardName { font-family: var(--font-ui); }
 select { font-family: var(--font-ui); cursor: pointer; }
 
@@ -641,6 +683,9 @@ input:disabled {
 
 .summary-card-thumbnail {
     width: 56px;
+    aspect-ratio: 570 / 795;
+    height: auto;
+    object-fit: cover;
     border-radius: 6px;
     border: 1px solid var(--hairline-soft);
 }
@@ -857,11 +902,13 @@ input:disabled {
 }
 
 .inv-card-thumb {
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    aspect-ratio: 570 / 795;
+    height: auto;
     border-radius: 6px;
     border: 1px solid var(--hairline-soft);
     object-fit: cover;
+    object-position: top center;
     flex: none;
     background: var(--panel-raised);
 }
@@ -887,10 +934,14 @@ input:disabled {
 
 .inv-card-fields input {
     height: 34px;
-    padding: 4px 8px;
+    padding: 4px 24px 4px 8px;
     font-size: 0.85rem;
     text-align: center;
 }
+
+.inv-card-fields .field-wrap { position: relative; }
+.inv-card-fields .stepper { width: 18px; top: 2px; right: 2px; bottom: 2px; }
+.inv-card-fields .stepper-btn svg { width: 7px; height: 4px; }
 
 .inv-progress-label {
     display: flex;
@@ -1038,6 +1089,7 @@ input:disabled {
                 <div class="panel-header">
                     <div>
                         <h2 class="panel-title">Upgrade Calculator</h2>
+                        <p class="panel-subtitle">Work out what a level target will cost you</p>
                     </div>
                 </div>
 
@@ -2928,13 +2980,33 @@ function renderInventoryCard(row) {
             <div class="inv-card-fields">
                 <div>
                     <label>Level</label>
-                    <input type="number" min="1" max="18" value="${entry.level}"
-                        onchange="handleInventoryFieldChange('${escapeForAttribute(cardName)}', this.value, null)">
+                    <div class="field-wrap">
+                        <input type="number" min="1" max="18" value="${entry.level}"
+                            onchange="handleInventoryFieldChange('${escapeForAttribute(cardName)}', this.value, null)">
+                        <div class="stepper">
+                            <button type="button" class="stepper-btn" tabindex="-1" aria-label="Increase level" onclick="stepNumberInput(this, 1)">
+                                <svg viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <button type="button" class="stepper-btn" tabindex="-1" aria-label="Decrease level" onclick="stepNumberInput(this, -1)">
+                                <svg viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <label>Owned</label>
-                    <input type="number" min="0" value="${entry.owned}"
-                        onchange="handleInventoryFieldChange('${escapeForAttribute(cardName)}', null, this.value)">
+                    <div class="field-wrap">
+                        <input type="number" min="0" value="${entry.owned}"
+                            onchange="handleInventoryFieldChange('${escapeForAttribute(cardName)}', null, this.value)">
+                        <div class="stepper">
+                            <button type="button" class="stepper-btn" tabindex="-1" aria-label="Increase owned" onclick="stepNumberInput(this, 1)">
+                                <svg viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <button type="button" class="stepper-btn" tabindex="-1" aria-label="Decrease owned" onclick="stepNumberInput(this, -1)">
+                                <svg viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -3167,6 +3239,50 @@ function importInventoryFromFile(event) {
 /* ---------- Init ---------- */
 updateInventoryTabCount();
 updateLoadInventoryButtonState();
+
+/* ---------- Custom number steppers ---------- */
+function stepNumberInput(buttonEl, direction) {
+    const wrap = buttonEl.closest(".field-wrap");
+    const input = wrap ? wrap.querySelector('input[type="number"]') : null;
+
+    if (!input) {
+        return;
+    }
+
+    const step = Number(input.step) || 1;
+    const min = input.min !== "" ? Number(input.min) : -Infinity;
+    const max = input.max !== "" ? Number(input.max) : Infinity;
+
+    let value = Number(input.value);
+    if (Number.isNaN(value)) {
+        value = 0;
+    }
+
+    value = Math.min(max, Math.max(min, value + direction * step));
+
+    input.value = value;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+    input.focus();
+}
+
+const STEPPER_HTML = `
+    <div class="stepper">
+        <button type="button" class="stepper-btn" tabindex="-1" aria-label="Increase" onclick="stepNumberInput(this, 1)">
+            <svg viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button type="button" class="stepper-btn" tabindex="-1" aria-label="Decrease" onclick="stepNumberInput(this, -1)">
+            <svg viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+    </div>
+`;
+
+document.querySelectorAll('input[type="number"]').forEach(input => {
+    const wrap = input.closest(".field-wrap");
+    if (wrap && !wrap.querySelector(".stepper")) {
+        wrap.insertAdjacentHTML("beforeend", STEPPER_HTML);
+    }
+});
 </script>
 
 </body>
