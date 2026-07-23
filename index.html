@@ -4118,9 +4118,9 @@ function renderInventoryCard(row) {
             ? `<span class="ready-badge">Ready</span>`
             : "";
 
-    const goldNote = nextInfo.isMax
-        ? `<div class="inv-gold-note">⏳ ${hourglassRate.toLocaleString()} tokens per extra copy</div>`
-        : `<div class="inv-gold-note">${goldIconHtml("summary")} ${nextInfo.goldCost.toLocaleString()} gold to reach Lv ${nextInfo.nextLevel}</div>`;
+    const resourceNote = nextInfo.isMax
+        ? `⏳ ${hourglassRate.toLocaleString()} tokens ea.`
+        : `<span class="gold-line">${goldIconHtml("summary")} ${nextInfo.goldCost.toLocaleString()} gold</span>`;
 
     return `
         <div class="inv-card ${rarityClass} ${isReady ? "is-ready" : ""} ${isSelected ? "is-selected" : ""}">
@@ -4182,12 +4182,12 @@ function renderInventoryCard(row) {
             </div>
 
             <div class="inv-progress-label">
+                <span class="inv-progress-resource">${resourceNote}</span>
                 <span>${progressLabel}</span>
             </div>
             <div class="inv-progress-track">
                 <div class="inv-progress-fill ${nextInfo.isMax ? "is-max" : isReady ? "is-ready" : ""}" style="width:${Math.round(progress * 100)}%"></div>
             </div>
-            ${goldNote}
         </div>
     `;
 }
