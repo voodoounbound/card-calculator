@@ -252,11 +252,7 @@ a { color: var(--gold); }
 }
 
 .calc-grid.calc-grid--single {
-    grid-template-columns: minmax(0, auto) minmax(0, 1fr);
-}
-
-.calc-grid.calc-grid--single #calculatorPanel .panel-subtitle {
-    display: none;
+    grid-template-columns: minmax(0, 1fr);
 }
 
 .panel {
@@ -884,11 +880,7 @@ input:disabled {
 }
 
 .inv-layout.inv-layout--full {
-    grid-template-columns: minmax(0, auto) minmax(0, 1fr);
-}
-
-.inv-layout.inv-layout--full #resourcesPanel .panel-subtitle {
-    display: none;
+    grid-template-columns: minmax(0, 1fr);
 }
 
 .inv-sidebar {
@@ -1507,9 +1499,8 @@ input:disabled {
             <div class="panel" id="calculatorPanel">
                 <div class="panel-header">
                     <div>
-                        <h2 class="panel-title">Card Upgrade Calculator</h2>
+                        <h2 class="panel-title">Upgrade Calculator</h2>
                     </div>
-                    <button type="button" class="btn btn-ghost btn-sm" id="toggleCalculatorBtn" onclick="toggleCalculatorPanel()">Hide calculator</button>
                 </div>
 
                 <div class="panel-body" id="calculatorPanelBody">
@@ -1614,8 +1605,13 @@ input:disabled {
                 <div class="panel-header">
                     <div>
                         <h2 class="panel-title">Calculation Summary</h2>
-                        <p class="panel-subtitle">Scenarios you've run this session</p>
                     </div>
+                    <button type="button" class="btn btn-ghost btn-icon" id="toggleCalculatorBtn" onclick="toggleCalculatorPanel()" title="Hide calculator" aria-label="Hide calculator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
                 </div>
 
                 <div class="summary-toolbar">
@@ -1634,7 +1630,7 @@ input:disabled {
 
                 <div class="summary-scroll">
                     <div id="summaryList" class="summary-empty">
-                        No calculations yet. Run one to see it here.
+                        No calculations yet. Run one on the left to see it here.
                     </div>
                 </div>
             </aside>
@@ -1654,7 +1650,7 @@ input:disabled {
                 <div class="panel" id="upgradePlanPanel" style="display:none;">
                     <div class="panel-header">
                         <div>
-                            <h2 class="panel-title">Card Upgrade Plan</h2>
+                            <h2 class="panel-title">Upgrade Plan</h2>
                         </div>
                     </div>
                     <div class="panel-body" id="upgradePlanBody"></div>
@@ -1665,7 +1661,6 @@ input:disabled {
                         <div>
                             <h2 class="panel-title">Resources</h2>
                         </div>
-                        <button type="button" class="btn btn-ghost btn-sm" id="toggleInventorySidebarBtn" onclick="toggleInventorySidebar()">Hide sidebar</button>
                     </div>
                     <div class="panel-body resource-panel-body">
 
@@ -1907,6 +1902,13 @@ input:disabled {
                             <option value="owned">Sort: Owned</option>
                         </select>
                     </div>
+
+                    <button type="button" class="btn btn-ghost btn-icon" id="toggleInventorySidebarBtn" onclick="toggleInventorySidebar()" title="Hide sidebar" aria-label="Hide sidebar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
 
                     <div class="toolbar-spacer"></div>
 
@@ -3505,11 +3507,19 @@ function saveResourcesToStorage() {
 const UI_PREFS_KEY = "voodooUnboundUIPrefsV1";
 
 function loadUIPrefs() {
+    const defaults = { collapsedSections: {}, calculatorHidden: false, inventorySidebarHidden: false };
+
     try {
         const raw = localStorage.getItem(UI_PREFS_KEY);
-        return raw ? JSON.parse(raw) : { collapsedSections: {}, calculatorHidden: false, inventorySidebarHidden: false };
+        const prefs = raw ? JSON.parse(raw) : defaults;
+
+        // The sidebar should always start open on a fresh page load, even if it
+        // was left hidden last session — it only stays hidden within a session.
+        prefs.inventorySidebarHidden = false;
+
+        return prefs;
     } catch (error) {
-        return { collapsedSections: {}, calculatorHidden: false, inventorySidebarHidden: false };
+        return defaults;
     }
 }
 
@@ -3553,16 +3563,28 @@ function toggleCalculatorPanel() {
     applyCalculatorPanelState();
 }
 
+const EYE_ICON = `<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle>`;
+const EYE_OFF_ICON = `<path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`;
+
+function setEyeButtonState(btn, isHidden, label) {
+    if (!btn) return;
+    const svg = btn.querySelector("svg");
+    if (svg) svg.innerHTML = isHidden ? EYE_OFF_ICON : EYE_ICON;
+    const title = isHidden ? `Show ${label}` : `Hide ${label}`;
+    btn.title = title;
+    btn.setAttribute("aria-label", title);
+}
+
 function applyCalculatorPanelState() {
     const grid = document.getElementById("calcGrid");
-    const body = document.getElementById("calculatorPanelBody");
+    const panel = document.getElementById("calculatorPanel");
     const btn = document.getElementById("toggleCalculatorBtn");
 
-    if (!grid || !body || !btn) return;
+    if (!grid || !panel || !btn) return;
 
     grid.classList.toggle("calc-grid--single", uiPrefs.calculatorHidden);
-    body.style.display = uiPrefs.calculatorHidden ? "none" : "";
-    btn.textContent = uiPrefs.calculatorHidden ? "Show calculator" : "Hide calculator";
+    panel.style.display = uiPrefs.calculatorHidden ? "none" : "";
+    setEyeButtonState(btn, uiPrefs.calculatorHidden, "calculator");
 }
 
 function toggleInventorySidebar() {
@@ -3573,14 +3595,14 @@ function toggleInventorySidebar() {
 
 function applyInventorySidebarState() {
     const layout = document.getElementById("invLayout");
-    const resourceBody = document.querySelector(".resource-panel-body");
+    const sidebar = document.getElementById("invSidebar");
     const btn = document.getElementById("toggleInventorySidebarBtn");
 
-    if (!layout || !resourceBody || !btn) return;
+    if (!layout || !sidebar || !btn) return;
 
     layout.classList.toggle("inv-layout--full", uiPrefs.inventorySidebarHidden);
-    resourceBody.style.display = uiPrefs.inventorySidebarHidden ? "none" : "";
-    btn.textContent = uiPrefs.inventorySidebarHidden ? "Show sidebar" : "Hide sidebar";
+    sidebar.style.display = uiPrefs.inventorySidebarHidden ? "none" : "";
+    setEyeButtonState(btn, uiPrefs.inventorySidebarHidden, "sidebar");
 
     renderUpgradePlan();
 }
