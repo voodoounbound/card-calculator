@@ -27,7 +27,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
 :root {
@@ -51,7 +51,8 @@
     --c-epic: #a262e8;
     --c-legendary: #d4af37;
     --c-mythic: #f3f1fa;
-    --c-dark: #f3f1fa;
+    --c-dark: #22e07a;
+    --c-dark-glow: rgba(34, 224, 122, 0.55);
     --c-opal-1: #ffffff;
     --c-opal-2: #dce9ff;
     --c-opal-3: #f5dcff;
@@ -61,8 +62,8 @@
     --radius-md: 10px;
     --radius-lg: 14px;
     --shadow-panel: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 20px 40px -20px rgba(0, 0, 0, 0.6);
-    --font-ui: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-mono: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-ui: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --font-display: 'Cinzel Decorative', var(--font-ui);
 }
 
@@ -516,19 +517,28 @@ input:disabled {
 .rarity-rare    { color: var(--c-rare); background: rgba(79,143,240,.12); }
 .rarity-epic    { color: var(--c-epic); background: rgba(162,98,232,.12); }
 .rarity-legendary { color: var(--c-legendary); background: rgba(212,175,55,.12); }
-.rarity-mythic, .rarity-dark {
+.rarity-mythic {
     color: var(--c-mythic);
     background: linear-gradient(120deg, rgba(255,255,255,.14), rgba(220,233,255,.1) 35%, rgba(245,220,255,.1) 65%, rgba(255,246,218,.14));
     text-shadow: 0 0 8px rgba(255,255,255,.35);
+}
+.rarity-dark {
+    color: var(--c-dark);
+    background: linear-gradient(120deg, rgba(0,0,0,.55), rgba(34,224,122,.14));
+    text-shadow: 0 0 8px var(--c-dark-glow);
 }
 
 .gem.rarity-common  { background: var(--c-common); }
 .gem.rarity-rare    { background: var(--c-rare); }
 .gem.rarity-epic    { background: var(--c-epic); }
 .gem.rarity-legendary { background: var(--c-legendary); }
-.gem.rarity-mythic, .gem.rarity-dark {
+.gem.rarity-mythic {
     background: linear-gradient(135deg, var(--c-opal-1) 0%, var(--c-opal-2) 30%, var(--c-opal-3) 60%, var(--c-opal-4) 100%);
     box-shadow: 0 0 6px rgba(255, 255, 255, 0.55);
+}
+.gem.rarity-dark {
+    background: radial-gradient(circle at 35% 30%, var(--c-dark) 0%, #063017 55%, #000000 100%);
+    box-shadow: 0 0 6px var(--c-dark-glow);
 }
 
 /* Buttons */
@@ -1289,8 +1299,11 @@ input:disabled {
 .inv-card.rarity-rare::before    { background: var(--c-rare); }
 .inv-card.rarity-epic::before    { background: var(--c-epic); }
 .inv-card.rarity-legendary::before { background: var(--c-legendary); }
-.inv-card.rarity-mythic::before, .inv-card.rarity-dark::before {
+.inv-card.rarity-mythic::before {
     background: linear-gradient(180deg, var(--c-opal-1), var(--c-opal-2), var(--c-opal-3), var(--c-opal-4));
+}
+.inv-card.rarity-dark::before {
+    background: linear-gradient(180deg, var(--c-dark), #063017, #000000);
 }
 
 .inv-card.is-ready {
