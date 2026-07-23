@@ -294,31 +294,8 @@ a { color: var(--gold); }
     align-items: start;
 }
 
-.calc-col {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-}
-
 .calc-grid.calc-grid--single {
-    grid-template-columns: minmax(0, auto) minmax(0, 1fr);
-}
-
-.slim-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 12px;
-    white-space: nowrap;
-}
-
-.slim-toolbar-title {
-    margin: 0;
-    font-size: 1.02rem;
-    font-weight: 700;
-    letter-spacing: 0.01em;
-    color: var(--ink);
+    grid-template-columns: minmax(0, 1fr);
 }
 
 .summary-header-actions {
@@ -968,28 +945,20 @@ input:disabled {
     align-items: start;
 }
 
-.inv-sidebar-col {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    position: sticky;
-    top: 20px;
-}
-
 .inv-layout.inv-layout--full {
-    grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
 }
 
 .inv-sidebar {
     display: flex;
     flex-direction: column;
     gap: 16px;
-}
-
-.resource-panel-body {
-    max-height: calc(100vh - 220px);
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
     overflow-y: auto;
 }
+
 
 .resource-section {
     margin-bottom: 16px;
@@ -1679,7 +1648,7 @@ input:disabled {
 @media (max-width: 900px) {
     .calc-grid { grid-template-columns: 1fr; }
     .inv-layout { grid-template-columns: 1fr; }
-    .inv-sidebar-col { position: static; }
+    .inv-sidebar { position: static; }
     .inv-grid, .inv-layout.inv-layout--full .inv-grid {
         grid-template-columns: repeat(3, 1fr);
     }
@@ -1719,7 +1688,7 @@ input:disabled {
 
         <nav class="tab-nav" role="tablist" aria-label="Sections">
             <div class="tab-hover-wrap">
-                <button type="button" class="tab-button" id="tabBtnCalculator" role="tab" aria-selected="false" aria-controls="view-calculator" onclick="switchView('calculator')">
+                <button type="button" class="tab-button" id="tabBtnCalculator" role="tab" aria-selected="false" aria-controls="view-calculator" onclick="switchView('calculator'); this.blur();">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01"/></svg>
                     Calculator
                 </button>
@@ -1732,7 +1701,7 @@ input:disabled {
             </div>
 
             <div class="tab-hover-wrap">
-                <button type="button" class="tab-button active" id="tabBtnInventory" role="tab" aria-selected="true" aria-controls="view-inventory" onclick="switchView('inventory')">
+                <button type="button" class="tab-button active" id="tabBtnInventory" role="tab" aria-selected="true" aria-controls="view-inventory" onclick="switchView('inventory'); this.blur();">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                     Inventory
                     <span class="tab-count" id="inventoryTabCount">0</span>
@@ -1752,19 +1721,14 @@ input:disabled {
 
         <div class="calc-grid" id="calcGrid">
 
-            <div class="calc-col">
-                <div class="slim-toolbar">
-                    <h2 class="slim-toolbar-title">Calculator</h2>
-                    <button type="button" class="btn btn-ghost btn-icon" id="toggleCalculatorBtn" onclick="toggleCalculatorPanel()" title="Hide calculator" aria-label="Hide calculator">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                    </button>
+            <div class="panel" id="calculatorPanel">
+                <div class="panel-header">
+                    <div>
+                        <h2 class="panel-title">Card Upgrade Calculator</h2>
+                    </div>
                 </div>
 
-                <div class="panel" id="calculatorPanel">
-                    <div class="panel-body" id="calculatorPanelBody">
+                <div class="panel-body" id="calculatorPanelBody">
                     <div class="input-grid">
 
                         <div class="field-block" style="grid-column: 1 / -1;">
@@ -1861,7 +1825,6 @@ input:disabled {
                     </div>
                 </div>
             </div>
-            </div>
 
             <aside class="panel">
                 <div class="panel-header">
@@ -1869,6 +1832,12 @@ input:disabled {
                         <h2 class="panel-title">Calculation Summary</h2>
                     </div>
                     <div class="summary-header-actions">
+                        <button type="button" class="btn btn-ghost btn-icon btn-icon-sm" id="toggleCalculatorBtn" onclick="toggleCalculatorPanel()" title="Hide calculator" aria-label="Hide calculator">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
                         <button type="button" class="btn btn-ghost btn-icon btn-icon-sm" onclick="exportResults()" title="Export CSV" aria-label="Export CSV">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 20h16"/></svg>
                         </button>
@@ -1891,7 +1860,7 @@ input:disabled {
 
                 <div class="summary-scroll">
                     <div id="summaryList" class="summary-empty">
-                        No calculations yet. Run one on the left to see it here.
+                        No calculations yet. Run one to see it here.
                     </div>
                 </div>
             </aside>
@@ -1906,29 +1875,23 @@ input:disabled {
 
         <div class="inv-layout" id="invLayout">
 
-            <div class="inv-sidebar-col">
-                <div class="slim-toolbar">
-                    <h2 class="slim-toolbar-title">Resources</h2>
-                    <button type="button" class="btn btn-ghost btn-icon" id="toggleInventorySidebarBtn" onclick="toggleInventorySidebar()" title="Hide sidebar" aria-label="Hide sidebar">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                    </button>
-                </div>
-
             <aside class="inv-sidebar" id="invSidebar">
 
                 <div class="panel" id="upgradePlanPanel" style="display:none;">
                     <div class="panel-header">
                         <div>
-                            <h2 class="panel-title">Upgrade Plan</h2>
+                            <h2 class="panel-title">Card Upgrade Plan</h2>
                         </div>
                     </div>
                     <div class="panel-body" id="upgradePlanBody"></div>
                 </div>
 
                 <div class="panel" id="resourcesPanel">
+                    <div class="panel-header">
+                        <div>
+                            <h2 class="panel-title">Resources</h2>
+                        </div>
+                    </div>
                     <div class="panel-body resource-panel-body">
 
                         <div class="resource-section" data-section="gold">
@@ -2067,7 +2030,6 @@ input:disabled {
                 </div>
 
             </aside>
-            </div>
 
             <div class="inv-main">
 
@@ -2189,6 +2151,13 @@ input:disabled {
                             </div>
                         </div>
                     </div>
+
+                    <button type="button" class="btn btn-ghost btn-icon" id="toggleInventorySidebarBtn" onclick="toggleInventorySidebar()" title="Hide sidebar" aria-label="Hide sidebar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
 
                     <div class="toolbar-spacer"></div>
 
@@ -3787,15 +3756,33 @@ function saveResourcesToStorage() {
 const UI_PREFS_KEY = "voodooUnboundUIPrefsV1";
 
 function loadUIPrefs() {
-    const defaults = { collapsedSections: {}, calculatorHidden: false, inventorySidebarHidden: false };
+    const defaults = {
+        collapsedSections: {
+            tradeTokens: true,
+            wildCards: true,
+            normalCrystals: true,
+            refinedCrystals: true
+        },
+        calculatorHidden: false,
+        inventorySidebarHidden: false
+    };
 
     try {
         const raw = localStorage.getItem(UI_PREFS_KEY);
         const prefs = raw ? JSON.parse(raw) : defaults;
 
-        // The sidebar should always start open on a fresh page load, even if it
-        // was left hidden last session — it only stays hidden within a session.
+        if (!prefs.collapsedSections) {
+            prefs.collapsedSections = {};
+        }
+
+        // The sidebar should always start open, and Trade Tokens / Wild Cards /
+        // Crystals should always start collapsed, on every fresh page load —
+        // regardless of what was saved from a previous session.
         prefs.inventorySidebarHidden = false;
+        prefs.collapsedSections.tradeTokens = true;
+        prefs.collapsedSections.wildCards = true;
+        prefs.collapsedSections.normalCrystals = true;
+        prefs.collapsedSections.refinedCrystals = true;
 
         return prefs;
     } catch (error) {
