@@ -884,7 +884,11 @@ input:disabled {
 }
 
 .inv-layout.inv-layout--full {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+}
+
+.inv-layout.inv-layout--full #resourcesPanel .panel-subtitle {
+    display: none;
 }
 
 .inv-sidebar {
@@ -1160,11 +1164,105 @@ input:disabled {
     gap: 10px;
     flex-wrap: wrap;
     margin-bottom: 16px;
+    position: relative;
 }
 
-.inv-toolbar .field-wrap { min-width: 220px; flex: 1; }
-.inv-toolbar select { min-width: 150px; }
+.inv-search-wrap {
+    flex: 0 0 auto;
+    width: 25%;
+    min-width: 140px;
+}
+
 .inv-toolbar input { min-width: 0; }
+
+.toolbar-spacer {
+    flex: 1;
+}
+
+.btn-icon {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    flex: none;
+    position: relative;
+}
+
+.btn-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.popover-wrap {
+    position: relative;
+    flex: none;
+}
+
+.popover-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--gold-bright);
+    box-shadow: 0 0 0 2px var(--panel);
+}
+
+.popover-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    min-width: 220px;
+    background: var(--panel-raised);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-md);
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.65);
+    padding: 10px;
+    z-index: 60;
+}
+
+.popover-menu[hidden] { display: none; }
+
+.popover-section-label {
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-dim);
+    padding: 4px 8px 6px;
+}
+
+.popover-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-bottom: 6px;
+}
+
+.popover-option {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: var(--ink);
+    text-align: left;
+    font-family: inherit;
+    font-size: 0.84rem;
+    padding: 7px 8px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.popover-option:hover { background: rgba(212, 175, 55, 0.1); }
+
+.popover-option.is-active {
+    background: rgba(212, 175, 55, 0.16);
+    color: var(--gold-bright);
+    font-weight: 600;
+}
+
 
 .inv-toolbar-actions {
     display: flex;
@@ -1363,6 +1461,8 @@ input:disabled {
     .inv-grid { grid-template-columns: 1fr; }
     .inv-toolbar-actions { width: 100%; margin-left: 0; }
     .inv-toolbar-actions .btn { flex: 1; }
+    .inv-search-wrap { width: 100%; order: -1; }
+    .toolbar-spacer { flex-basis: 100%; height: 0; order: 5; }
     .inv-stats { gap: 8px; }
     .inv-stat { padding: 10px 8px; }
     .inv-stat-value { font-size: 1.1rem; }
@@ -1514,6 +1614,7 @@ input:disabled {
                 <div class="panel-header">
                     <div>
                         <h2 class="panel-title">Calculation Summary</h2>
+                        <p class="panel-subtitle">Scenarios you've run this session</p>
                     </div>
                 </div>
 
@@ -1559,11 +1660,12 @@ input:disabled {
                     <div class="panel-body" id="upgradePlanBody"></div>
                 </div>
 
-                <div class="panel">
+                <div class="panel" id="resourcesPanel">
                     <div class="panel-header">
                         <div>
-                            <h2 class="panel-title">Resources Available</h2>
+                            <h2 class="panel-title">Resources</h2>
                         </div>
+                        <button type="button" class="btn btn-ghost btn-sm" id="toggleInventorySidebarBtn" onclick="toggleInventorySidebar()">Hide sidebar</button>
                     </div>
                     <div class="panel-body resource-panel-body">
 
@@ -1728,38 +1830,87 @@ input:disabled {
                 </div>
 
                 <div class="inv-toolbar">
-                    <div class="field-wrap">
-                        <input type="text" id="invSearch" placeholder="Search your cards..." autocomplete="off" oninput="renderInventory()">
+                    <div class="field-wrap inv-search-wrap">
+                        <input type="text" id="invSearch" placeholder="Search..." autocomplete="off" oninput="renderInventory()">
                     </div>
 
-                    <select id="invRarityFilter" onchange="renderInventory()">
-                        <option value="">All rarities</option>
-                        <option>Mythic</option>
-                        <option>Dark</option>
-                        <option>Legendary</option>
-                        <option>Epic</option>
-                        <option>Rare</option>
-                        <option>Common</option>
-                    </select>
+                    <div class="popover-wrap">
+                        <button type="button" class="btn btn-ghost btn-icon" id="filterToggleBtn" onclick="toggleFilterPopover(event)" aria-expanded="false" title="Filter">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="4" y1="6" x2="20" y2="6"></line>
+                                <circle cx="9" cy="6" r="2" fill="currentColor" stroke="none"></circle>
+                                <line x1="4" y1="12" x2="20" y2="12"></line>
+                                <circle cx="15" cy="12" r="2" fill="currentColor" stroke="none"></circle>
+                                <line x1="4" y1="18" x2="20" y2="18"></line>
+                                <circle cx="11" cy="18" r="2" fill="currentColor" stroke="none"></circle>
+                            </svg>
+                            <span class="popover-badge" id="filterBadge" hidden></span>
+                        </button>
 
-                    <select id="invStatusFilter" onchange="renderInventory()">
-                        <option value="all">All cards</option>
-                        <option value="tracked">Tracked only</option>
-                        <option value="ready">Ready to upgrade</option>
-                        <option value="selected">Selected only</option>
-                    </select>
+                        <div class="popover-menu" id="filterPopover" hidden>
+                            <div class="popover-section-label">Rarity</div>
+                            <div class="popover-options" id="rarityOptions">
+                                <button type="button" class="popover-option" data-rarity="">All rarities</button>
+                                <button type="button" class="popover-option" data-rarity="Mythic"><span class="gem rarity-mythic"></span>Mythic</button>
+                                <button type="button" class="popover-option" data-rarity="Dark"><span class="gem rarity-dark"></span>Dark</button>
+                                <button type="button" class="popover-option" data-rarity="Legendary"><span class="gem rarity-legendary"></span>Legendary</button>
+                                <button type="button" class="popover-option" data-rarity="Epic"><span class="gem rarity-epic"></span>Epic</button>
+                                <button type="button" class="popover-option" data-rarity="Rare"><span class="gem rarity-rare"></span>Rare</button>
+                                <button type="button" class="popover-option" data-rarity="Common"><span class="gem rarity-common"></span>Common</button>
+                            </div>
 
-                    <select id="invSort" onchange="renderInventory()">
-                        <option value="progress">Sort: Upgrade progress</option>
-                        <option value="name">Sort: Name (A–Z)</option>
-                        <option value="rarity">Sort: Rarity</option>
-                        <option value="level-desc">Sort: Level (high–low)</option>
-                        <option value="level-asc">Sort: Level (low–high)</option>
-                        <option value="owned">Sort: Owned</option>
-                    </select>
+                            <div class="popover-section-label">Status</div>
+                            <div class="popover-options" id="statusOptions">
+                                <button type="button" class="popover-option" data-status="all">All cards</button>
+                                <button type="button" class="popover-option" data-status="tracked">Tracked only</button>
+                                <button type="button" class="popover-option" data-status="ready">Ready to upgrade</button>
+                                <button type="button" class="popover-option" data-status="selected">Selected only</button>
+                            </div>
+
+                            <button type="button" class="btn btn-ghost btn-sm btn-block" style="margin-top:8px;" onclick="clearInventoryFilters()">Clear filters</button>
+                        </div>
+
+                        <select id="invRarityFilter" hidden><option value="">All rarities</option><option>Mythic</option><option>Dark</option><option>Legendary</option><option>Epic</option><option>Rare</option><option>Common</option></select>
+                        <select id="invStatusFilter" hidden><option value="all">All cards</option><option value="tracked">Tracked only</option><option value="ready">Ready to upgrade</option><option value="selected">Selected only</option></select>
+                    </div>
+
+                    <div class="popover-wrap">
+                        <button type="button" class="btn btn-ghost btn-icon" id="sortToggleBtn" onclick="toggleSortPopover(event)" aria-expanded="false" title="Sort">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 4v15"></path>
+                                <path d="M3 16l3 3 3-3"></path>
+                                <path d="M12 6h8"></path>
+                                <path d="M12 11h6"></path>
+                                <path d="M12 16h4"></path>
+                                <path d="M12 21h2"></path>
+                            </svg>
+                        </button>
+
+                        <div class="popover-menu" id="sortPopover" hidden>
+                            <div class="popover-options" id="sortOptions">
+                                <button type="button" class="popover-option" data-sort="progress">Upgrade progress</button>
+                                <button type="button" class="popover-option" data-sort="name">Name (A–Z)</button>
+                                <button type="button" class="popover-option" data-sort="rarity">Rarity</button>
+                                <button type="button" class="popover-option" data-sort="level-desc">Level (high–low)</button>
+                                <button type="button" class="popover-option" data-sort="level-asc">Level (low–high)</button>
+                                <button type="button" class="popover-option" data-sort="owned">Owned</button>
+                            </div>
+                            <button type="button" class="btn btn-ghost btn-sm btn-block" style="margin-top:8px;" onclick="clearInventorySort()">Reset sort</button>
+                        </div>
+
+                        <select id="invSort" hidden>
+                            <option value="progress">Sort: Upgrade progress</option>
+                            <option value="name">Sort: Name (A–Z)</option>
+                            <option value="rarity">Sort: Rarity</option>
+                            <option value="level-desc">Sort: Level (high–low)</option>
+                            <option value="level-asc">Sort: Level (low–high)</option>
+                            <option value="owned">Sort: Owned</option>
+                        </select>
+                    </div>
+
+                    <div class="toolbar-spacer"></div>
 
                     <div class="inv-toolbar-actions">
-                        <button class="btn btn-ghost btn-sm" id="toggleInventorySidebarBtn" onclick="toggleInventorySidebar()">Hide sidebar</button>
                         <button class="btn btn-ghost btn-sm" onclick="exportInventory()">Export</button>
                         <button class="btn btn-ghost btn-sm" onclick="triggerImportInventory()">Import</button>
                         <button class="btn btn-danger-ghost btn-sm" onclick="resetInventory()">Reset</button>
@@ -3249,6 +3400,10 @@ document.addEventListener("click", function(event) {
     if (!cardField.contains(event.target) && !menu.contains(event.target)) {
         hideCardSuggestions();
     }
+
+    if (!event.target.closest(".popover-wrap")) {
+        closeAllPopovers(null);
+    }
 });
 
 document.getElementById("cardName").addEventListener("input", updateLoadInventoryButtonState);
@@ -3418,14 +3573,16 @@ function toggleInventorySidebar() {
 
 function applyInventorySidebarState() {
     const layout = document.getElementById("invLayout");
-    const sidebar = document.getElementById("invSidebar");
+    const resourceBody = document.querySelector(".resource-panel-body");
     const btn = document.getElementById("toggleInventorySidebarBtn");
 
-    if (!layout || !sidebar || !btn) return;
+    if (!layout || !resourceBody || !btn) return;
 
     layout.classList.toggle("inv-layout--full", uiPrefs.inventorySidebarHidden);
-    sidebar.style.display = uiPrefs.inventorySidebarHidden ? "none" : "";
+    resourceBody.style.display = uiPrefs.inventorySidebarHidden ? "none" : "";
     btn.textContent = uiPrefs.inventorySidebarHidden ? "Show sidebar" : "Hide sidebar";
+
+    renderUpgradePlan();
 }
 
 function populateResourceInputs() {
@@ -3613,7 +3770,7 @@ function renderUpgradePlan() {
     const panel = document.getElementById("upgradePlanPanel");
     const body = document.getElementById("upgradePlanBody");
 
-    if (selectedCards.size === 0) {
+    if (selectedCards.size === 0 || uiPrefs.inventorySidebarHidden) {
         panel.style.display = "none";
         body.innerHTML = "";
         return;
@@ -3982,6 +4139,99 @@ function resetInventory() {
     showToast("Inventory cleared.");
 }
 
+/* ---------- Filter / sort popovers ---------- */
+function closeAllPopovers(exceptId) {
+    ["filterPopover", "sortPopover"].forEach(id => {
+        if (id === exceptId) return;
+        const menu = document.getElementById(id);
+        const btn = document.getElementById(id === "filterPopover" ? "filterToggleBtn" : "sortToggleBtn");
+        if (menu) menu.hidden = true;
+        if (btn) btn.setAttribute("aria-expanded", "false");
+    });
+}
+
+function toggleFilterPopover(event) {
+    event.stopPropagation();
+    const menu = document.getElementById("filterPopover");
+    const btn = document.getElementById("filterToggleBtn");
+    const willOpen = menu.hidden;
+
+    closeAllPopovers(willOpen ? "filterPopover" : null);
+    menu.hidden = !willOpen;
+    btn.setAttribute("aria-expanded", String(willOpen));
+}
+
+function toggleSortPopover(event) {
+    event.stopPropagation();
+    const menu = document.getElementById("sortPopover");
+    const btn = document.getElementById("sortToggleBtn");
+    const willOpen = menu.hidden;
+
+    closeAllPopovers(willOpen ? "sortPopover" : null);
+    menu.hidden = !willOpen;
+    btn.setAttribute("aria-expanded", String(willOpen));
+}
+
+function setInventoryRarityFilter(value) {
+    document.getElementById("invRarityFilter").value = value;
+    updatePopoverActiveStates();
+    updateFilterBadge();
+    renderInventory();
+}
+
+function setInventoryStatusFilter(value) {
+    document.getElementById("invStatusFilter").value = value;
+    updatePopoverActiveStates();
+    updateFilterBadge();
+    renderInventory();
+}
+
+function setInventorySort(value) {
+    document.getElementById("invSort").value = value;
+    updatePopoverActiveStates();
+    renderInventory();
+    closeAllPopovers(null);
+}
+
+function clearInventoryFilters() {
+    document.getElementById("invRarityFilter").value = "";
+    document.getElementById("invStatusFilter").value = "all";
+    updatePopoverActiveStates();
+    updateFilterBadge();
+    renderInventory();
+}
+
+function clearInventorySort() {
+    document.getElementById("invSort").value = "progress";
+    updatePopoverActiveStates();
+    renderInventory();
+}
+
+function updateFilterBadge() {
+    const badge = document.getElementById("filterBadge");
+    const rarityActive = document.getElementById("invRarityFilter").value !== "";
+    const statusActive = document.getElementById("invStatusFilter").value !== "all";
+    badge.hidden = !(rarityActive || statusActive);
+}
+
+function updatePopoverActiveStates() {
+    const rarityValue = document.getElementById("invRarityFilter").value;
+    const statusValue = document.getElementById("invStatusFilter").value;
+    const sortValue = document.getElementById("invSort").value;
+
+    document.querySelectorAll("#rarityOptions .popover-option").forEach(btn => {
+        btn.classList.toggle("is-active", btn.dataset.rarity === rarityValue);
+    });
+
+    document.querySelectorAll("#statusOptions .popover-option").forEach(btn => {
+        btn.classList.toggle("is-active", btn.dataset.status === statusValue);
+    });
+
+    document.querySelectorAll("#sortOptions .popover-option").forEach(btn => {
+        btn.classList.toggle("is-active", btn.dataset.sort === sortValue);
+    });
+}
+
 /* ---------- Calculator <-> Inventory bridge ---------- */
 function updateLoadInventoryButtonState() {
     const cardName = document.getElementById("cardName").value.trim();
@@ -4166,6 +4416,21 @@ document.querySelectorAll(".resource-input").forEach(input => {
 applyAllResourceSectionStates();
 applyCalculatorPanelState();
 applyInventorySidebarState();
+
+document.querySelectorAll("#rarityOptions .popover-option").forEach(btn => {
+    btn.addEventListener("click", () => setInventoryRarityFilter(btn.dataset.rarity));
+});
+
+document.querySelectorAll("#statusOptions .popover-option").forEach(btn => {
+    btn.addEventListener("click", () => setInventoryStatusFilter(btn.dataset.status));
+});
+
+document.querySelectorAll("#sortOptions .popover-option").forEach(btn => {
+    btn.addEventListener("click", () => setInventorySort(btn.dataset.sort));
+});
+
+updateFilterBadge();
+updatePopoverActiveStates();
 renderInventory();
 
 /* ---------- Custom number steppers ---------- */
