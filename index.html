@@ -1750,6 +1750,101 @@ input:focus::selection, textarea:focus::selection { background: rgba(212,175,55,
     .inv-stat-value { font-size: 1.1rem; }
     .inv-stat-label { font-size: 0.58rem; margin-top: 4px; letter-spacing: 0.02em; }
 }
+
+
+/* ---------- Fluid viewport layout ---------- */
+/* Use the available screen width instead of stopping at the original 1240px shell. */
+.app {
+    width: 100%;
+    max-width: 1920px;
+    padding-left: clamp(14px, 1.6vw, 30px);
+    padding-right: clamp(14px, 1.6vw, 30px);
+}
+
+/* Sidebars scale gently while the card area receives all remaining space. */
+.inv-layout {
+    grid-template-columns:
+        clamp(220px, 16vw, 280px)
+        minmax(0, 1fr)
+        clamp(260px, 18vw, 320px);
+    width: 100%;
+}
+.inv-layout.resources-collapsed {
+    grid-template-columns: 46px minmax(0, 1fr) clamp(260px, 18vw, 320px);
+}
+.inv-layout.right-sidebar-collapsed {
+    grid-template-columns: clamp(220px, 16vw, 280px) minmax(0, 1fr) 46px;
+}
+.inv-layout.resources-collapsed.right-sidebar-collapsed {
+    grid-template-columns: 46px minmax(0, 1fr) 46px;
+}
+.inv-layout.right-sidebar-empty {
+    grid-template-columns: clamp(220px, 16vw, 280px) minmax(0, 1fr);
+}
+.inv-layout.resources-collapsed.right-sidebar-empty {
+    grid-template-columns: 46px minmax(0, 1fr);
+}
+
+/* Add or remove card columns automatically according to the real center-column width. */
+.inv-grid,
+.inv-layout.inv-layout--full .inv-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(205px, 100%), 1fr));
+}
+
+/* Prevent long toolbar contents and panels from forcing horizontal overflow. */
+.inv-layout > *,
+.inv-main,
+.inv-toolbar,
+.inv-stats,
+.panel,
+.summary-scroll {
+    min-width: 0;
+}
+
+.inv-toolbar {
+    row-gap: 10px;
+}
+
+/* Let statistics compress cleanly before the mobile breakpoint. */
+.inv-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* Very wide displays can use nearly the whole viewport without becoming unmanageably broad. */
+@media (min-width: 1921px) {
+    .app { max-width: calc(100vw - 32px); }
+}
+
+/* Keep all three columns visible for typical laptops, then stack only when space is truly tight. */
+@media (max-width: 1180px) {
+    .inv-layout,
+    .inv-layout.resources-collapsed,
+    .inv-layout.right-sidebar-collapsed,
+    .inv-layout.resources-collapsed.right-sidebar-collapsed,
+    .inv-layout.right-sidebar-empty,
+    .inv-layout.resources-collapsed.right-sidebar-empty {
+        grid-template-columns: 1fr;
+    }
+    .inv-sidebar,
+    .inv-sidebar-right {
+        position: static;
+        width: 100%;
+        max-height: none;
+    }
+    .inv-sidebar-right.is-collapsed-sidebar,
+    .inv-sidebar-right.is-collapsed-sidebar .panel {
+        width: 100%;
+    }
+}
+
+@media (max-width: 760px) {
+    .inv-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .inv-grid,
+    .inv-layout.inv-layout--full .inv-grid {
+        grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
+    }
+}
+
 </style>
 </head>
 
