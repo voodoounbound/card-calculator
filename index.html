@@ -818,7 +818,6 @@ input:disabled {
     height: auto;
     object-fit: cover;
     border-radius: 6px;
-    border: 1px solid var(--hairline-soft);
 }
 
 .card-group-title {
@@ -1212,25 +1211,33 @@ input:disabled {
 .inv-card-select {
     appearance: none;
     -webkit-appearance: none;
+    -moz-appearance: none;
     flex: none;
     width: 16px;
     height: 16px;
     padding: 0;
-    margin-top: 2px;
-    border: 1.5px solid var(--hairline);
+    margin: 2px 0 0;
+    border: 1.5px solid var(--hairline-soft);
     border-radius: 4px;
-    background: var(--panel-raised);
+    background-color: var(--panel-raised);
+    box-shadow: none;
+    outline: none;
     cursor: pointer;
     position: relative;
-    transition: background .15s ease, border-color .15s ease;
+    transition: background-color .15s ease, border-color .15s ease;
 }
 
 .inv-card-select:hover {
     border-color: rgba(212, 175, 55, 0.5);
 }
 
+.inv-card-select:focus-visible {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 2px;
+}
+
 .inv-card-select:checked {
-    background: var(--gold);
+    background-color: var(--gold);
     border-color: var(--gold);
 }
 
@@ -1486,7 +1493,6 @@ input:disabled {
     aspect-ratio: 570 / 795;
     height: auto;
     border-radius: 6px;
-    border: 1px solid var(--hairline-soft);
     object-fit: cover;
     object-position: top center;
     background: var(--panel-raised);
