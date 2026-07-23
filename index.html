@@ -108,6 +108,7 @@
 body {
     margin: 0;
     min-height: 100vh;
+    overflow-x: hidden;
     background:
         radial-gradient(circle at 12% 0%, rgba(212, 175, 55, 0.05), transparent 40%),
         radial-gradient(circle at 88% 8%, rgba(162, 98, 232, 0.05), transparent 38%),
@@ -963,8 +964,8 @@ input:disabled {
    ============================================================ */
 .inv-layout {
     display: grid;
-    grid-template-columns: 300px minmax(0, 1fr);
-    gap: 20px;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 18px;
     align-items: start;
 }
 
@@ -1209,12 +1210,40 @@ input:disabled {
 .plan-pool-usage .short { color: var(--danger); }
 
 .inv-card-select {
+    appearance: none;
+    -webkit-appearance: none;
     flex: none;
     width: 16px;
     height: 16px;
+    padding: 0;
     margin-top: 2px;
-    accent-color: var(--gold);
+    border: 1.5px solid var(--hairline);
+    border-radius: 4px;
+    background: var(--panel-raised);
     cursor: pointer;
+    position: relative;
+    transition: background .15s ease, border-color .15s ease;
+}
+
+.inv-card-select:hover {
+    border-color: rgba(212, 175, 55, 0.5);
+}
+
+.inv-card-select:checked {
+    background: var(--gold);
+    border-color: var(--gold);
+}
+
+.inv-card-select:checked::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 4px;
+    height: 8px;
+    border: solid #14131a;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
 }
 
 .inv-card.is-selected {
@@ -1367,12 +1396,12 @@ input:disabled {
 
 .inv-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(230px, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 12px;
 }
 
 .inv-layout.inv-layout--full .inv-grid {
-    grid-template-columns: repeat(auto-fit, minmax(228px, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .inv-group-section {
@@ -1444,15 +1473,22 @@ input:disabled {
     margin-bottom: 12px;
 }
 
-.inv-card-thumb {
-    width: 42px;
+.inv-card-body-row {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.inv-card-thumb-large {
+    flex: none;
+    width: 58px;
     aspect-ratio: 570 / 795;
     height: auto;
     border-radius: 6px;
     border: 1px solid var(--hairline-soft);
     object-fit: cover;
     object-position: top center;
-    flex: none;
     background: var(--panel-raised);
 }
 
@@ -1465,8 +1501,10 @@ input:disabled {
 
 .inv-card-fields {
     display: flex;
-    gap: 10px;
-    margin-bottom: 12px;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
 }
 
 .inv-inline-field {
@@ -1848,7 +1886,7 @@ input:disabled {
 
                 <div class="summary-scroll">
                     <div id="summaryList" class="summary-empty">
-                        No calculations yet. Run one to see it here.
+                        No calculations yet. Run one on the left to see it here.
                     </div>
                 </div>
             </aside>
@@ -2240,6 +2278,7 @@ const cardRarities = {
     "Orb of Water": "Legendary",
     "Glacius Maxima": "Epic",
     "Zouwu": "Legendary",
+    "Weasleys' Whiz-bangs": "Epic",
     "Weasleys' Wildfire Whiz-bangs": "Epic",
     "Azkaban": "Dark",
 
@@ -4347,7 +4386,6 @@ function renderInventoryCard(row) {
                 <input type="checkbox" class="inv-card-select" ${isSelected ? "checked" : ""}
                     aria-label="Select ${cardName} for the upgrade plan"
                     onchange="toggleCardSelection('${escapeForAttribute(cardName)}', this.checked)">
-                <img class="inv-card-thumb" src="${imgPath}" alt="" onerror="this.style.display='none'">
                 <div style="min-width:0; flex:1;">
                     <div class="inv-card-name">${cardName}</div>
                     <span class="rarity-pill ${rarityClass}"><span class="gem ${rarityClass}"></span>${rarity}</span>
@@ -4367,37 +4405,40 @@ function renderInventoryCard(row) {
                 </button>
             </div>
 
-            <div class="inv-card-fields">
-                <div class="inv-inline-field">
-                    <label>Level:</label>
-                    <div class="field-wrap">
-                        <input type="number" min="1" max="18" value="${entry.level}"
-                            onchange="handleInventoryFieldChange('${escapeForAttribute(cardName)}', this.value, null)">
-                        <div class="stepper">
-                            <button type="button" class="stepper-btn" tabindex="-1" aria-label="Increase level" onclick="stepNumberInput(this, 1)">
-                                <svg viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            </button>
-                            <button type="button" class="stepper-btn" tabindex="-1" aria-label="Decrease level" onclick="stepNumberInput(this, -1)">
-                                <svg viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            </button>
+            <div class="inv-card-body-row">
+                <div class="inv-card-fields">
+                    <div class="inv-inline-field">
+                        <label>Level:</label>
+                        <div class="field-wrap">
+                            <input type="number" min="1" max="18" value="${entry.level}"
+                                onchange="handleInventoryFieldChange('${escapeForAttribute(cardName)}', this.value, null)">
+                            <div class="stepper">
+                                <button type="button" class="stepper-btn" tabindex="-1" aria-label="Increase level" onclick="stepNumberInput(this, 1)">
+                                    <svg viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </button>
+                                <button type="button" class="stepper-btn" tabindex="-1" aria-label="Decrease level" onclick="stepNumberInput(this, -1)">
+                                    <svg viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="inv-inline-field">
+                        <label>${nextInfo.isMax ? "Extra" : "Owned"}:</label>
+                        <div class="field-wrap">
+                            <input type="number" min="0" value="${entry.owned}"
+                                onchange="handleInventoryFieldChange('${escapeForAttribute(cardName)}', null, this.value)">
+                            <div class="stepper">
+                                <button type="button" class="stepper-btn" tabindex="-1" aria-label="Increase owned" onclick="stepNumberInput(this, 1)">
+                                    <svg viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </button>
+                                <button type="button" class="stepper-btn" tabindex="-1" aria-label="Decrease owned" onclick="stepNumberInput(this, -1)">
+                                    <svg viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="inv-inline-field">
-                    <label>${nextInfo.isMax ? "Extra" : "Owned"}:</label>
-                    <div class="field-wrap">
-                        <input type="number" min="0" value="${entry.owned}"
-                            onchange="handleInventoryFieldChange('${escapeForAttribute(cardName)}', null, this.value)">
-                        <div class="stepper">
-                            <button type="button" class="stepper-btn" tabindex="-1" aria-label="Increase owned" onclick="stepNumberInput(this, 1)">
-                                <svg viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            </button>
-                            <button type="button" class="stepper-btn" tabindex="-1" aria-label="Decrease owned" onclick="stepNumberInput(this, -1)">
-                                <svg viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <img class="inv-card-thumb-large" src="${imgPath}" alt="" onerror="this.style.display='none'">
             </div>
 
             <div class="inv-progress-label">
