@@ -1638,6 +1638,88 @@ input:disabled {
     transform: translateX(-50%) translateY(0);
 }
 
+
+/* ---------- Panel collapse controls & multi-edit ---------- */
+.panel-header { position: relative; }
+.panel-header-actions { display:flex; align-items:center; gap:6px; margin-left:auto; }
+.panel-collapse-btn {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--ink-dim);
+}
+.panel-collapse-btn:hover { color: var(--gold-bright); background: rgba(212,175,55,.1); }
+.panel-collapse-btn svg { width: 14px; height: 14px; transition: transform .18s ease; }
+.panel.is-collapsed-panel .panel-header { min-height: 46px; padding: 8px; justify-content:center; border-bottom:none; }
+.panel.is-collapsed-panel .panel-header > :not(.panel-header-actions),
+.panel.is-collapsed-panel .panel-header-actions > :not(.panel-collapse-btn),
+.panel.is-collapsed-panel > .panel-body { display:none !important; }
+.panel.is-collapsed-panel .panel-header-actions { margin:0; }
+
+.calc-grid.calc-grid--calculator-collapsed { grid-template-columns: 46px minmax(0, 1fr); }
+#calculatorPanel.is-collapsed-panel { min-height: 54px; }
+
+.inv-layout {
+    grid-template-columns: 260px minmax(0, 1fr) 300px;
+}
+.inv-sidebar-right {
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    position:sticky;
+    top:20px;
+    max-height:calc(100vh - 40px);
+    overflow-y:auto;
+}
+.inv-layout.resources-collapsed { grid-template-columns: 46px minmax(0,1fr) 300px; }
+.inv-layout.right-sidebar-collapsed { grid-template-columns: 260px minmax(0,1fr) 46px; }
+.inv-layout.resources-collapsed.right-sidebar-collapsed { grid-template-columns: 46px minmax(0,1fr) 46px; }
+.inv-layout.right-sidebar-empty { grid-template-columns: 260px minmax(0,1fr); }
+.inv-layout.resources-collapsed.right-sidebar-empty { grid-template-columns: 46px minmax(0,1fr); }
+.inv-sidebar-right.is-collapsed-sidebar { width:46px; overflow:visible; }
+.inv-sidebar-right.is-collapsed-sidebar .panel { width:46px; }
+
+.multi-edit-list { display:flex; flex-direction:column; gap:9px; }
+.multi-edit-card {
+    position:relative;
+    border:1px solid var(--hairline-soft);
+    border-radius:var(--radius-sm);
+    background:var(--panel-raised);
+    padding:10px 34px 10px 11px;
+}
+.multi-edit-card-name { font-size:.8rem; font-weight:700; margin-bottom:8px; line-height:1.25; }
+.multi-edit-level-row { display:flex; align-items:center; gap:8px; }
+.multi-edit-level-row label { margin:0; text-transform:none; letter-spacing:0; white-space:nowrap; }
+.multi-edit-level-wrap { width:76px; }
+.multi-edit-level-wrap input { height:32px; padding:4px 24px 4px 8px; text-align:center; font-size:.82rem; }
+.multi-edit-remove {
+    position:absolute; top:5px; right:6px; width:22px; height:22px; padding:0;
+    border:none; border-radius:50%; background:transparent; color:var(--ink-faint);
+    font-size:1rem; cursor:pointer;
+}
+.multi-edit-remove:hover { color:var(--danger); background:rgba(192,71,90,.14); }
+
+.clear-field {
+    top: 29px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    font-size: 22px;
+    line-height: 26px;
+    font-weight: 500;
+}
+
+input:focus::selection, textarea:focus::selection { background: rgba(212,175,55,.45); color:#fff; }
+
+@media (max-width: 1100px) {
+    .inv-layout, .inv-layout.resources-collapsed, .inv-layout.right-sidebar-collapsed,
+    .inv-layout.resources-collapsed.right-sidebar-collapsed, .inv-layout.right-sidebar-empty,
+    .inv-layout.resources-collapsed.right-sidebar-empty { grid-template-columns: 1fr; }
+    .inv-sidebar, .inv-sidebar-right { position:static; max-height:none; }
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 1200px) {
     .inv-grid, .inv-layout.inv-layout--full .inv-grid {
@@ -1725,6 +1807,12 @@ input:disabled {
                 <div class="panel-header">
                     <div>
                         <h2 class="panel-title">Card Upgrade Calculator</h2>
+                    </div>
+                    <div class="panel-header-actions">
+                        <button type="button" class="inline-action" onclick="clearCardAndAllFields()">Clear Form</button>
+                        <button type="button" class="btn panel-collapse-btn" id="toggleCalculatorBtn" onclick="toggleCalculatorPanel()" title="Hide calculator" aria-label="Hide calculator">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+                        </button>
                     </div>
                 </div>
 
@@ -1820,9 +1908,6 @@ input:disabled {
 
                     <div id="result"></div>
 
-                    <div class="button-row">
-                        <button class="btn btn-ghost" onclick="clearCardAndAllFields()">Clear Form</button>
-                    </div>
                 </div>
             </div>
 
@@ -1832,12 +1917,7 @@ input:disabled {
                         <h2 class="panel-title">Calculation Summary</h2>
                     </div>
                     <div class="summary-header-actions">
-                        <button type="button" class="btn btn-ghost btn-icon btn-icon-sm" id="toggleCalculatorBtn" onclick="toggleCalculatorPanel()" title="Hide calculator" aria-label="Hide calculator">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
-                                <circle cx="12" cy="12" r="3"></circle>
-                            </svg>
-                        </button>
+
                         <button type="button" class="btn btn-ghost btn-icon btn-icon-sm" onclick="exportResults()" title="Export CSV" aria-label="Export CSV">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 20h16"/></svg>
                         </button>
@@ -1877,19 +1957,15 @@ input:disabled {
 
             <aside class="inv-sidebar" id="invSidebar">
 
-                <div class="panel" id="upgradePlanPanel" style="display:none;">
-                    <div class="panel-header">
-                        <div>
-                            <h2 class="panel-title">Card Upgrade Plan</h2>
-                        </div>
-                    </div>
-                    <div class="panel-body" id="upgradePlanBody"></div>
-                </div>
-
                 <div class="panel" id="resourcesPanel">
                     <div class="panel-header">
                         <div>
                             <h2 class="panel-title">Resources</h2>
+                        </div>
+                        <div class="panel-header-actions">
+                            <button type="button" class="btn panel-collapse-btn" id="toggleResourcesBtn" onclick="toggleResourcesPanel()" title="Hide resources" aria-label="Hide resources">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+                            </button>
                         </div>
                     </div>
                     <div class="panel-body resource-panel-body">
@@ -2123,7 +2199,7 @@ input:disabled {
 
                         <select id="invSort" hidden>
                             <option value="progress">Sort: Upgrade progress</option>
-                            <option value="name">Sort: Name (A–Z)</option>
+                            <option value="name" selected>Sort: Name (A–Z)</option>
                             <option value="rarity">Sort: Rarity</option>
                             <option value="level-desc">Sort: Level (high–low)</option>
                             <option value="level-asc">Sort: Level (low–high)</option>
@@ -2152,12 +2228,7 @@ input:disabled {
                         </div>
                     </div>
 
-                    <button type="button" class="btn btn-ghost btn-icon" id="toggleInventorySidebarBtn" onclick="toggleInventorySidebar()" title="Hide sidebar" aria-label="Hide sidebar">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                    </button>
+
 
                     <div class="toolbar-spacer"></div>
 
@@ -2179,6 +2250,32 @@ input:disabled {
 
             </div>
 
+            <aside class="inv-sidebar-right" id="invSidebarRight">
+                <div class="panel" id="multiEditPanel" style="display:none;">
+                    <div class="panel-header">
+                        <div><h2 class="panel-title">Edit Selected Cards</h2></div>
+                        <div class="panel-header-actions">
+                            <button type="button" class="btn panel-collapse-btn" id="toggleMultiEditBtn" onclick="toggleMultiEditPanel()" title="Hide multi-edit" aria-label="Hide multi-edit">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="panel-body" id="multiEditBody"></div>
+                </div>
+
+                <div class="panel" id="upgradePlanPanel" style="display:none;">
+                    <div class="panel-header">
+                        <div><h2 class="panel-title">Card Upgrade Plan</h2></div>
+                        <div class="panel-header-actions">
+                            <button type="button" class="btn panel-collapse-btn" id="toggleUpgradePlanBtn" onclick="toggleUpgradePlanPanel()" title="Hide upgrade plan" aria-label="Hide upgrade plan">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="panel-body" id="upgradePlanBody"></div>
+                </div>
+            </aside>
+
         </div>
     </section>
 
@@ -2188,6 +2285,59 @@ input:disabled {
 <div class="toast" id="toast"></div>
 
 <script>
+
+/* ============================================================
+   PRIVACY-CONSCIOUS USAGE ANALYTICS (GOOGLE ANALYTICS 4)
+   Replace the placeholder below with your GA4 Measurement ID.
+   Example format: G-ABC123DE45
+   No card names, exact inventory balances, or free-text values are sent.
+   ============================================================ */
+const GA_MEASUREMENT_ID = "G-XXXXXXXXXX";
+const GA_ID_IS_CONFIGURED = /^G-[A-Z0-9]{6,}$/i.test(GA_MEASUREMENT_ID) && GA_MEASUREMENT_ID !== "G-XXXXXXXXXX";
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){ dataLayer.push(arguments); }
+
+function initializeAnalytics() {
+    if (!GA_ID_IS_CONFIGURED) {
+        console.info("Analytics disabled: replace G-XXXXXXXXXX with your GA4 Measurement ID.");
+        return;
+    }
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(GA_MEASUREMENT_ID)}`;
+    document.head.appendChild(script);
+
+    gtag("js", new Date());
+    gtag("config", GA_MEASUREMENT_ID, {
+        anonymize_ip: true,
+        allow_google_signals: false,
+        allow_ad_personalization_signals: false
+    });
+}
+
+function trackEvent(eventName, parameters = {}) {
+    if (!GA_ID_IS_CONFIGURED) return;
+
+    const safeParameters = Object.fromEntries(
+        Object.entries(parameters).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    );
+
+    gtag("event", eventName, safeParameters);
+}
+
+function getUsageBucket(value) {
+    const number = Math.max(0, Number(value) || 0);
+    if (number === 0) return "0";
+    if (number <= 5) return "1-5";
+    if (number <= 25) return "6-25";
+    if (number <= 100) return "26-100";
+    return "101+";
+}
+
+initializeAnalytics();
+
 const cardRarities = {
     "Prior Incantato": "Epic",
     "Broomstick": "Rare",
@@ -2663,6 +2813,11 @@ function clearField(fieldId) {
     field.focus();
 
 if (fieldId === "cardName") {
+    document.getElementById("category").value = "";
+    document.getElementById("currentLevel").value = "";
+    document.getElementById("desiredLevel").value = "";
+    document.getElementById("result").innerHTML = "";
+    updateLoadInventoryButtonState();
     renderCardSuggestions();
     return;
 }
@@ -2817,37 +2972,41 @@ function calculateCards() {
 
     const result = document.getElementById("result");
 
-    function showValidationMessage(message) {
+    function showValidationMessage(message, reason) {
         result.innerHTML = `<div class="result-note">${message}</div>`;
+        trackEvent("calculation_error", {
+            error_reason: reason,
+            selected_rarity: displayCategory || "none"
+        });
     }
 
     if (!cardName) {
-        showValidationMessage("Choose or type a card name.");
+        showValidationMessage("Choose or type a card name.", "missing_card");
         return;
     }
 
     if (!cardRarities[cardName]) {
-        showValidationMessage("Select a card from the suggested list.");
+        showValidationMessage("Select a card from the suggested list.", "invalid_card");
         return;
     }
 
     if (!displayCategory) {
-        showValidationMessage("Select a rarity.");
+        showValidationMessage("Select a rarity.", "missing_rarity");
         return;
     }
 
     if (!current || !desired) {
-        showValidationMessage("Enter both levels.");
+        showValidationMessage("Enter both levels.", "missing_levels");
         return;
     }
 
     if (current < 1 || current > 18 || desired < 1 || desired > 18) {
-        showValidationMessage("Levels must be between 1 and 18.");
+        showValidationMessage("Levels must be between 1 and 18.", "level_out_of_range");
         return;
     }
 
     if (desired <= current) {
-        showValidationMessage("Desired level must be higher.");
+        showValidationMessage("Desired level must be higher.", "desired_not_higher");
         return;
     }
 
@@ -2963,6 +3122,20 @@ function calculateCards() {
         </div>
     </div>
 `;
+
+    trackEvent("calculation_completed", {
+        rarity: displayCategory,
+        current_level: current,
+        desired_level: desired,
+        levels_added: desired - current,
+        cards_needed_bucket: getUsageBucket(finalNeed),
+        used_owned_cards: ownedCards > 0,
+        used_trade_tokens: tradeTokens > 0,
+        used_wild_cards: wildCards > 0,
+        used_normal_crystals: crystalSavings.normalUsed > 0,
+        used_refined_crystals: crystalSavings.refinedUsed > 0,
+        fully_covered: finalNeed === 0
+    });
 
     addToSummary({
         cardName,
@@ -3324,6 +3497,10 @@ item.finalNeed
     document.body.appendChild(link);
     link.click();
 
+    trackEvent("calculation_history_exported", {
+        calculation_count_bucket: getUsageBucket(calculationHistory.length)
+    });
+
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 }
@@ -3524,8 +3701,12 @@ function parseCSV(csvText) {
 }
 
 function clearSummary() {
+    const clearedCount = calculationHistory.length;
     calculationHistory = [];
     renderSummary();
+    trackEvent("calculation_history_cleared", {
+        cleared_count_bucket: getUsageBucket(clearedCount)
+    });
 }
 
 function clearCardAndAllFields() {
@@ -3545,10 +3726,18 @@ function clearCardAndAllFields() {
 
     hideCardSuggestions();
     updateLoadInventoryButtonState();
+    trackEvent("calculator_form_cleared");
     document.getElementById("cardName").focus();
 }
 
 /* Event Listeners */
+document.addEventListener("focusin", function(event) {
+    const field = event.target;
+    if ((field.matches("input[type='text'], input[type='number']")) && !field.readOnly) {
+        requestAnimationFrame(() => field.select());
+    }
+});
+
 document.getElementById("cardName").addEventListener("focus", renderCardSuggestions);
 document.getElementById("cardName").addEventListener("click", renderCardSuggestions);
 
@@ -3665,6 +3854,7 @@ document.getElementById("cardName").addEventListener("blur", updateLoadInventory
    ============================================================ */
 function switchView(viewName) {
     const isCalculator = viewName === "calculator";
+    trackEvent("view_changed", { view_name: viewName });
 
     document.getElementById("view-calculator").classList.toggle("active", isCalculator);
     document.getElementById("view-inventory").classList.toggle("active", !isCalculator);
@@ -3708,6 +3898,7 @@ let cardInventory = loadInventoryFromStorage();
 const RESOURCE_STORAGE_KEY = "voodooUnboundResourcesV1";
 let resourcePools = loadResourcesFromStorage();
 let selectedCards = new Map(); // cardName -> targetLevel
+let multiEditCards = new Set(); // independently removable from multi-edit while remaining in plan
 
 function getDefaultResources() {
     return {
@@ -3764,7 +3955,9 @@ function loadUIPrefs() {
             refinedCrystals: true
         },
         calculatorHidden: false,
-        inventorySidebarHidden: false
+        resourcesHidden: false,
+        multiEditHidden: false,
+        upgradePlanHidden: false
     };
 
     try {
@@ -3778,7 +3971,9 @@ function loadUIPrefs() {
         // The sidebar should always start open, and Trade Tokens / Wild Cards /
         // Crystals should always start collapsed, on every fresh page load —
         // regardless of what was saved from a previous session.
-        prefs.inventorySidebarHidden = false;
+        prefs.resourcesHidden = false;
+        prefs.multiEditHidden = false;
+        prefs.upgradePlanHidden = false;
         prefs.collapsedSections.tradeTokens = true;
         prefs.collapsedSections.wildCards = true;
         prefs.collapsedSections.normalCrystals = true;
@@ -3836,13 +4031,15 @@ function toggleCalculatorPanel() {
     applyCalculatorPanelState();
 }
 
-const EYE_ICON = `<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle>`;
-const EYE_OFF_ICON = `<path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`;
+const CHEVRON_LEFT = `<path d="M15 5l-7 7 7 7"></path>`;
+const CHEVRON_RIGHT = `<path d="M9 5l7 7-7 7"></path>`;
 
-function setEyeButtonState(btn, isHidden, label) {
+function setArrowButtonState(btn, isHidden, label, hiddenDirection = "right") {
     if (!btn) return;
     const svg = btn.querySelector("svg");
-    if (svg) svg.innerHTML = isHidden ? EYE_OFF_ICON : EYE_ICON;
+    const showPath = hiddenDirection === "left" ? CHEVRON_RIGHT : CHEVRON_LEFT;
+    const hidePath = hiddenDirection === "left" ? CHEVRON_LEFT : CHEVRON_RIGHT;
+    if (svg) svg.innerHTML = isHidden ? showPath : hidePath;
     const title = isHidden ? `Show ${label}` : `Hide ${label}`;
     btn.title = title;
     btn.setAttribute("aria-label", title);
@@ -3852,32 +4049,53 @@ function applyCalculatorPanelState() {
     const grid = document.getElementById("calcGrid");
     const panel = document.getElementById("calculatorPanel");
     const btn = document.getElementById("toggleCalculatorBtn");
-
     if (!grid || !panel || !btn) return;
-
-    grid.classList.toggle("calc-grid--single", uiPrefs.calculatorHidden);
-    panel.style.display = uiPrefs.calculatorHidden ? "none" : "";
-    setEyeButtonState(btn, uiPrefs.calculatorHidden, "calculator");
+    grid.classList.toggle("calc-grid--calculator-collapsed", uiPrefs.calculatorHidden);
+    panel.classList.toggle("is-collapsed-panel", uiPrefs.calculatorHidden);
+    setArrowButtonState(btn, uiPrefs.calculatorHidden, "calculator", "right");
 }
 
-function toggleInventorySidebar() {
-    uiPrefs.inventorySidebarHidden = !uiPrefs.inventorySidebarHidden;
+function toggleResourcesPanel() {
+    uiPrefs.resourcesHidden = !uiPrefs.resourcesHidden;
     saveUIPrefs();
-    applyInventorySidebarState();
+    applyResourcesPanelState();
 }
 
-function applyInventorySidebarState() {
+function applyResourcesPanelState() {
     const layout = document.getElementById("invLayout");
-    const sidebar = document.getElementById("invSidebar");
-    const btn = document.getElementById("toggleInventorySidebarBtn");
+    const panel = document.getElementById("resourcesPanel");
+    const btn = document.getElementById("toggleResourcesBtn");
+    if (!layout || !panel || !btn) return;
+    layout.classList.toggle("resources-collapsed", uiPrefs.resourcesHidden);
+    panel.classList.toggle("is-collapsed-panel", uiPrefs.resourcesHidden);
+    setArrowButtonState(btn, uiPrefs.resourcesHidden, "resources", "right");
+}
 
-    if (!layout || !sidebar || !btn) return;
+function toggleMultiEditPanel() {
+    uiPrefs.multiEditHidden = !uiPrefs.multiEditHidden;
+    saveUIPrefs();
+    renderMultiEditPanel();
+}
 
-    layout.classList.toggle("inv-layout--full", uiPrefs.inventorySidebarHidden);
-    sidebar.style.display = uiPrefs.inventorySidebarHidden ? "none" : "";
-    setEyeButtonState(btn, uiPrefs.inventorySidebarHidden, "sidebar");
-
+function toggleUpgradePlanPanel() {
+    uiPrefs.upgradePlanHidden = !uiPrefs.upgradePlanHidden;
+    saveUIPrefs();
     renderUpgradePlan();
+}
+
+function updateRightSidebarState() {
+    const layout = document.getElementById("invLayout");
+    const right = document.getElementById("invSidebarRight");
+    if (!layout || !right) return;
+
+    const visiblePanels = Array.from(right.children).filter(panel => panel.style.display !== "none");
+    const hasVisiblePanel = visiblePanels.length > 0;
+    const allVisiblePanelsCollapsed = hasVisiblePanel && visiblePanels.every(panel => panel.classList.contains("is-collapsed-panel"));
+
+    layout.classList.toggle("right-sidebar-empty", !hasVisiblePanel);
+    layout.classList.toggle("right-sidebar-collapsed", allVisiblePanelsCollapsed);
+    right.classList.toggle("is-collapsed-sidebar", allVisiblePanelsCollapsed);
+    right.style.display = hasVisiblePanel ? "" : "none";
 }
 
 function populateResourceInputs() {
@@ -3905,6 +4123,11 @@ function handleResourceInputChange(event) {
 
     saveResourcesToStorage();
     renderUpgradePlan();
+    trackEvent("resource_updated", {
+        resource_type: type,
+        resource_tier: tier || "all",
+        has_balance: value > 0
+    });
 }
 
 function loadInventoryFromStorage() {
@@ -4034,20 +4257,29 @@ function toggleCardSelection(cardName, isSelected) {
         const entry = getInventoryEntry(cardName);
         const defaultTarget = Math.min(18, entry.level + 1);
         selectedCards.set(cardName, defaultTarget);
+        multiEditCards.add(cardName);
     } else {
         selectedCards.delete(cardName);
+        multiEditCards.delete(cardName);
     }
 
+    trackEvent("upgrade_plan_selection_changed", {
+        action: isSelected ? "added" : "removed",
+        selected_count_bucket: getUsageBucket(selectedCards.size),
+        rarity: cardRarities[cardName] || "unknown"
+    });
     renderInventory();
 }
 
 function removeFromPlan(cardName) {
     selectedCards.delete(cardName);
+    multiEditCards.delete(cardName);
     renderInventory();
 }
 
 function clearPlanSelection() {
     selectedCards.clear();
+    multiEditCards.clear();
     renderInventory();
 }
 
@@ -4061,17 +4293,90 @@ function updatePlanTargetLevel(cardName, rawValue) {
     renderUpgradePlan();
 }
 
-function renderUpgradePlan() {
-    const panel = document.getElementById("upgradePlanPanel");
-    const body = document.getElementById("upgradePlanBody");
+function removeFromMultiEdit(cardName) {
+    multiEditCards.delete(cardName);
+    renderMultiEditPanel();
+}
 
-    if (selectedCards.size === 0 || uiPrefs.inventorySidebarHidden) {
+function updateMultiEditLevel(cardName, rawValue) {
+    const sourceEntry = getInventoryEntry(cardName);
+    const level = Math.min(18, Math.max(1, Math.round(Number(rawValue)) || sourceEntry.level));
+
+    // A level change in the Edit Selected Cards panel applies to every card
+    // currently shown in that panel. Removing a card with its × keeps it in
+    // the Upgrade Plan but excludes it from this bulk-edit action.
+    const cardsToUpdate = Array.from(multiEditCards).filter(name => selectedCards.has(name));
+
+    cardsToUpdate.forEach(name => {
+        const entry = getInventoryEntry(name);
+        setInventoryEntry(name, level, entry.owned);
+
+        const currentTarget = selectedCards.get(name);
+        if (currentTarget !== undefined && currentTarget <= level) {
+            selectedCards.set(name, Math.min(18, level + 1));
+        }
+    });
+
+    trackEvent("inventory_bulk_level_updated", {
+        selected_count_bucket: getUsageBucket(cardsToUpdate.length),
+        level_bucket: level >= 18 ? "18" : level >= 15 ? "15_17" : level >= 10 ? "10_14" : level >= 5 ? "5_9" : "1_4"
+    });
+
+    renderInventory();
+}
+
+function renderMultiEditPanel() {
+    const panel = document.getElementById("multiEditPanel");
+    const body = document.getElementById("multiEditBody");
+    if (!panel || !body) return;
+
+    const cardsToEdit = Array.from(multiEditCards).filter(cardName => selectedCards.has(cardName));
+    if (cardsToEdit.length === 0) {
         panel.style.display = "none";
         body.innerHTML = "";
+        updateRightSidebarState();
         return;
     }
 
     panel.style.display = "";
+    panel.classList.toggle("is-collapsed-panel", uiPrefs.multiEditHidden);
+    setArrowButtonState(document.getElementById("toggleMultiEditBtn"), uiPrefs.multiEditHidden, "multi-edit", "left");
+
+    body.innerHTML = `<div class="multi-edit-list">${cardsToEdit.map(cardName => {
+        const entry = getInventoryEntry(cardName);
+        return `
+            <div class="multi-edit-card">
+                <button type="button" class="multi-edit-remove" title="Remove from multi-edit" aria-label="Remove ${cardName} from multi-edit" onclick="removeFromMultiEdit('${escapeForAttribute(cardName)}')">×</button>
+                <div class="multi-edit-card-name">${cardName}</div>
+                <div class="multi-edit-level-row">
+                    <label>Level</label>
+                    <div class="field-wrap multi-edit-level-wrap">
+                        <input type="number" min="1" max="18" value="${entry.level}" onchange="updateMultiEditLevel('${escapeForAttribute(cardName)}', this.value)">
+                        <div class="stepper">
+                            <button type="button" class="stepper-btn" tabindex="-1" aria-label="Increase level" onclick="stepNumberInput(this, 1)"><svg viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                            <button type="button" class="stepper-btn" tabindex="-1" aria-label="Decrease level" onclick="stepNumberInput(this, -1)"><svg viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+    }).join("")}</div>`;
+    updateRightSidebarState();
+}
+
+function renderUpgradePlan() {
+    const panel = document.getElementById("upgradePlanPanel");
+    const body = document.getElementById("upgradePlanBody");
+
+    if (selectedCards.size === 0) {
+        panel.style.display = "none";
+        body.innerHTML = "";
+        updateRightSidebarState();
+        return;
+    }
+
+    panel.style.display = "";
+    panel.classList.toggle("is-collapsed-panel", uiPrefs.upgradePlanHidden);
+    setArrowButtonState(document.getElementById("toggleUpgradePlanBtn"), uiPrefs.upgradePlanHidden, "upgrade plan", "left");
 
     // Work against a scratch copy of the pools so the real pools aren't mutated while planning.
     const remaining = JSON.parse(JSON.stringify(resourcePools));
@@ -4218,6 +4523,7 @@ function renderUpgradePlan() {
             Clear selection
         </button>
     `;
+    updateRightSidebarState();
 }
 
 let groupByMode = "none";
@@ -4328,6 +4634,7 @@ function renderInventory() {
 
     if (rows.length === 0) {
         grid.innerHTML = `<div class="inv-empty-state">No cards match these filters.</div>`;
+        renderMultiEditPanel();
         renderUpgradePlan();
         return;
     }
@@ -4347,6 +4654,7 @@ function renderInventory() {
         `).join("");
     }
 
+    renderMultiEditPanel();
     renderUpgradePlan();
 }
 
@@ -4588,7 +4896,7 @@ function clearInventoryFilters() {
 }
 
 function clearInventorySort() {
-    document.getElementById("invSort").value = "progress";
+    document.getElementById("invSort").value = "name";
     updatePopoverActiveStates();
     renderInventory();
 }
@@ -4645,6 +4953,9 @@ function loadCardFromInventory() {
     document.getElementById("ownedCards").value = entry.owned;
     autoFillDesiredLevel();
 
+    trackEvent("inventory_loaded_into_calculator", {
+        rarity: cardRarities[cardName]
+    });
     showToast(`Loaded ${cardName} from inventory.`);
 }
 
@@ -4658,6 +4969,10 @@ function saveScenarioToInventory(scenarioId) {
     setInventoryEntry(scenario.cardName, scenario.current, scenario.ownedCards);
     updateLoadInventoryButtonState();
     updateInventoryTabCount();
+    trackEvent("calculation_saved_to_inventory", {
+        source: "summary",
+        rarity: scenario.category
+    });
     showToast(`Saved ${scenario.cardName} — Lv ${scenario.current}, ${scenario.ownedCards} owned — to inventory.`);
 }
 
@@ -4673,6 +4988,10 @@ function saveCurrentCardToInventory() {
     setInventoryEntry(cardName, level, owned);
     updateLoadInventoryButtonState();
     updateInventoryTabCount();
+    trackEvent("calculation_saved_to_inventory", {
+        source: "current_result",
+        rarity: cardRarities[cardName]
+    });
     showToast(`Saved ${cardName} — Lv ${level}, ${owned} owned — to inventory.`);
 }
 
@@ -4691,6 +5010,9 @@ function sendCardToCalculator(cardName) {
     autoFillDesiredLevel();
     updateLoadInventoryButtonState();
 
+    trackEvent("inventory_card_sent_to_calculator", {
+        rarity: cardRarities[cardName]
+    });
     switchView("calculator");
     document.getElementById("desiredLevel").focus();
 }
@@ -4724,6 +5046,10 @@ function exportInventory() {
     link.download = `voodoo-card-inventory-${fileDate}.csv`;
     document.body.appendChild(link);
     link.click();
+
+    trackEvent("inventory_exported", {
+        tracked_card_count_bucket: getUsageBucket(trackedNames.length)
+    });
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 }
@@ -4778,6 +5104,9 @@ function importInventoryFromFile(event) {
             }
 
             renderInventory();
+            trackEvent("inventory_imported", {
+                imported_count_bucket: getUsageBucket(importedCount)
+            });
             alert(`${importedCount} inventory ${importedCount === 1 ? "entry" : "entries"} imported.`);
         } catch (error) {
             console.error(error);
@@ -4801,7 +5130,7 @@ document.querySelectorAll(".resource-input").forEach(input => {
 
 applyAllResourceSectionStates();
 applyCalculatorPanelState();
-applyInventorySidebarState();
+applyResourcesPanelState();
 
 document.querySelectorAll("#rarityOptions .popover-option").forEach(btn => {
     btn.addEventListener("click", () => setInventoryRarityFilter(btn.dataset.rarity));
