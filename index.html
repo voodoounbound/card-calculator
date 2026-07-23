@@ -200,6 +200,46 @@ a { color: var(--gold); }
     border-radius: 999px;
 }
 
+.tab-hover-wrap {
+    position: relative;
+    display: inline-flex;
+}
+
+.tab-info-tooltip {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 280px;
+    background: var(--panel-raised);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-md);
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.65);
+    padding: 10px;
+    z-index: 60;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(4px);
+    transition: opacity .15s ease, transform .15s ease, visibility .15s;
+    pointer-events: none;
+}
+
+.tab-hover-wrap:hover .tab-info-tooltip,
+.tab-hover-wrap:focus-within .tab-info-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.popover-info-text {
+    margin: 4px 4px 2px;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--ink);
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
 .tab-button {
     appearance: none;
     border: none;
@@ -253,8 +293,46 @@ a { color: var(--gold); }
     align-items: start;
 }
 
+.calc-col {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
 .calc-grid.calc-grid--single {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+}
+
+.slim-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    white-space: nowrap;
+}
+
+.slim-toolbar-title {
+    margin: 0;
+    font-size: 1.02rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+}
+
+.summary-header-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-icon-sm {
+    width: 30px;
+    height: 30px;
+}
+
+.btn-icon-sm svg {
+    width: 14px;
+    height: 14px;
 }
 
 .panel {
@@ -890,16 +968,22 @@ input:disabled {
     align-items: start;
 }
 
+.inv-sidebar-col {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    position: sticky;
+    top: 20px;
+}
+
 .inv-layout.inv-layout--full {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, auto) minmax(0, 1fr);
 }
 
 .inv-sidebar {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    position: sticky;
-    top: 20px;
 }
 
 .resource-panel-body {
@@ -1283,8 +1367,42 @@ input:disabled {
 
 .inv-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(258px, 1fr));
+    grid-template-columns: repeat(4, minmax(230px, 1fr));
     gap: 12px;
+}
+
+.inv-layout.inv-layout--full .inv-grid {
+    grid-template-columns: repeat(auto-fit, minmax(228px, 1fr));
+}
+
+.inv-group-section {
+    margin-bottom: 20px;
+}
+
+.inv-group-section:last-child {
+    margin-bottom: 0;
+}
+
+.inv-group-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--hairline-soft);
+}
+
+.inv-group-count {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--ink-dim);
+    background: rgba(255,255,255,0.06);
+    padding: 1px 7px;
+    border-radius: 999px;
 }
 
 .inv-card {
@@ -1347,22 +1465,22 @@ input:disabled {
 
 .inv-card-fields {
     display: flex;
-    gap: 14px;
+    gap: 10px;
     margin-bottom: 12px;
 }
 
 .inv-inline-field {
     display: flex;
     align-items: center;
-    gap: 6px;
-    flex: 1;
+    gap: 5px;
+    flex: none;
     min-width: 0;
 }
 
 .inv-inline-field label {
     display: inline;
     margin: 0;
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     font-weight: 600;
     text-transform: none;
     letter-spacing: 0;
@@ -1372,19 +1490,19 @@ input:disabled {
 }
 
 .inv-inline-field .field-wrap {
-    flex: 1;
-    min-width: 0;
+    flex: none;
+    width: 62px;
     position: relative;
 }
 
 .inv-card-fields input {
     height: 30px;
-    padding: 4px 22px 4px 8px;
+    padding: 4px 20px 4px 6px;
     font-size: 0.82rem;
     text-align: center;
 }
 
-.inv-card-fields .stepper { width: 18px; top: 2px; right: 2px; bottom: 2px; }
+.inv-card-fields .stepper { width: 16px; top: 2px; right: 2px; bottom: 2px; }
 .inv-card-fields .stepper-btn svg { width: 7px; height: 4px; }
 
 .inv-progress-label {
@@ -1452,15 +1570,15 @@ input:disabled {
 
 .inv-card-calc-btn {
     flex: none;
-    width: 26px;
-    height: 26px;
+    width: 34px;
+    height: 34px;
     margin-left: auto;
     padding: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border: 1px solid var(--hairline-soft);
-    border-radius: 7px;
+    border-radius: 8px;
     background: var(--panel-raised);
     color: var(--ink-dim);
     cursor: pointer;
@@ -1468,8 +1586,8 @@ input:disabled {
 }
 
 .inv-card-calc-btn svg {
-    width: 15px;
-    height: 15px;
+    width: 20px;
+    height: 20px;
 }
 
 .inv-card-calc-btn:hover {
@@ -1509,17 +1627,26 @@ input:disabled {
 }
 
 /* ---------- Responsive ---------- */
+@media (max-width: 1200px) {
+    .inv-grid, .inv-layout.inv-layout--full .inv-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
 @media (max-width: 900px) {
     .calc-grid { grid-template-columns: 1fr; }
     .inv-layout { grid-template-columns: 1fr; }
-    .inv-sidebar { position: static; }
+    .inv-sidebar-col { position: static; }
+    .inv-grid, .inv-layout.inv-layout--full .inv-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 @media (max-width: 640px) {
     .app { padding: 16px 14px 40px; }
     .app-header { flex-direction: column; align-items: flex-start; }
     .input-grid { grid-template-columns: 1fr 1fr; }
-    .inv-grid { grid-template-columns: 1fr; }
+    .inv-grid, .inv-layout.inv-layout--full .inv-grid { grid-template-columns: 1fr; }
     .inv-toolbar-actions { width: 100%; margin-left: 0; }
     .inv-toolbar-actions .btn { flex: 1; }
     .inv-search-wrap { width: 100%; order: -1; }
@@ -1548,15 +1675,32 @@ input:disabled {
         </div>
 
         <nav class="tab-nav" role="tablist" aria-label="Sections">
-            <button type="button" class="tab-button" id="tabBtnCalculator" role="tab" aria-selected="false" aria-controls="view-calculator" onclick="switchView('calculator')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01"/></svg>
-                Calculator
-            </button>
-            <button type="button" class="tab-button active" id="tabBtnInventory" role="tab" aria-selected="true" aria-controls="view-inventory" onclick="switchView('inventory')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                Inventory
-                <span class="tab-count" id="inventoryTabCount">0</span>
-            </button>
+            <div class="tab-hover-wrap">
+                <button type="button" class="tab-button" id="tabBtnCalculator" role="tab" aria-selected="false" aria-controls="view-calculator" onclick="switchView('calculator')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01"/></svg>
+                    Calculator
+                </button>
+                <div class="tab-info-tooltip">
+                    <div class="popover-section-label">Using the Calculator</div>
+                    <p class="popover-info-text">
+                        Pick a card, its rarity, current level, and desired level. Add anything you already have — owned copies, trade tokens, crystals, wild cards — and the calculator subtracts them from the total. Every calculation is saved to the Summary panel on the right, where you can pin favorites, export to CSV, or push a result straight into your Inventory.
+                    </p>
+                </div>
+            </div>
+
+            <div class="tab-hover-wrap">
+                <button type="button" class="tab-button active" id="tabBtnInventory" role="tab" aria-selected="true" aria-controls="view-inventory" onclick="switchView('inventory')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    Inventory
+                    <span class="tab-count" id="inventoryTabCount">0</span>
+                </button>
+                <div class="tab-info-tooltip">
+                    <div class="popover-section-label">Using the Inventory</div>
+                    <p class="popover-info-text">
+                        Track every card's level and owned copies here — they're saved automatically. Log your Gold, Trade Tokens, Wild Cards, Crystals, and Hourglass Tokens in the Resources sidebar. Tick the checkbox on any card to add it to a combined Upgrade Plan, or tap the calculator icon on a card to jump straight into a detailed calculation for just that one. Use the filter, sort, and group icons above the grid to organize things your way.
+                    </p>
+                </div>
+            </div>
         </nav>
     </header>
 
@@ -1565,14 +1709,19 @@ input:disabled {
 
         <div class="calc-grid" id="calcGrid">
 
-            <div class="panel" id="calculatorPanel">
-                <div class="panel-header">
-                    <div>
-                        <h2 class="panel-title">Card Upgrade Calculator</h2>
-                    </div>
+            <div class="calc-col">
+                <div class="slim-toolbar">
+                    <h2 class="slim-toolbar-title">Calculator</h2>
+                    <button type="button" class="btn btn-ghost btn-icon" id="toggleCalculatorBtn" onclick="toggleCalculatorPanel()" title="Hide calculator" aria-label="Hide calculator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
                 </div>
 
-                <div class="panel-body" id="calculatorPanelBody">
+                <div class="panel" id="calculatorPanel">
+                    <div class="panel-body" id="calculatorPanelBody">
                     <div class="input-grid">
 
                         <div class="field-block" style="grid-column: 1 / -1;">
@@ -1669,24 +1818,24 @@ input:disabled {
                     </div>
                 </div>
             </div>
+            </div>
 
             <aside class="panel">
                 <div class="panel-header">
                     <div>
                         <h2 class="panel-title">Calculation Summary</h2>
                     </div>
-                    <button type="button" class="btn btn-ghost btn-icon" id="toggleCalculatorBtn" onclick="toggleCalculatorPanel()" title="Hide calculator" aria-label="Hide calculator">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                    </button>
-                </div>
-
-                <div class="summary-toolbar">
-                    <button class="btn btn-ghost btn-sm" style="flex:1" onclick="exportResults()">Export CSV</button>
-                    <button class="btn btn-ghost btn-sm" style="flex:1" onclick="triggerImportResults()">Import CSV</button>
-                    <button class="btn btn-danger-ghost btn-sm" onclick="clearSummary()">Clear</button>
+                    <div class="summary-header-actions">
+                        <button type="button" class="btn btn-ghost btn-icon btn-icon-sm" onclick="exportResults()" title="Export CSV" aria-label="Export CSV">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 20h16"/></svg>
+                        </button>
+                        <button type="button" class="btn btn-ghost btn-icon btn-icon-sm" onclick="triggerImportResults()" title="Import CSV" aria-label="Import CSV">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V9"/><path d="M7 14l5-5 5 5"/><path d="M4 4h16"/></svg>
+                        </button>
+                        <button type="button" class="btn btn-danger-ghost btn-icon btn-icon-sm" onclick="clearSummary()" title="Clear all" aria-label="Clear all">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                        </button>
+                    </div>
                 </div>
 
                 <input
@@ -1714,23 +1863,29 @@ input:disabled {
 
         <div class="inv-layout" id="invLayout">
 
+            <div class="inv-sidebar-col">
+                <div class="slim-toolbar">
+                    <h2 class="slim-toolbar-title">Resources</h2>
+                    <button type="button" class="btn btn-ghost btn-icon" id="toggleInventorySidebarBtn" onclick="toggleInventorySidebar()" title="Hide sidebar" aria-label="Hide sidebar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+
             <aside class="inv-sidebar" id="invSidebar">
 
                 <div class="panel" id="upgradePlanPanel" style="display:none;">
                     <div class="panel-header">
                         <div>
-                            <h2 class="panel-title">Card Upgrade Plan</h2>
+                            <h2 class="panel-title">Upgrade Plan</h2>
                         </div>
                     </div>
                     <div class="panel-body" id="upgradePlanBody"></div>
                 </div>
 
                 <div class="panel" id="resourcesPanel">
-                    <div class="panel-header">
-                        <div>
-                            <h2 class="panel-title">Resources</h2>
-                        </div>
-                    </div>
                     <div class="panel-body resource-panel-body">
 
                         <div class="resource-section" data-section="gold">
@@ -1869,6 +2024,7 @@ input:disabled {
                 </div>
 
             </aside>
+            </div>
 
             <div class="inv-main">
 
@@ -1970,12 +2126,26 @@ input:disabled {
                         </select>
                     </div>
 
-                    <button type="button" class="btn btn-ghost btn-icon" id="toggleInventorySidebarBtn" onclick="toggleInventorySidebar()" title="Hide sidebar" aria-label="Hide sidebar">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                    </button>
+                    <div class="popover-wrap" id="groupByDropdown">
+                        <button type="button" class="btn btn-ghost btn-icon" id="groupByToggleBtn" onclick="toggleGroupByPopover(event)" aria-haspopup="true" aria-expanded="false" title="Group by">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 4v6a1 1 0 0 0 1 1h2"></path>
+                                <line x1="9" y1="6" x2="20" y2="6"></line>
+                                <line x1="9" y1="10" x2="20" y2="10"></line>
+                                <path d="M3 14v6a1 1 0 0 0 1 1h2"></path>
+                                <line x1="9" y1="16" x2="20" y2="16"></line>
+                                <line x1="9" y1="20" x2="20" y2="20"></line>
+                            </svg>
+                        </button>
+                        <div class="popover-menu" id="groupByPopover" hidden>
+                            <div class="popover-section-label">Group cards by</div>
+                            <div class="popover-options" id="groupByOptions">
+                                <button type="button" class="popover-option is-active" data-group="none">No grouping</button>
+                                <button type="button" class="popover-option" data-group="rarity">Rarity</button>
+                                <button type="button" class="popover-option" data-group="status">Status</button>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="toolbar-spacer"></div>
 
@@ -1993,7 +2163,7 @@ input:disabled {
                     >
                 </div>
 
-                <div id="inventoryGrid" class="inv-grid"></div>
+                <div id="inventoryGrid"></div>
 
             </div>
 
@@ -4020,6 +4190,42 @@ function renderUpgradePlan() {
     `;
 }
 
+let groupByMode = "none";
+
+const RARITY_GROUP_ORDER = ["Mythic", "Dark", "Legendary", "Epic", "Rare", "Common"];
+const STATUS_GROUP_ORDER = ["Ready to upgrade", "Tracked", "At max level", "Untracked"];
+
+function getInventoryGroupKey(row, mode) {
+    if (mode === "rarity") {
+        return row.rarity;
+    }
+
+    if (mode === "status") {
+        if (row.nextInfo.isMax) return "At max level";
+        if (row.isReady) return "Ready to upgrade";
+        if (row.tracked) return "Tracked";
+        return "Untracked";
+    }
+
+    return "";
+}
+
+function buildInventoryGroups(rows, mode) {
+    const buckets = new Map();
+
+    rows.forEach(row => {
+        const key = getInventoryGroupKey(row, mode);
+        if (!buckets.has(key)) buckets.set(key, []);
+        buckets.get(key).push(row);
+    });
+
+    const order = mode === "rarity" ? RARITY_GROUP_ORDER : STATUS_GROUP_ORDER;
+
+    return order
+        .filter(key => buckets.has(key))
+        .map(key => ({ title: key, rows: buckets.get(key) }));
+}
+
 function renderInventory() {
     const grid = document.getElementById("inventoryGrid");
     const searchTerm = document.getElementById("invSearch").value.trim().toLowerCase();
@@ -4096,7 +4302,21 @@ function renderInventory() {
         return;
     }
 
-    grid.innerHTML = rows.map(row => renderInventoryCard(row)).join("");
+    if (groupByMode === "none") {
+        grid.innerHTML = `<div class="inv-grid">${rows.map(row => renderInventoryCard(row)).join("")}</div>`;
+    } else {
+        const groups = buildInventoryGroups(rows, groupByMode);
+        grid.innerHTML = groups.map(group => `
+            <div class="inv-group-section">
+                <div class="inv-group-title">
+                    <span>${group.title}</span>
+                    <span class="inv-group-count">${group.rows.length}</span>
+                </div>
+                <div class="inv-grid">${group.rows.map(row => renderInventoryCard(row)).join("")}</div>
+            </div>
+        `).join("");
+    }
+
     renderUpgradePlan();
 }
 
@@ -4244,10 +4464,16 @@ function resetInventory() {
 
 /* ---------- Filter / sort popovers ---------- */
 function closeAllPopovers(exceptId) {
-    ["filterPopover", "sortPopover"].forEach(id => {
+    const idMap = {
+        filterPopover: "filterToggleBtn",
+        sortPopover: "sortToggleBtn",
+        groupByPopover: "groupByToggleBtn"
+    };
+
+    Object.keys(idMap).forEach(id => {
         if (id === exceptId) return;
         const menu = document.getElementById(id);
-        const btn = document.getElementById(id === "filterPopover" ? "filterToggleBtn" : "sortToggleBtn");
+        const btn = document.getElementById(idMap[id]);
         if (menu) menu.hidden = true;
         if (btn) btn.setAttribute("aria-expanded", "false");
     });
@@ -4273,6 +4499,31 @@ function toggleSortPopover(event) {
     closeAllPopovers(willOpen ? "sortPopover" : null);
     menu.hidden = !willOpen;
     btn.setAttribute("aria-expanded", String(willOpen));
+}
+
+function toggleGroupByPopover(event) {
+    event.stopPropagation();
+    const menu = document.getElementById("groupByPopover");
+    const btn = document.getElementById("groupByToggleBtn");
+    const willOpen = menu.hidden;
+
+    closeAllPopovers(willOpen ? "groupByPopover" : null);
+    menu.hidden = !willOpen;
+    btn.setAttribute("aria-expanded", String(willOpen));
+}
+
+function setInventoryGroupBy(value) {
+    groupByMode = value;
+
+    document.querySelectorAll("#groupByOptions .popover-option").forEach(btn => {
+        btn.classList.toggle("is-active", btn.dataset.group === value);
+    });
+
+    const toggleBtn = document.getElementById("groupByToggleBtn");
+    toggleBtn.classList.toggle("is-popover-active", value !== "none");
+
+    renderInventory();
+    closeAllPopovers(null);
 }
 
 function setInventoryRarityFilter(value) {
@@ -4530,6 +4781,10 @@ document.querySelectorAll("#statusOptions .popover-option").forEach(btn => {
 
 document.querySelectorAll("#sortOptions .popover-option").forEach(btn => {
     btn.addEventListener("click", () => setInventorySort(btn.dataset.sort));
+});
+
+document.querySelectorAll("#groupByOptions .popover-option").forEach(btn => {
+    btn.addEventListener("click", () => setInventoryGroupBy(btn.dataset.group));
 });
 
 updateFilterBadge();
