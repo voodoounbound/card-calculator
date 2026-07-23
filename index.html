@@ -244,12 +244,6 @@ a { color: var(--gold); }
 /* ============================================================
    CALCULATOR VIEW
    ============================================================ */
-.view-toolbar {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 12px;
-}
-
 .calc-grid {
     display: grid;
     grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
@@ -258,7 +252,11 @@ a { color: var(--gold); }
 }
 
 .calc-grid.calc-grid--single {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+}
+
+.calc-grid.calc-grid--single #calculatorPanel .panel-subtitle {
+    display: none;
 }
 
 .panel {
@@ -1389,11 +1387,11 @@ input:disabled {
         </div>
 
         <nav class="tab-nav" role="tablist" aria-label="Sections">
-            <button type="button" class="tab-button active" id="tabBtnCalculator" role="tab" aria-selected="true" aria-controls="view-calculator" onclick="switchView('calculator')">
+            <button type="button" class="tab-button" id="tabBtnCalculator" role="tab" aria-selected="false" aria-controls="view-calculator" onclick="switchView('calculator')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01"/></svg>
                 Calculator
             </button>
-            <button type="button" class="tab-button" id="tabBtnInventory" role="tab" aria-selected="false" aria-controls="view-inventory" onclick="switchView('inventory')">
+            <button type="button" class="tab-button active" id="tabBtnInventory" role="tab" aria-selected="true" aria-controls="view-inventory" onclick="switchView('inventory')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                 Inventory
                 <span class="tab-count" id="inventoryTabCount">0</span>
@@ -1402,11 +1400,7 @@ input:disabled {
     </header>
 
     <!-- ===================== CALCULATOR VIEW ===================== -->
-    <section id="view-calculator" class="view active">
-
-        <div class="view-toolbar">
-            <button type="button" class="btn btn-ghost btn-sm" id="toggleCalculatorBtn" onclick="toggleCalculatorPanel()">Hide calculator</button>
-        </div>
+    <section id="view-calculator" class="view">
 
         <div class="calc-grid" id="calcGrid">
 
@@ -1415,9 +1409,10 @@ input:disabled {
                     <div>
                         <h2 class="panel-title">Card Upgrade Calculator</h2>
                     </div>
+                    <button type="button" class="btn btn-ghost btn-sm" id="toggleCalculatorBtn" onclick="toggleCalculatorPanel()">Hide calculator</button>
                 </div>
 
-                <div class="panel-body">
+                <div class="panel-body" id="calculatorPanelBody">
                     <div class="input-grid">
 
                         <div class="field-block" style="grid-column: 1 / -1;">
@@ -1519,7 +1514,6 @@ input:disabled {
                 <div class="panel-header">
                     <div>
                         <h2 class="panel-title">Calculation Summary</h2>
-                        <p class="panel-subtitle">Scenarios you've run this session</p>
                     </div>
                 </div>
 
@@ -1539,7 +1533,7 @@ input:disabled {
 
                 <div class="summary-scroll">
                     <div id="summaryList" class="summary-empty">
-                        No calculations yet. Run one on the left to see it here.
+                        No calculations yet. Run one to see it here.
                     </div>
                 </div>
             </aside>
@@ -1550,7 +1544,7 @@ input:disabled {
     </section>
 
     <!-- ===================== INVENTORY VIEW ===================== -->
-    <section id="view-inventory" class="view">
+    <section id="view-inventory" class="view active">
 
         <div class="inv-layout" id="invLayout">
 
@@ -1568,8 +1562,7 @@ input:disabled {
                 <div class="panel">
                     <div class="panel-header">
                         <div>
-                            <h2 class="panel-title">Available Resources</h2>
-                            <p class="panel-subtitle">What you have on hand to spend</p>
+                            <h2 class="panel-title">Resources Available</h2>
                         </div>
                     </div>
                     <div class="panel-body resource-panel-body">
@@ -3407,13 +3400,13 @@ function toggleCalculatorPanel() {
 
 function applyCalculatorPanelState() {
     const grid = document.getElementById("calcGrid");
-    const panel = document.getElementById("calculatorPanel");
+    const body = document.getElementById("calculatorPanelBody");
     const btn = document.getElementById("toggleCalculatorBtn");
 
-    if (!grid || !panel || !btn) return;
+    if (!grid || !body || !btn) return;
 
     grid.classList.toggle("calc-grid--single", uiPrefs.calculatorHidden);
-    panel.style.display = uiPrefs.calculatorHidden ? "none" : "";
+    body.style.display = uiPrefs.calculatorHidden ? "none" : "";
     btn.textContent = uiPrefs.calculatorHidden ? "Show calculator" : "Hide calculator";
 }
 
@@ -4173,6 +4166,7 @@ document.querySelectorAll(".resource-input").forEach(input => {
 applyAllResourceSectionStates();
 applyCalculatorPanelState();
 applyInventorySidebarState();
+renderInventory();
 
 /* ---------- Custom number steppers ---------- */
 function stepNumberInput(buttonEl, direction) {
