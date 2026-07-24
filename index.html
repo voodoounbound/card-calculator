@@ -2253,6 +2253,14 @@ input:focus::selection, textarea:focus::selection { background: rgba(212,175,55,
                                 <button type="button" class="popover-option" data-rarity="Common"><span class="gem rarity-common"></span>Common</button>
                             </div>
 
+                            <div class="popover-section-label">Card Type</div>
+                            <div class="popover-options" id="cardTypeOptions">
+                                <button type="button" class="popover-option" data-card-type="">All card types</button>
+                                <button type="button" class="popover-option" data-card-type="Summon">Summon</button>
+                                <button type="button" class="popover-option" data-card-type="Spell">Spell</button>
+                                <button type="button" class="popover-option" data-card-type="Companion">Companion</button>
+                            </div>
+
                             <div class="popover-section-label">Status</div>
                             <div class="popover-options" id="statusOptions">
                                 <button type="button" class="popover-option" data-status="all">All cards</button>
@@ -2265,6 +2273,7 @@ input:focus::selection, textarea:focus::selection { background: rgba(212,175,55,
                         </div>
 
                         <select id="invRarityFilter" hidden><option value="">All rarities</option><option>Mythic</option><option>Dark</option><option>Legendary</option><option>Epic</option><option>Rare</option><option>Common</option></select>
+                        <select id="invCardTypeFilter" hidden><option value="">All card types</option><option>Summon</option><option>Spell</option><option>Companion</option></select>
                         <select id="invStatusFilter" hidden><option value="all">All cards</option><option value="tracked">Tracked only</option><option value="ready">Ready to upgrade</option><option value="selected">Selected only</option></select>
                     </div>
 
@@ -2285,6 +2294,7 @@ input:focus::selection, textarea:focus::selection { background: rgba(212,175,55,
                                 <button type="button" class="popover-option" data-sort="progress">Upgrade progress</button>
                                 <button type="button" class="popover-option" data-sort="name">Name (A–Z)</button>
                                 <button type="button" class="popover-option" data-sort="rarity">Rarity</button>
+                                <button type="button" class="popover-option" data-sort="card-type">Card type</button>
                                 <button type="button" class="popover-option" data-sort="level-desc">Level (high–low)</button>
                                 <button type="button" class="popover-option" data-sort="level-asc">Level (low–high)</button>
                                 <button type="button" class="popover-option" data-sort="owned">Owned</button>
@@ -2296,6 +2306,7 @@ input:focus::selection, textarea:focus::selection { background: rgba(212,175,55,
                             <option value="progress">Sort: Upgrade progress</option>
                             <option value="name" selected>Sort: Name (A–Z)</option>
                             <option value="rarity">Sort: Rarity</option>
+                            <option value="card-type">Sort: Card type</option>
                             <option value="level-desc">Sort: Level (high–low)</option>
                             <option value="level-asc">Sort: Level (low–high)</option>
                             <option value="owned">Sort: Owned</option>
@@ -2318,6 +2329,7 @@ input:focus::selection, textarea:focus::selection { background: rgba(212,175,55,
                             <div class="popover-options" id="groupByOptions">
                                 <button type="button" class="popover-option is-active" data-group="none">No grouping</button>
                                 <button type="button" class="popover-option" data-group="rarity">Rarity</button>
+                                <button type="button" class="popover-option" data-group="card-type">Card type</button>
                                 <button type="button" class="popover-option" data-group="status">Status</button>
                             </div>
                         </div>
@@ -2578,6 +2590,155 @@ const cardRarities = {
     "Harry Potter (Throwback)": "Mythic",
     "Abigail Grey": "Epic"
 };
+const cardTypes = Object.freeze({
+    ...Object.fromEntries([
+        "Prior Incantato",
+        "Broomstick",
+        "Swelling Solution",
+        "Expulso",
+        "Oppugno",
+        "Nebulus",
+        "Floo Network",
+        "Transfiguration",
+        "Side-Along Apparition",
+        "The Tales of Beedle the Bard",
+        "Confundus Charm",
+        "Incarcerous",
+        "Episkey",
+        "Expelliarmus",
+        "Petrificus Totalus",
+        "Essence of Dittany",
+        "Protego",
+        "Expecto Patronum",
+        "Stupefy",
+        "Inflatus",
+        "Fanged Flyer",
+        "The Standard Book of Spells",
+        "Portkey",
+        "Bewitched Snowballs",
+        "Flipendo",
+        "Invisibility Cloak",
+        "Carpe Retractum",
+        "Group Counter-Spell",
+        "Gobstones",
+        "Felix Felicis",
+        "Hot Air Charm",
+        "Incendio",
+        "Acromantula Venom",
+        "Bludger",
+        "Ventus",
+        "Gubraithian Fire",
+        "Avis",
+        "Sectumsempra",
+        "Tebo",
+        "Atmospheric Charm",
+        "Legilimency",
+        "Howler",
+        "Accio",
+        "Time-Turner",
+        "Crystal Ball",
+        "Enchanted Popping Candy",
+        "Rennervate",
+        "Diffindo",
+        "Glacius",
+        "Confringo",
+        "Crucio",
+        "Protego Totalum",
+        "Headless Hunt",
+        "Protego Diabolica",
+        "Aguamenti",
+        "Obscurus",
+        "Meteolojinx",
+        "Bat-Bogey Hex",
+        "Avada Kedavra",
+        "Thunderstorm",
+        "Orb of Water",
+        "Glacius Maxima",
+        "Zouwu",
+        "Weasleys' Whiz-bangs",
+        "Weasleys' Wildfire Whiz-bangs",
+        "Azkaban"
+    ].map(name => [name, "Spell"])),
+    ...Object.fromEntries([
+        "Niffler",
+        "Accio Snowman",
+        "Vanishing Cabinet",
+        "Book of Spells",
+        "Spiders",
+        "The Monster Book of Monsters",
+        "Ashwinder",
+        "Hinkypunk",
+        "Centaur",
+        "Cornish Pixies",
+        "Knight Bus",
+        "Weasley's Firework Box",
+        "Bombtastic Bomb Box",
+        "Baby Manticores",
+        "Murtlap",
+        "Pranktastic Present",
+        "Scamander's Suitcase",
+        "Occamy",
+        "Thunderbird",
+        "Matagot",
+        "Swooping Evil",
+        "Mooncalf",
+        "Pawn",
+        "Peeves",
+        "Troll",
+        "Golden Snitch",
+        "Unicorn",
+        "Erumpent",
+        "Dessert Master",
+        "Fire Crab",
+        "Acromantula's Nest",
+        "Fwoopers",
+        "Baby Chinese Fireball",
+        "Whomping Willow",
+        "Winged Catapult",
+        "Yeti",
+        "Memory Vial",
+        "Death Eater",
+        "Demiguise",
+        "Kelpie",
+        "Piertotum Locomotor",
+        "Baby Antipodean Opaleye",
+        "En Pointe",
+        "Mimbulus Mimbletonia",
+        "Fiendfyre",
+        "Norwegian Ridgeback Egg",
+        "Phoenix",
+        "Stack of Monster Book of Monsters",
+        "Giant Squid",
+        "Three-Headed Puppy",
+        "Blast-Ended Skrewt"
+    ].map(name => [name, "Summon"])),
+    ...Object.fromEntries([
+        "Cassandra Vole",
+        "Daniel Page",
+        "Lottie Turner",
+        "Dolores Umbridge",
+        "Ivy Warrington",
+        "Kevin Farrell",
+        "Rubeus Hagrid",
+        "Robyn Thistlethwaite",
+        "Hermione Granger",
+        "Minerva McGonagall",
+        "Grawp",
+        "Harry Potter",
+        "Ron Weasley",
+        "Malfoy Gang",
+        "Hermione Granger (Throwback)",
+        "Albus Dumbledore",
+        "Severus Snape",
+        "Long Shouren",
+        "Newt Scamander",
+        "Frey Twins",
+        "Dobby",
+        "Luna Lovegood",
+        "Harry Potter (Throwback)",
+        "Abigail Grey"
+    ].map(name => [name, "Companion"]))
+});
 const CARD_IMAGE_FOLDER = "card-images";
 
 const cardImageAliases = {
@@ -4670,11 +4831,16 @@ function renderUpgradePlan() {
 let groupByMode = "none";
 
 const RARITY_GROUP_ORDER = ["Mythic", "Dark", "Legendary", "Epic", "Rare", "Common"];
+const CARD_TYPE_GROUP_ORDER = ["Summon", "Spell", "Companion"];
 const STATUS_GROUP_ORDER = ["Ready to upgrade", "Tracked", "At max level", "Untracked"];
 
 function getInventoryGroupKey(row, mode) {
     if (mode === "rarity") {
         return row.rarity;
+    }
+
+    if (mode === "card-type") {
+        return row.cardType;
     }
 
     if (mode === "status") {
@@ -4696,7 +4862,11 @@ function buildInventoryGroups(rows, mode) {
         buckets.get(key).push(row);
     });
 
-    const order = mode === "rarity" ? RARITY_GROUP_ORDER : STATUS_GROUP_ORDER;
+    const order = mode === "rarity"
+        ? RARITY_GROUP_ORDER
+        : mode === "card-type"
+            ? CARD_TYPE_GROUP_ORDER
+            : STATUS_GROUP_ORDER;
 
     return order
         .filter(key => buckets.has(key))
@@ -4707,10 +4877,12 @@ function renderInventory() {
     const grid = document.getElementById("inventoryGrid");
     const searchTerm = document.getElementById("invSearch").value.trim().toLowerCase();
     const rarityFilter = document.getElementById("invRarityFilter").value;
+    const cardTypeFilter = document.getElementById("invCardTypeFilter").value;
     const statusFilter = document.getElementById("invStatusFilter").value;
     const sortMode = document.getElementById("invSort").value;
 
     const rarityOrder = { Mythic: 0, Dark: 1, Legendary: 2, Epic: 3, Rare: 4, Common: 5 };
+    const cardTypeOrder = { Summon: 0, Spell: 1, Companion: 2 };
 
     let allNames = Object.keys(cardRarities);
 
@@ -4727,6 +4899,7 @@ function renderInventory() {
         return {
             cardName,
             rarity: cardRarities[cardName],
+            cardType: cardTypes[cardName] || "Spell",
             entry,
             nextInfo,
             progress,
@@ -4743,6 +4916,10 @@ function renderInventory() {
         rows = rows.filter(row => row.rarity === rarityFilter);
     }
 
+    if (cardTypeFilter) {
+        rows = rows.filter(row => row.cardType === cardTypeFilter);
+    }
+
     if (statusFilter === "tracked") {
         rows = rows.filter(row => row.tracked);
     } else if (statusFilter === "ready") {
@@ -4757,6 +4934,8 @@ function renderInventory() {
                 return a.cardName.localeCompare(b.cardName);
             case "rarity":
                 return rarityOrder[a.rarity] - rarityOrder[b.rarity] || a.cardName.localeCompare(b.cardName);
+            case "card-type":
+                return cardTypeOrder[a.cardType] - cardTypeOrder[b.cardType] || a.cardName.localeCompare(b.cardName);
             case "level-desc":
                 return b.entry.level - a.entry.level || a.cardName.localeCompare(b.cardName);
             case "level-asc":
@@ -5014,6 +5193,13 @@ function setInventoryRarityFilter(value) {
     renderInventory();
 }
 
+function setInventoryCardTypeFilter(value) {
+    document.getElementById("invCardTypeFilter").value = value;
+    updatePopoverActiveStates();
+    updateFilterBadge();
+    renderInventory();
+}
+
 function setInventoryStatusFilter(value) {
     document.getElementById("invStatusFilter").value = value;
     updatePopoverActiveStates();
@@ -5030,6 +5216,7 @@ function setInventorySort(value) {
 
 function clearInventoryFilters() {
     document.getElementById("invRarityFilter").value = "";
+    document.getElementById("invCardTypeFilter").value = "";
     document.getElementById("invStatusFilter").value = "all";
     updatePopoverActiveStates();
     updateFilterBadge();
@@ -5045,17 +5232,23 @@ function clearInventorySort() {
 function updateFilterBadge() {
     const badge = document.getElementById("filterBadge");
     const rarityActive = document.getElementById("invRarityFilter").value !== "";
+    const cardTypeActive = document.getElementById("invCardTypeFilter").value !== "";
     const statusActive = document.getElementById("invStatusFilter").value !== "all";
-    badge.hidden = !(rarityActive || statusActive);
+    badge.hidden = !(rarityActive || cardTypeActive || statusActive);
 }
 
 function updatePopoverActiveStates() {
     const rarityValue = document.getElementById("invRarityFilter").value;
+    const cardTypeValue = document.getElementById("invCardTypeFilter").value;
     const statusValue = document.getElementById("invStatusFilter").value;
     const sortValue = document.getElementById("invSort").value;
 
     document.querySelectorAll("#rarityOptions .popover-option").forEach(btn => {
         btn.classList.toggle("is-active", btn.dataset.rarity === rarityValue);
+    });
+
+    document.querySelectorAll("#cardTypeOptions .popover-option").forEach(btn => {
+        btn.classList.toggle("is-active", btn.dataset.cardType === cardTypeValue);
     });
 
     document.querySelectorAll("#statusOptions .popover-option").forEach(btn => {
@@ -5278,6 +5471,10 @@ applyResourcesPanelState();
 
 document.querySelectorAll("#rarityOptions .popover-option").forEach(btn => {
     btn.addEventListener("click", () => setInventoryRarityFilter(btn.dataset.rarity));
+});
+
+document.querySelectorAll("#cardTypeOptions .popover-option").forEach(btn => {
+    btn.addEventListener("click", () => setInventoryCardTypeFilter(btn.dataset.cardType));
 });
 
 document.querySelectorAll("#statusOptions .popover-option").forEach(btn => {
