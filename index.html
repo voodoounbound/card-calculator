@@ -4120,6 +4120,52 @@ function applyAllResourceSectionStates() {
     });
 }
 
+function setResourceSectionExpanded(sectionKey, shouldExpand) {
+    if (NON_COLLAPSIBLE_SECTIONS.includes(sectionKey)) return;
+
+    const shouldCollapse = !shouldExpand;
+    if (!!uiPrefs.collapsedSections[sectionKey] === shouldCollapse) return;
+
+    uiPrefs.collapsedSections[sectionKey] = shouldCollapse;
+    saveUIPrefs();
+    applyResourceSectionState(sectionKey);
+}
+
+function handleResourceSectionKeydown(event) {
+    const button = event.currentTarget;
+    const section = button.closest('.resource-section[data-section]');
+    if (!section) return;
+
+    const sectionKey = section.dataset.section;
+
+    if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        setResourceSectionExpanded(sectionKey, true);
+    } else if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        setResourceSectionExpanded(sectionKey, false);
+    } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        const buttons = Array.from(document.querySelectorAll(
+            '.resource-section-title:not(.resource-section-title--static)'
+        ));
+        const currentIndex = buttons.indexOf(button);
+        if (currentIndex === -1 || buttons.length < 2) return;
+
+        event.preventDefault();
+        const direction = event.key === 'ArrowDown' ? 1 : -1;
+        const nextIndex = (currentIndex + direction + buttons.length) % buttons.length;
+        buttons[nextIndex].focus();
+    } else if (event.key === 'Home' || event.key === 'End') {
+        const buttons = Array.from(document.querySelectorAll(
+            '.resource-section-title:not(.resource-section-title--static)'
+        ));
+        if (!buttons.length) return;
+
+        event.preventDefault();
+        (event.key === 'Home' ? buttons[0] : buttons[buttons.length - 1]).focus();
+    }
+}
+
 function toggleCalculatorPanel() {
     uiPrefs.calculatorHidden = !uiPrefs.calculatorHidden;
     saveUIPrefs();
@@ -5224,6 +5270,9 @@ document.querySelectorAll(".resource-input").forEach(input => {
 });
 
 applyAllResourceSectionStates();
+document.querySelectorAll('.resource-section-title:not(.resource-section-title--static)').forEach(button => {
+    button.addEventListener('keydown', handleResourceSectionKeydown);
+});
 applyCalculatorPanelState();
 applyResourcesPanelState();
 
