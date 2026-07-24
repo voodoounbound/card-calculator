@@ -1363,6 +1363,13 @@ input:disabled {
     font-weight: 600;
 }
 
+#filterPopover .popover-option.is-active::after {
+    content: "✓";
+    margin-left: auto;
+    color: var(--gold-bright);
+    font-weight: 700;
+}
+
 
 .inv-toolbar-actions {
     display: flex;
@@ -2272,9 +2279,9 @@ input:focus::selection, textarea:focus::selection { background: rgba(212,175,55,
                             <button type="button" class="btn btn-ghost btn-sm btn-block" style="margin-top:8px;" onclick="clearInventoryFilters()">Clear filters</button>
                         </div>
 
-                        <select id="invRarityFilter" hidden><option value="">All rarities</option><option>Mythic</option><option>Dark</option><option>Legendary</option><option>Epic</option><option>Rare</option><option>Common</option></select>
-                        <select id="invCardTypeFilter" hidden><option value="">All card types</option><option>Summon</option><option>Spell</option><option>Companion</option></select>
-                        <select id="invStatusFilter" hidden><option value="all">All cards</option><option value="tracked">Tracked only</option><option value="ready">Ready to upgrade</option><option value="selected">Selected only</option></select>
+                        <select id="invRarityFilter" hidden aria-hidden="true" tabindex="-1"><option value="">All rarities</option><option>Mythic</option><option>Dark</option><option>Legendary</option><option>Epic</option><option>Rare</option><option>Common</option></select>
+                        <select id="invCardTypeFilter" hidden aria-hidden="true" tabindex="-1"><option value="">All card types</option><option>Summon</option><option>Spell</option><option>Companion</option></select>
+                        <select id="invStatusFilter" hidden aria-hidden="true" tabindex="-1"><option value="all">All cards</option><option value="tracked">Tracked only</option><option value="ready">Ready to upgrade</option><option value="selected">Selected only</option></select>
                     </div>
 
                     <div class="popover-wrap">
@@ -4153,6 +4160,12 @@ let cardInventory = loadInventoryFromStorage();
 
 const RESOURCE_STORAGE_KEY = "voodooUnboundResourcesV1";
 let resourcePools = loadResourcesFromStorage();
+const inventoryFilterState = {
+    rarities: new Set(),
+    cardTypes: new Set(),
+    statuses: new Set()
+};
+
 let selectedCards = new Map(); // cardName -> targetLevel
 let multiEditCards = new Set(); // independently removable from multi-edit while remaining in plan
 
@@ -4876,9 +4889,9 @@ function buildInventoryGroups(rows, mode) {
 function renderInventory() {
     const grid = document.getElementById("inventoryGrid");
     const searchTerm = document.getElementById("invSearch").value.trim().toLowerCase();
-    const rarityFilter = document.getElementById("invRarityFilter").value;
-    const cardTypeFilter = document.getElementById("invCardTypeFilter").value;
-    const statusFilter = document.getElementById("invStatusFilter").value;
+    const rarityFilters = inventoryFilterState.rarities;
+    const cardTypeFilters = inventoryFilterState.cardTypes;
+    const statusFilters = inventoryFilterState.statuses;
     const sortMode = document.getElementById("invSort").value;
 
     const rarityOrder = { Mythic: 0, Dark: 1, Legendary: 2, Epic: 3, Rare: 4, Common: 5 };
@@ -4912,20 +4925,20 @@ function renderInventory() {
         rows = rows.filter(row => row.cardName.toLowerCase().includes(searchTerm));
     }
 
-    if (rarityFilter) {
-        rows = rows.filter(row => row.rarity === rarityFilter);
+    if (rarityFilters.size > 0) {
+        rows = rows.filter(row => rarityFilters.has(row.rarity));
     }
 
-    if (cardTypeFilter) {
-        rows = rows.filter(row => row.cardType === cardTypeFilter);
+    if (cardTypeFilters.size > 0) {
+        rows = rows.filter(row => cardTypeFilters.has(row.cardType));
     }
 
-    if (statusFilter === "tracked") {
-        rows = rows.filter(row => row.tracked);
-    } else if (statusFilter === "ready") {
-        rows = rows.filter(row => row.isReady);
-    } else if (statusFilter === "selected") {
-        rows = rows.filter(row => selectedCards.has(row.cardName));
+    if (statusFilters.size > 0) {
+        rows = rows.filter(row =>
+            (statusFilters.has("tracked") && row.tracked) ||
+            (statusFilters.has("ready") && row.isReady) ||
+            (statusFilters.has("selected") && selectedCards.has(row.cardName))
+        );
     }
 
     rows.sort((a, b) => {
@@ -5186,25 +5199,32 @@ function setInventoryGroupBy(value) {
     closeAllPopovers(null);
 }
 
-function setInventoryRarityFilter(value) {
-    document.getElementById("invRarityFilter").value = value;
+function toggleFilterValue(setName, value) {
+    const filterSet = inventoryFilterState[setName];
+
+    if (!value || value === "all") {
+        filterSet.clear();
+    } else if (filterSet.has(value)) {
+        filterSet.delete(value);
+    } else {
+        filterSet.add(value);
+    }
+
     updatePopoverActiveStates();
     updateFilterBadge();
     renderInventory();
+}
+
+function setInventoryRarityFilter(value) {
+    toggleFilterValue("rarities", value);
 }
 
 function setInventoryCardTypeFilter(value) {
-    document.getElementById("invCardTypeFilter").value = value;
-    updatePopoverActiveStates();
-    updateFilterBadge();
-    renderInventory();
+    toggleFilterValue("cardTypes", value);
 }
 
 function setInventoryStatusFilter(value) {
-    document.getElementById("invStatusFilter").value = value;
-    updatePopoverActiveStates();
-    updateFilterBadge();
-    renderInventory();
+    toggleFilterValue("statuses", value);
 }
 
 function setInventorySort(value) {
@@ -5215,9 +5235,9 @@ function setInventorySort(value) {
 }
 
 function clearInventoryFilters() {
-    document.getElementById("invRarityFilter").value = "";
-    document.getElementById("invCardTypeFilter").value = "";
-    document.getElementById("invStatusFilter").value = "all";
+    inventoryFilterState.rarities.clear();
+    inventoryFilterState.cardTypes.clear();
+    inventoryFilterState.statuses.clear();
     updatePopoverActiveStates();
     updateFilterBadge();
     renderInventory();
@@ -5231,28 +5251,36 @@ function clearInventorySort() {
 
 function updateFilterBadge() {
     const badge = document.getElementById("filterBadge");
-    const rarityActive = document.getElementById("invRarityFilter").value !== "";
-    const cardTypeActive = document.getElementById("invCardTypeFilter").value !== "";
-    const statusActive = document.getElementById("invStatusFilter").value !== "all";
-    badge.hidden = !(rarityActive || cardTypeActive || statusActive);
+    const activeCount = inventoryFilterState.rarities.size
+        + inventoryFilterState.cardTypes.size
+        + inventoryFilterState.statuses.size;
+
+    badge.hidden = activeCount === 0;
+    badge.textContent = activeCount > 0 ? String(activeCount) : "";
 }
 
 function updatePopoverActiveStates() {
-    const rarityValue = document.getElementById("invRarityFilter").value;
-    const cardTypeValue = document.getElementById("invCardTypeFilter").value;
-    const statusValue = document.getElementById("invStatusFilter").value;
     const sortValue = document.getElementById("invSort").value;
 
     document.querySelectorAll("#rarityOptions .popover-option").forEach(btn => {
-        btn.classList.toggle("is-active", btn.dataset.rarity === rarityValue);
+        const value = btn.dataset.rarity;
+        btn.classList.toggle("is-active",
+            value === "" ? inventoryFilterState.rarities.size === 0 : inventoryFilterState.rarities.has(value)
+        );
     });
 
     document.querySelectorAll("#cardTypeOptions .popover-option").forEach(btn => {
-        btn.classList.toggle("is-active", btn.dataset.cardType === cardTypeValue);
+        const value = btn.dataset.cardType;
+        btn.classList.toggle("is-active",
+            value === "" ? inventoryFilterState.cardTypes.size === 0 : inventoryFilterState.cardTypes.has(value)
+        );
     });
 
     document.querySelectorAll("#statusOptions .popover-option").forEach(btn => {
-        btn.classList.toggle("is-active", btn.dataset.status === statusValue);
+        const value = btn.dataset.status;
+        btn.classList.toggle("is-active",
+            value === "all" ? inventoryFilterState.statuses.size === 0 : inventoryFilterState.statuses.has(value)
+        );
     });
 
     document.querySelectorAll("#sortOptions .popover-option").forEach(btn => {
