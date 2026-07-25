@@ -1701,6 +1701,54 @@ input:disabled {
 .multi-edit-level-row label { margin:0; text-transform:none; letter-spacing:0; white-space:nowrap; }
 .multi-edit-level-wrap { width:76px; }
 .multi-edit-level-wrap input { height:32px; padding:4px 24px 4px 8px; text-align:center; font-size:.82rem; }
+
+.multi-edit-owned-row { display:flex; align-items:center; gap:8px; margin-top:8px; }
+.multi-edit-owned-row label { margin:0; text-transform:none; letter-spacing:0; white-space:nowrap; }
+.multi-edit-owned-wrap { width:88px; }
+.multi-edit-owned-wrap input { height:32px; padding:4px 24px 4px 8px; text-align:center; font-size:.82rem; }
+
+/* Bottom multi-edit drawer: keeps Upgrade Plan in the right sidebar while
+   giving bulk editing the horizontal room it needs. */
+.multi-edit-dock {
+    position: sticky;
+    bottom: 10px;
+    z-index: 120;
+    margin: 16px 0 0;
+    box-shadow: 0 18px 46px -18px rgba(0,0,0,.85);
+}
+.multi-edit-dock .panel-header { align-items:center; }
+.multi-edit-dock .multi-edit-list {
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(190px, 1fr));
+    gap:10px;
+    max-height:260px;
+    overflow:auto;
+}
+.multi-edit-dock.is-collapsed-panel {
+    min-height:46px;
+}
+.multi-edit-dock.is-collapsed-panel .panel-header {
+    min-height:46px;
+    padding:8px 14px;
+    justify-content:space-between;
+    border-bottom:none;
+}
+.multi-edit-dock.is-collapsed-panel .panel-header > :not(.panel-header-actions) {
+    display:block !important;
+}
+.multi-edit-dock.is-collapsed-panel .panel-header-actions {
+    margin-left:auto;
+}
+.multi-edit-dock.is-collapsed-panel .panel-header-actions > :not(.panel-collapse-btn),
+.multi-edit-dock.is-collapsed-panel > .panel-body {
+    display:none !important;
+}
+.multi-edit-dock .panel-collapse-btn svg { transform:rotate(90deg); }
+.multi-edit-dock.is-collapsed-panel .panel-collapse-btn svg { transform:rotate(-90deg); }
+@media (max-width: 900px) {
+    .multi-edit-dock { position:static; }
+    .multi-edit-dock .multi-edit-list { grid-template-columns:1fr; max-height:none; }
+}
 .multi-edit-remove {
     position:absolute; top:5px; right:6px; width:22px; height:22px; padding:0;
     border:none; border-radius:50%; background:transparent; color:var(--ink-faint);
@@ -2363,18 +2411,6 @@ input:focus::selection, textarea:focus::selection { background: rgba(212,175,55,
             </div>
 
             <aside class="inv-sidebar-right" id="invSidebarRight">
-                <div class="panel" id="multiEditPanel" style="display:none;">
-                    <div class="panel-header">
-                        <div><h2 class="panel-title">Edit Selected Cards</h2></div>
-                        <div class="panel-header-actions">
-                            <button type="button" class="btn panel-collapse-btn" id="toggleMultiEditBtn" onclick="toggleMultiEditPanel()" title="Hide multi-edit" aria-label="Hide multi-edit">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="panel-body" id="multiEditBody"></div>
-                </div>
-
                 <div class="panel" id="upgradePlanPanel" style="display:none;">
                     <div class="panel-header">
                         <div><h2 class="panel-title">Card Upgrade Plan</h2></div>
@@ -2388,6 +2424,18 @@ input:focus::selection, textarea:focus::selection { background: rgba(212,175,55,
                 </div>
             </aside>
 
+        </div>
+
+        <div class="panel multi-edit-dock" id="multiEditPanel" style="display:none;">
+            <div class="panel-header">
+                <div><h2 class="panel-title">Edit Selected Cards</h2></div>
+                <div class="panel-header-actions">
+                    <button type="button" class="btn panel-collapse-btn" id="toggleMultiEditBtn" onclick="toggleMultiEditPanel()" title="Hide multi-edit" aria-label="Hide multi-edit">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="panel-body" id="multiEditBody"></div>
         </div>
     </section>
 
@@ -4668,6 +4716,21 @@ function updateMultiEditLevel(cardName, rawValue) {
     renderInventory();
 }
 
+function updateMultiEditOwned(cardName, rawValue) {
+    const entry = getInventoryEntry(cardName);
+    let owned = Math.max(0, Math.round(Number(rawValue)) || 0);
+    setInventoryEntry(cardName, entry.level, owned);
+
+    trackEvent("inventory_multi_edit_owned_updated", {
+        rarity: cardRarities[cardName] || "unknown",
+        owned_bucket: getUsageBucket(owned)
+    });
+
+    // Owned counts are intentionally independent per card. Re-rendering keeps
+    // the inventory card, upgrade plan, and bottom edit drawer synchronized.
+    renderInventory();
+}
+
 function renderMultiEditPanel() {
     const panel = document.getElementById("multiEditPanel");
     const body = document.getElementById("multiEditBody");
@@ -4683,7 +4746,7 @@ function renderMultiEditPanel() {
 
     panel.style.display = "";
     panel.classList.toggle("is-collapsed-panel", uiPrefs.multiEditHidden);
-    setArrowButtonState(document.getElementById("toggleMultiEditBtn"), uiPrefs.multiEditHidden, "multi-edit", "left");
+    setArrowButtonState(document.getElementById("toggleMultiEditBtn"), uiPrefs.multiEditHidden, "multi-edit", "right");
 
     body.innerHTML = `<div class="multi-edit-list">${cardsToEdit.map(cardName => {
         const entry = getInventoryEntry(cardName);
@@ -4698,6 +4761,16 @@ function renderMultiEditPanel() {
                         <div class="stepper">
                             <button type="button" class="stepper-btn" tabindex="-1" aria-label="Increase level" onclick="stepNumberInput(this, 1)"><svg viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
                             <button type="button" class="stepper-btn" tabindex="-1" aria-label="Decrease level" onclick="stepNumberInput(this, -1)"><svg viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="multi-edit-owned-row">
+                    <label>Owned</label>
+                    <div class="field-wrap multi-edit-owned-wrap">
+                        <input type="number" min="0" value="${entry.owned}" onchange="updateMultiEditOwned('${escapeForAttribute(cardName)}', this.value)">
+                        <div class="stepper">
+                            <button type="button" class="stepper-btn" tabindex="-1" aria-label="Increase owned cards" onclick="stepNumberInput(this, 1)"><svg viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                            <button type="button" class="stepper-btn" tabindex="-1" aria-label="Decrease owned cards" onclick="stepNumberInput(this, -1)"><svg viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
                         </div>
                     </div>
                 </div>
@@ -5067,7 +5140,7 @@ function renderInventoryCard(row) {
         : `<span class="gold-line">${goldIconHtml("summary")} ${(upgradeReach.gainsMultipleLevels ? upgradeReach.totalGoldCost : nextInfo.goldCost).toLocaleString()} gold</span>`;
 
     return `
-        <div class="inv-card ${rarityClass} ${isReady ? "is-ready" : ""} ${isSelected ? "is-selected" : ""}">
+        <div class="inv-card ${rarityClass} ${isReady ? "is-ready" : ""} ${isSelected ? "is-selected" : ""}" data-card-key="${encodeURIComponent(cardName)}">
             <div class="inv-card-head">
                 <input type="checkbox" class="inv-card-select" ${isSelected ? "checked" : ""}
                     aria-label="Select ${cardName} for the upgrade plan"
@@ -5096,8 +5169,9 @@ function renderInventoryCard(row) {
                     <div class="inv-inline-field">
                         <label>Level:</label>
                         <div class="field-wrap">
-                            <input type="number" min="1" max="18" value="${entry.level}"
-                                onchange="handleInventoryFieldChange('${escapeForAttribute(cardName)}', this.value, null)">
+                            <input type="number" min="1" max="18" value="${entry.level}" class="inventory-level-input"
+                                onchange="handleInventoryFieldChange('${escapeForAttribute(cardName)}', this.value, null)"
+                                onkeydown="handleInventoryLevelKeydown(event, '${escapeForAttribute(cardName)}')">
                             <div class="stepper">
                                 <button type="button" class="stepper-btn" tabindex="-1" aria-label="Increase level" onclick="stepNumberInput(this, 1)">
                                     <svg viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -5111,7 +5185,7 @@ function renderInventoryCard(row) {
                     <div class="inv-inline-field">
                         <label>${nextInfo.isMax ? "Extra" : "Owned"}:</label>
                         <div class="field-wrap">
-                            <input type="number" min="0" value="${entry.owned}"
+                            <input type="number" min="0" value="${entry.owned}" class="inventory-owned-input"
                                 onchange="handleInventoryFieldChange('${escapeForAttribute(cardName)}', null, this.value)">
                             <div class="stepper">
                                 <button type="button" class="stepper-btn" tabindex="-1" aria-label="Increase owned" onclick="stepNumberInput(this, 1)">
@@ -5140,6 +5214,28 @@ function renderInventoryCard(row) {
 
 function escapeForAttribute(value) {
     return String(value).replace(/'/g, "\\'");
+}
+
+function handleInventoryLevelKeydown(event, cardName) {
+    if (event.key !== "Tab" || event.shiftKey) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const current = getInventoryEntry(cardName);
+    const level = Math.max(1, Math.min(18, parseInt(event.currentTarget.value, 10) || current.level));
+
+    setInventoryEntry(cardName, level, current.owned);
+    renderInventory();
+
+    requestAnimationFrame(() => {
+        const card = document.querySelector(`.inv-card[data-card-key="${CSS.escape(encodeURIComponent(cardName))}"]`);
+        const ownedInput = card ? card.querySelector(".inventory-owned-input") : null;
+        if (ownedInput) {
+            ownedInput.focus();
+            ownedInput.select();
+        }
+    });
 }
 
 function handleInventoryFieldChange(cardName, levelValue, ownedValue) {
