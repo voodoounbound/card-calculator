@@ -2393,6 +2393,7 @@ input:focus::selection, textarea:focus::selection { background: rgba(212,175,55,
                     <div class="toolbar-spacer"></div>
 
                     <div class="inv-toolbar-actions">
+                        <button class="btn btn-ghost btn-sm" onclick="downloadInventoryTemplate()" title="Download a blank inventory CSV">Template</button>
                         <button class="btn btn-ghost btn-sm" onclick="exportInventory()">Export</button>
                         <button class="btn btn-ghost btn-sm" onclick="triggerImportInventory()">Import</button>
                         <button class="btn btn-danger-ghost btn-sm" onclick="resetInventory()">Reset</button>
@@ -5554,6 +5555,32 @@ function sendCardToCalculator(cardName) {
 }
 
 /* ---------- Inventory import / export (CSV) ---------- */
+function downloadInventoryTemplate() {
+    const headers = ["Card", "Rarity", "Card Type", "Level", "Owned"];
+    const rows = Object.keys(cardRarities)
+        .sort((a, b) => a.localeCompare(b))
+        .map(name => [name, cardRarities[name], cardTypes[name] || "Spell", "", ""]);
+
+    const csvContent = [headers, ...rows]
+        .map(row => row.map(escapeCSV).join(","))
+        .join("\n");
+
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "voodoo-card-inventory-template.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    trackEvent("inventory_template_downloaded", {
+        template_card_count_bucket: getUsageBucket(rows.length)
+    });
+}
+
 function exportInventory() {
     const trackedNames = Object.keys(cardInventory);
 
@@ -5562,11 +5589,17 @@ function exportInventory() {
         return;
     }
 
-    const headers = ["Card", "Rarity", "Level", "Owned"];
+    const headers = ["Card", "Rarity", "Card Type", "Level", "Owned"];
 
     const rows = trackedNames
         .filter(name => cardRarities[name])
-        .map(name => [name, cardRarities[name], cardInventory[name].level, cardInventory[name].owned]);
+        .map(name => [
+            name,
+            cardRarities[name],
+            cardTypes[name] || "Spell",
+            cardInventory[name].level,
+            cardInventory[name].owned
+        ]);
 
     const csvContent = [headers, ...rows]
         .map(row => row.map(escapeCSV).join(","))
@@ -5632,8 +5665,23 @@ function importInventoryFromFile(event) {
                     continue;
                 }
 
-                const level = Number(row[levelIndex]) || getDefaultLevelForCard(cardName);
-                const owned = Number(row[ownedIndex]) || 0;
+                const rawLevel = String(row[levelIndex] ?? "").trim();
+                const rawOwned = String(row[ownedIndex] ?? "").trim();
+
+                // Blank template rows are intentionally ignored. Users only need
+                // to complete the cards they want to add or update.
+                if (rawLevel === "" && rawOwned === "") {
+                    continue;
+                }
+
+                const parsedLevel = Number(rawLevel);
+                const parsedOwned = Number(rawOwned);
+                const level = rawLevel === "" || !Number.isFinite(parsedLevel)
+                    ? getDefaultLevelForCard(cardName)
+                    : parsedLevel;
+                const owned = rawOwned === "" || !Number.isFinite(parsedOwned)
+                    ? 0
+                    : parsedOwned;
 
                 setInventoryEntry(cardName, level, owned);
                 importedCount++;
