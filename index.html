@@ -2298,24 +2298,22 @@ input:focus::selection, textarea:focus::selection { background: rgba(212,175,55,
 
                         <div class="popover-menu" id="sortPopover" hidden>
                             <div class="popover-options" id="sortOptions">
-                                <button type="button" class="popover-option" data-sort="progress">Upgrade progress</button>
-                                <button type="button" class="popover-option" data-sort="name">Name (A–Z)</button>
-                                <button type="button" class="popover-option" data-sort="rarity">Rarity</button>
-                                <button type="button" class="popover-option" data-sort="card-type">Card type</button>
-                                <button type="button" class="popover-option" data-sort="level-desc">Level (high–low)</button>
-                                <button type="button" class="popover-option" data-sort="level-asc">Level (low–high)</button>
-                                <button type="button" class="popover-option" data-sort="owned">Owned</button>
+                                <button type="button" class="popover-option" data-sort="progress" data-label="Upgrade progress">Upgrade progress</button>
+                                <button type="button" class="popover-option" data-sort="name" data-label="Name">Name</button>
+                                <button type="button" class="popover-option" data-sort="rarity" data-label="Rarity">Rarity</button>
+                                <button type="button" class="popover-option" data-sort="card-type" data-label="Card type">Card type</button>
+                                <button type="button" class="popover-option" data-sort="level" data-label="Level">Level</button>
+                                <button type="button" class="popover-option" data-sort="owned" data-label="Owned">Owned</button>
                             </div>
                             <button type="button" class="btn btn-ghost btn-sm btn-block" style="margin-top:8px;" onclick="clearInventorySort()">Reset sort</button>
                         </div>
 
                         <select id="invSort" hidden>
                             <option value="progress">Sort: Upgrade progress</option>
-                            <option value="name" selected>Sort: Name (A–Z)</option>
+                            <option value="name" selected>Sort: Name</option>
                             <option value="rarity">Sort: Rarity</option>
                             <option value="card-type">Sort: Card type</option>
-                            <option value="level-desc">Sort: Level (high–low)</option>
-                            <option value="level-asc">Sort: Level (low–high)</option>
+                            <option value="level">Sort: Level</option>
                             <option value="owned">Sort: Owned</option>
                         </select>
                     </div>
@@ -4534,6 +4532,36 @@ function getNextLevelInfo(cardName, level) {
     return { isMax: false, needed, goldCost, nextLevel };
 }
 
+function getOwnedUpgradeReach(cardName, currentLevel, ownedCards) {
+    const displayCategory = cardRarities[cardName];
+    const category = getCalculationCategory(displayCategory);
+    let reachableLevel = Math.min(18, Math.max(1, Number(currentLevel) || 1));
+    let cardsRemaining = Math.max(0, Number(ownedCards) || 0);
+    let cardsUsed = 0;
+    let totalGoldCost = 0;
+
+    while (reachableLevel < 18) {
+        const nextLevel = reachableLevel + 1;
+        const neededForNext = (cards[category] && cards[category][nextLevel]) || 0;
+
+        if (cardsRemaining < neededForNext) break;
+
+        cardsRemaining -= neededForNext;
+        cardsUsed += neededForNext;
+        totalGoldCost += goldCosts[nextLevel] || 0;
+        reachableLevel = nextLevel;
+    }
+
+    return {
+        reachableLevel,
+        cardsUsed,
+        cardsRemaining,
+        totalGoldCost,
+        gainsMultipleLevels: reachableLevel > currentLevel + 1,
+        canUpgrade: reachableLevel > currentLevel
+    };
+}
+
 function updateInventoryTabCount() {
     const trackedCount = Object.keys(cardInventory).filter(name => {
         const entry = cardInventory[name];
@@ -4841,6 +4869,15 @@ function renderUpgradePlan() {
     updateRightSidebarState();
 }
 
+const INVENTORY_SORT_DEFAULT_DIRECTIONS = {
+    progress: "desc",
+    name: "asc",
+    rarity: "asc",
+    "card-type": "asc",
+    level: "desc",
+    owned: "desc"
+};
+let inventorySortDirection = "asc";
 let groupByMode = "none";
 
 const RARITY_GROUP_ORDER = ["Mythic", "Dark", "Legendary", "Epic", "Rare", "Common"];
@@ -4941,25 +4978,38 @@ function renderInventory() {
         );
     }
 
+    const directionMultiplier = inventorySortDirection === "desc" ? -1 : 1;
+
     rows.sort((a, b) => {
+        let comparison = 0;
+
         switch (sortMode) {
             case "name":
-                return a.cardName.localeCompare(b.cardName);
+                comparison = a.cardName.localeCompare(b.cardName);
+                break;
             case "rarity":
-                return rarityOrder[a.rarity] - rarityOrder[b.rarity] || a.cardName.localeCompare(b.cardName);
+                comparison = rarityOrder[a.rarity] - rarityOrder[b.rarity];
+                break;
             case "card-type":
-                return cardTypeOrder[a.cardType] - cardTypeOrder[b.cardType] || a.cardName.localeCompare(b.cardName);
-            case "level-desc":
-                return b.entry.level - a.entry.level || a.cardName.localeCompare(b.cardName);
-            case "level-asc":
-                return a.entry.level - b.entry.level || a.cardName.localeCompare(b.cardName);
+                comparison = cardTypeOrder[a.cardType] - cardTypeOrder[b.cardType];
+                break;
+            case "level":
+                comparison = a.entry.level - b.entry.level;
+                break;
             case "owned":
-                return b.entry.owned - a.entry.owned || a.cardName.localeCompare(b.cardName);
+                comparison = a.entry.owned - b.entry.owned;
+                break;
             case "progress":
             default:
-                if (a.isReady !== b.isReady) return a.isReady ? -1 : 1;
-                return b.progress - a.progress || a.cardName.localeCompare(b.cardName);
+                if (a.isReady !== b.isReady) {
+                    comparison = a.isReady ? 1 : -1;
+                } else {
+                    comparison = a.progress - b.progress;
+                }
+                break;
         }
+
+        return (comparison * directionMultiplier) || a.cardName.localeCompare(b.cardName);
     });
 
     updateInventoryStats(allNames);
@@ -4998,10 +5048,13 @@ function renderInventoryCard(row) {
     const isSelected = selectedCards.has(cardName);
     const hourglassRate = getHourglassRate(rarity);
     const hourglassValue = entry.owned * hourglassRate;
+    const upgradeReach = getOwnedUpgradeReach(cardName, entry.level, entry.owned);
 
     const progressLabel = nextInfo.isMax
         ? `${entry.owned.toLocaleString()} extra → ${hourglassValue.toLocaleString()} tokens`
-        : `${entry.owned.toLocaleString()} / ${nextInfo.needed.toLocaleString()} to Lv ${nextInfo.nextLevel}`;
+        : upgradeReach.gainsMultipleLevels
+            ? `${entry.owned.toLocaleString()} cards → Lv ${upgradeReach.reachableLevel}`
+            : `${entry.owned.toLocaleString()} / ${nextInfo.needed.toLocaleString()} to Lv ${nextInfo.nextLevel}`;
 
     const badge = nextInfo.isMax
         ? `<span class="max-badge">Max</span>`
@@ -5011,7 +5064,7 @@ function renderInventoryCard(row) {
 
     const resourceNote = nextInfo.isMax
         ? `⏳ ${hourglassRate.toLocaleString()} tokens ea.`
-        : `<span class="gold-line">${goldIconHtml("summary")} ${nextInfo.goldCost.toLocaleString()} gold</span>`;
+        : `<span class="gold-line">${goldIconHtml("summary")} ${(upgradeReach.gainsMultipleLevels ? upgradeReach.totalGoldCost : nextInfo.goldCost).toLocaleString()} gold</span>`;
 
     return `
         <div class="inv-card ${rarityClass} ${isReady ? "is-ready" : ""} ${isSelected ? "is-selected" : ""}">
@@ -5228,10 +5281,18 @@ function setInventoryStatusFilter(value) {
 }
 
 function setInventorySort(value) {
-    document.getElementById("invSort").value = value;
+    const sortSelect = document.getElementById("invSort");
+
+    if (sortSelect.value === value) {
+        inventorySortDirection = inventorySortDirection === "asc" ? "desc" : "asc";
+    } else {
+        sortSelect.value = value;
+        inventorySortDirection = INVENTORY_SORT_DEFAULT_DIRECTIONS[value] || "asc";
+    }
+
     updatePopoverActiveStates();
     renderInventory();
-    closeAllPopovers(null);
+    // Keep the menu open so another click can reverse the active sort immediately.
 }
 
 function clearInventoryFilters() {
@@ -5245,6 +5306,7 @@ function clearInventoryFilters() {
 
 function clearInventorySort() {
     document.getElementById("invSort").value = "name";
+    inventorySortDirection = "asc";
     updatePopoverActiveStates();
     renderInventory();
 }
@@ -5284,8 +5346,24 @@ function updatePopoverActiveStates() {
     });
 
     document.querySelectorAll("#sortOptions .popover-option").forEach(btn => {
-        btn.classList.toggle("is-active", btn.dataset.sort === sortValue);
+        const isActive = btn.dataset.sort === sortValue;
+        btn.classList.toggle("is-active", isActive);
+        btn.setAttribute("aria-pressed", String(isActive));
+
+        const baseLabel = btn.dataset.label || btn.textContent.replace(/[↑↓]\s*$/, "").trim();
+        btn.dataset.label = baseLabel;
+        btn.textContent = isActive
+            ? `${baseLabel} ${inventorySortDirection === "asc" ? "↑" : "↓"}`
+            : baseLabel;
     });
+
+    const sortToggleBtn = document.getElementById("sortToggleBtn");
+    const activeSortButton = document.querySelector(`#sortOptions .popover-option[data-sort="${sortValue}"]`);
+    if (sortToggleBtn && activeSortButton) {
+        const directionText = inventorySortDirection === "asc" ? "ascending" : "descending";
+        sortToggleBtn.title = `Sort: ${activeSortButton.dataset.label}, ${directionText}`;
+        sortToggleBtn.setAttribute("aria-label", sortToggleBtn.title);
+    }
 }
 
 /* ---------- Calculator <-> Inventory bridge ---------- */
