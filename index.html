@@ -2503,7 +2503,7 @@ input:focus::selection, textarea:focus::selection { background: rgba(155,107,192
                             <div class="popover-section-label">Status</div>
                             <div class="popover-options" id="statusOptions">
                                 <button type="button" class="popover-option" data-status="all">All cards</button>
-                                <button type="button" class="popover-option" data-status="tracked">Tracked only</button>
+                                <button type="button" class="popover-option" data-status="tracked" id="statusTrackedBtn">Tracked only</button>
                                 <button type="button" class="popover-option" data-status="ready">Ready to upgrade</button>
                                 <button type="button" class="popover-option" data-status="selected">Selected only</button>
                             </div>
@@ -5571,6 +5571,7 @@ function renderInventory() {
     if (statusFilters.size > 0) {
         rows = rows.filter(row =>
             (statusFilters.has("tracked") && row.tracked) ||
+            (statusFilters.has("untracked") && !row.tracked) ||
             (statusFilters.has("ready") && row.isReady) ||
             (statusFilters.has("selected") && selectedCards.has(row.cardName))
         );
@@ -5916,6 +5917,26 @@ function setInventoryStatusFilter(value) {
     toggleFilterValue("statuses", value);
 }
 
+/* The Tracked filter cycles through three states on repeated clicks of the
+   same button: no filter -> tracked only -> untracked only -> no filter.
+   This keeps "not tracked" one click away without adding a second button. */
+function toggleTrackedFilter() {
+    const statuses = inventoryFilterState.statuses;
+
+    if (statuses.has("tracked")) {
+        statuses.delete("tracked");
+        statuses.add("untracked");
+    } else if (statuses.has("untracked")) {
+        statuses.delete("untracked");
+    } else {
+        statuses.add("tracked");
+    }
+
+    updatePopoverActiveStates();
+    updateFilterBadge();
+    renderInventory();
+}
+
 function setInventorySort(value) {
     const sortSelect = document.getElementById("invSort");
 
@@ -5975,11 +5996,23 @@ function updatePopoverActiveStates() {
     });
 
     document.querySelectorAll("#statusOptions .popover-option").forEach(btn => {
+        if (btn.id === "statusTrackedBtn") {
+            return;
+        }
+
         const value = btn.dataset.status;
         btn.classList.toggle("is-active",
             value === "all" ? inventoryFilterState.statuses.size === 0 : inventoryFilterState.statuses.has(value)
         );
     });
+
+    const trackedBtn = document.getElementById("statusTrackedBtn");
+    if (trackedBtn) {
+        const isUntracked = inventoryFilterState.statuses.has("untracked");
+        const isTracked = inventoryFilterState.statuses.has("tracked");
+        trackedBtn.classList.toggle("is-active", isTracked || isUntracked);
+        trackedBtn.textContent = isUntracked ? "Not tracked" : "Tracked only";
+    }
 
     document.querySelectorAll("#sortOptions .popover-option").forEach(btn => {
         const isActive = btn.dataset.sort === sortValue;
@@ -6387,7 +6420,11 @@ document.querySelectorAll("#cardTypeOptions .popover-option").forEach(btn => {
 });
 
 document.querySelectorAll("#statusOptions .popover-option").forEach(btn => {
-    btn.addEventListener("click", () => setInventoryStatusFilter(btn.dataset.status));
+    if (btn.id === "statusTrackedBtn") {
+        btn.addEventListener("click", toggleTrackedFilter);
+    } else {
+        btn.addEventListener("click", () => setInventoryStatusFilter(btn.dataset.status));
+    }
 });
 
 document.querySelectorAll("#sortOptions .popover-option").forEach(btn => {
