@@ -697,6 +697,27 @@ input:disabled {
 }
 .btn-danger-ghost:hover { background: rgba(192, 71, 90, 0.1); }
 
+.btn-fill {
+    background: rgba(155, 107, 192, 0.16);
+    color: var(--ink);
+    border: 1px solid rgba(155, 107, 192, 0.4);
+}
+.btn-fill:hover {
+    background: rgba(155, 107, 192, 0.26);
+    border-color: rgba(155, 107, 192, 0.55);
+    color: var(--ink);
+}
+
+.btn-danger-fill {
+    background: rgba(192, 71, 90, 0.16);
+    color: var(--danger);
+    border: 1px solid rgba(192, 71, 90, 0.4);
+}
+.btn-danger-fill:hover {
+    background: rgba(192, 71, 90, 0.26);
+    border-color: rgba(192, 71, 90, 0.6);
+}
+
 .btn-block { width: 100%; }
 .btn-sm { padding: 7px 12px; font-size: 0.78rem; }
 
@@ -2557,7 +2578,7 @@ input:focus::selection, textarea:focus::selection { background: rgba(155,107,192
                     </div>
 
                     <div class="popover-wrap">
-                        <button type="button" class="btn btn-ghost btn-icon" id="filterToggleBtn" onclick="toggleFilterPopover(event)" aria-expanded="false" title="Filter">
+                        <button type="button" class="btn btn-fill btn-icon" id="filterToggleBtn" onclick="toggleFilterPopover(event)" aria-expanded="false" title="Filter">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="4" y1="6" x2="20" y2="6"></line>
                                 <circle cx="9" cy="6" r="2" fill="currentColor" stroke="none"></circle>
@@ -2619,7 +2640,7 @@ input:focus::selection, textarea:focus::selection { background: rgba(155,107,192
                     </div>
 
                     <div class="popover-wrap">
-                        <button type="button" class="btn btn-ghost btn-icon" id="sortToggleBtn" onclick="toggleSortPopover(event)" aria-expanded="false" title="Sort">
+                        <button type="button" class="btn btn-fill btn-icon" id="sortToggleBtn" onclick="toggleSortPopover(event)" aria-expanded="false" title="Sort">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M6 4v15"></path>
                                 <path d="M3 16l3 3 3-3"></path>
@@ -2653,7 +2674,7 @@ input:focus::selection, textarea:focus::selection { background: rgba(155,107,192
                     </div>
 
                     <div class="popover-wrap" id="groupByDropdown">
-                        <button type="button" class="btn btn-ghost btn-icon" id="groupByToggleBtn" onclick="toggleGroupByPopover(event)" aria-haspopup="true" aria-expanded="false" title="Group by">
+                        <button type="button" class="btn btn-fill btn-icon" id="groupByToggleBtn" onclick="toggleGroupByPopover(event)" aria-haspopup="true" aria-expanded="false" title="Group by">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M3 4v6a1 1 0 0 0 1 1h2"></path>
                                 <line x1="9" y1="6" x2="20" y2="6"></line>
@@ -2679,14 +2700,14 @@ input:focus::selection, textarea:focus::selection { background: rgba(155,107,192
                     <div class="toolbar-spacer"></div>
 
                     <div class="inv-toolbar-actions">
-                        <button class="btn btn-ghost btn-sm" onclick="downloadInventoryTemplate()" title="Download a blank inventory CSV">Template</button>
-                        <button type="button" class="btn btn-ghost btn-icon btn-icon-sm" onclick="exportInventory()" title="Export CSV" aria-label="Export CSV">
+                        <button class="btn btn-fill btn-sm" onclick="downloadInventoryTemplate()" title="Download a blank inventory CSV">Template</button>
+                        <button type="button" class="btn btn-fill btn-icon btn-icon-sm" onclick="exportInventory()" title="Export CSV" aria-label="Export CSV">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 20h16"/></svg>
                         </button>
-                        <button type="button" class="btn btn-ghost btn-icon btn-icon-sm" onclick="triggerImportInventory()" title="Import CSV" aria-label="Import CSV">
+                        <button type="button" class="btn btn-fill btn-icon btn-icon-sm" onclick="triggerImportInventory()" title="Import CSV" aria-label="Import CSV">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V9"/><path d="M7 14l5-5 5 5"/><path d="M4 4h16"/></svg>
                         </button>
-                        <button type="button" class="btn btn-danger-ghost btn-icon btn-icon-sm" onclick="resetInventory()" title="Reset inventory" aria-label="Reset inventory">
+                        <button type="button" class="btn btn-danger-fill btn-icon btn-icon-sm" onclick="resetInventory()" title="Reset inventory" aria-label="Reset inventory">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
                         </button>
                     </div>
