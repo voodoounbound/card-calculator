@@ -318,6 +318,10 @@ a { color: var(--gold); }
 
 .calc-mobile-nav-btn {
     flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     appearance: none;
     border: 1px solid var(--hairline-soft);
     background: var(--panel-raised);
@@ -328,6 +332,13 @@ a { color: var(--gold); }
     padding: 9px 10px;
     border-radius: var(--radius-md);
     cursor: pointer;
+}
+
+.calc-mobile-nav-icon {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    opacity: .85;
 }
 
 .calc-mobile-nav-btn.is-active {
@@ -2238,10 +2249,12 @@ input:focus::selection, textarea:focus::selection { background: rgba(155,107,192
 
         <div class="calc-mobile-nav" id="calcMobileNav">
             <button type="button" class="calc-mobile-nav-btn is-active" data-target="calculatorPanel" onclick="scrollCalcPanelIntoView('calculatorPanel', this)">
-                🧮 Calculator
+                <svg class="calc-mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01"/></svg>
+                Calculator
             </button>
             <button type="button" class="calc-mobile-nav-btn" data-target="summaryPanel" onclick="scrollCalcPanelIntoView('summaryPanel', this)">
-                📋 Summary
+                <svg class="calc-mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 6h6M8 11h8M8 15h5"/></svg>
+                Summary
             </button>
         </div>
 
@@ -2578,7 +2591,7 @@ input:focus::selection, textarea:focus::selection { background: rgba(155,107,192
                     </div>
 
                     <div class="popover-wrap">
-                        <button type="button" class="btn btn-fill btn-icon" id="filterToggleBtn" onclick="toggleFilterPopover(event)" aria-expanded="false" title="Filter">
+                        <button type="button" class="btn btn-icon" id="filterToggleBtn" onclick="toggleFilterPopover(event)" aria-expanded="false" title="Filter">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="4" y1="6" x2="20" y2="6"></line>
                                 <circle cx="9" cy="6" r="2" fill="currentColor" stroke="none"></circle>
@@ -2640,7 +2653,7 @@ input:focus::selection, textarea:focus::selection { background: rgba(155,107,192
                     </div>
 
                     <div class="popover-wrap">
-                        <button type="button" class="btn btn-fill btn-icon" id="sortToggleBtn" onclick="toggleSortPopover(event)" aria-expanded="false" title="Sort">
+                        <button type="button" class="btn btn-icon" id="sortToggleBtn" onclick="toggleSortPopover(event)" aria-expanded="false" title="Sort">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M6 4v15"></path>
                                 <path d="M3 16l3 3 3-3"></path>
@@ -2674,7 +2687,7 @@ input:focus::selection, textarea:focus::selection { background: rgba(155,107,192
                     </div>
 
                     <div class="popover-wrap" id="groupByDropdown">
-                        <button type="button" class="btn btn-fill btn-icon" id="groupByToggleBtn" onclick="toggleGroupByPopover(event)" aria-haspopup="true" aria-expanded="false" title="Group by">
+                        <button type="button" class="btn btn-icon" id="groupByToggleBtn" onclick="toggleGroupByPopover(event)" aria-haspopup="true" aria-expanded="false" title="Group by">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M3 4v6a1 1 0 0 0 1 1h2"></path>
                                 <line x1="9" y1="6" x2="20" y2="6"></line>
